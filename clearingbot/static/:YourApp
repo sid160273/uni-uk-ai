@@ -1,0 +1,7 @@
+/YourApp
+    /static
+        /css
+            style.css
+    /templates
+        your_html_files.html
+    app.py

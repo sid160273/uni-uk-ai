@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot Interface</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Loader Element -->
+        <div id="loader" class="loader" style="display:none;"></div>
+
+        <div class="chat-box" id="chatBox">
+            {% if chat_history %}
+                {% for record in chat_history %}
+                    <div class="{{ record.role }}-message chat-message">
+                        <p class="message" id="message-{{ loop.index }}">{{ record.message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <form method="post" action="/" class="chat-form">
+            <input type="text" name="user_input" placeholder="Ask me anything" autocomplete="off" />
+            <button type="submit" class="send-button">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // Typing effect function
+        function typeMessage(message, elementId) {
+            let i = 0;
+            let interval = setInterval(function() {
+                if (i < message.length) {
+                    document.getElementById(elementId).innerHTML += message.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    linkifyMessages(); // Call linkify after typing effect
+                    document.getElementById('loader').style.display = 'none'; // Hide loader
+                }
+            }, 10); // Speed of typing in milliseconds
+        }
+
+        // Function to turn URLs into hyperlinks
+        function linkifyMessages() {
+            const messageElements = document.querySelectorAll('.message');
+
+            messageElements.forEach(function(messageElement) {
+                const text = messageElement.innerHTML;
+                // Updated regex to exclude trailing characters like ")"
+                const linkedText = text.replace(/(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g, '<a href="$1" target="_blank">$1</a>');
+                messageElement.innerHTML = linkedText;
+            });
+        }
+
+        // On form submit, show loader
+        let chatForm = document.querySelector('.chat-form');
+        chatForm.addEventListener('submit', function() {
+            document.getElementById('loader').style.display = 'block'; // Show loader
+            setTimeout(function() {
+                let chatBox = document.querySelector('#chatBox');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 100);
+        });
+
+        // Existing onload function
+        window.onload = function() {
+            let chatBox = document.querySelector('#chatBox');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Identify the last bot message
+            let botMessages = document.querySelectorAll('.bot-message .message');
+            if (botMessages.length > 0) {
+                let lastBotMessage = botMessages[botMessages.length - 1];
+                typeMessage(lastBotMessage.innerText, lastBotMessage.id);
+                lastBotMessage.innerText = ''; // Clear the message before typing effect
+            }
+        }
+    </script>
+</body>
+</html>
+
