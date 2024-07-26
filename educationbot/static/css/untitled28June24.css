@@ -1,0 +1,211 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Univers Light Condensed', sans-serif;
+}
+
+.send-button {
+    font-size: 18px !important;
+    color: #fff !important;
+    background-color: #000 !important;
+    padding: 10px 30px !important;
+    border: solid #000 2px !important;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px !important;
+    border-radius: 50px 0px 0px 50px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.send-button:hover {
+    background-color: #c8102e !important;
+    border: solid #c8102e 2px !important;
+    color: #ffffff !important;
+}
+
+textarea:focus, input:focus {
+    outline: none;
+}
+
+.chat-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    position: relative; /* Set relative positioning to anchor the loader */
+}
+
+.chat-box {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.bot-message, .user-message {
+    margin-bottom: 10px;
+    background-color: #e7e7e7;
+    border-radius: 18px;
+    display: block;
+    max-width: 100%;
+    color: black;
+    font-family: Arial, sans-serif;
+}
+
+.bot-message {
+    background-color: #c8102e;
+    color: white;
+    border-radius: 18px;
+    padding: 10px 20px;
+    margin-right: auto;
+    text-align: left;
+}
+
+.user-message {
+    background-color: #E1E2E3;
+    color: black;
+    border-radius: 18px;
+    padding: 10px 20px;
+    margin-left: auto;
+    text-align: left;
+}
+
+.chat-form {
+    display: flex;
+    border: 2px solid #5f5f5f;
+    border-radius: 50px 0px 0px 50px !important;
+    height: 90px;
+    overflow: hidden !important;
+}
+
+.chat-form input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 20px 0 0 20px;
+    margin: 0;
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+}
+
+.chat-form input[type="submit"] {
+    border: none;
+    background-color: #007bff;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 0 18px 18px 0;
+    cursor: pointer;
+}
+
+.message p {
+    margin: 0;
+    padding: 10px;
+    line-height: 1.5;
+}
+
+.message strong {
+    font-weight: bold;
+}
+
+.message em {
+    font-style: italic;
+}
+
+.message a {
+    color: lightgrey; /* Changed hyperlink color to grey */
+    text-decoration: none;
+}
+
+.message a:hover {
+    color: #0056b3;
+}
+
+/* Styles for H1, H2, H3 tags based on the description */
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.17em;
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translate3d(0, 20px, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    bottom: 100px; /* Adjust based on your chat form's position */
+    height: 50px;
+}
+
+.loader .dot {
+    width: 12px;
+    height: 12px;
+    background-color: #c8102e;
+    border-radius: 50%;
+    margin: 0 5px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loader .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 768px) {
+    .chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .chat-box {
+        margin-bottom: 110px;
+    }
+
+    .chat-form {
+        position: fixed;
+        bottom: 50px;
+        left: 0;
+        width: 100%;
+        padding-bottom: 0;
+    }
+}

@@ -1,0 +1,78 @@
+import os
+import psycopg2
+import re
+from flask import Flask, request, render_template, session, jsonify
+from markupsafe import Markup
+from flask_session import Session
+from openai import OpenAI
+from markdown2 import markdown
+
+app = Flask(__name__)
+
+# Configuration and setup
+app.secret_key = os.getenv('SECRET_KEY', 'a_secret_key')  # Use a real secret key in production
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_PERMANENT'] = False
+Session(app)
+
+# Initialize the OpenAI client
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+def get_chatbot_response(user_input):
+    try:
+        with open('chatbot_instructions.txt', 'r') as file:
+            chatbot_instruction = file.read().strip()
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": chatbot_instruction},
+                {"role": "user", "content": user_input}
+            ],
+            temperature=1,
+            max_tokens=4096,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        # Convert Markdown to HTML
+        response_content = markdown(response.choices[0].message.content)
+
+        # Convert URLs and emails to HTML links
+        response_content = re.sub(r'https?://[^\s,)<]+', r'<a href="\g<0>" target="_blank">\g<0></a>', response_content)
+        response_content = re.sub(r'(\S+@\S+)', r'<a href="mailto:\1">\1</a>', response_content)
+
+
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO chat_history (user_input, bot_response) VALUES (%s, %s)", (user_input, Markup(response_content)))
+            conn.commit()
+
+        return Markup(response_content)
+    except Exception as e:
+        return Markup(str(e))
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if 'chat_history' not in session or not session['chat_history']:
+        session['chat_history'] = [{
+            'role': 'bot',
+            'message': "Hi there, I'm Bedzy, your AI assistant. Please ask me anything about the Media courses in Clearing. If I am unable to answer, please leave your name, phone number, email and the issue, and we will call you as soon as possible."
+        }]
+
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        user_input = data['user_input']
+        bot_response = get_chatbot_response(user_input)
+        session['chat_history'].append({'role': 'user', 'message': user_input})
+        session['chat_history'].append({'role': 'bot', 'message': bot_response})
+        session.modified = True
+        return jsonify(user_input=user_input, bot_response=str(bot_response))
+
+    return render_template('index.html', chat_history=session['chat_history'])
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

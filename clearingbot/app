@@ -1,7 +1,7 @@
 import os
 import psycopg2
-import re  # Import re for regular expressions
-from flask import Flask, request, render_template, session
+import re
+from flask import Flask, request, render_template, session, jsonify
 from markupsafe import Markup
 from flask_session import Session
 from openai import OpenAI
@@ -9,10 +9,8 @@ from markdown2 import markdown
 
 app = Flask(__name__)
 
-# Configure the secret key for session management
-app.secret_key = os.getenv('SECRET_KEY', 'a_secret_key') # Replace 'a_secret_key' with a real secret key in production
-
-# Configure session to use filesystem (instead of signed cookies)
+# Configuration and setup
+app.secret_key = os.getenv('SECRET_KEY', 'a_secret_key')  # Use a real secret key in production
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 Session(app)
@@ -25,13 +23,11 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def get_chatbot_response(user_input):
     try:
-        # Read instruction from the file
         with open('chatbot_instructions.txt', 'r') as file:
             chatbot_instruction = file.read().strip()
 
-        # Use the OpenAI API to send a message
         response = client.chat.completions.create(
-            model="gpt-4-1106-preview",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": chatbot_instruction},
                 {"role": "user", "content": user_input}
@@ -42,56 +38,41 @@ def get_chatbot_response(user_input):
             frequency_penalty=0,
             presence_penalty=0
         )
-        
-        # Access the response content
-        response_content = response.choices[0].message.content
 
-        # Use regular expressions to find URLs and wrap them in anchor tags
-        url_pattern = r'https?://[^\s,)]+(?<![.,)])'
-        response_content = re.sub(url_pattern, r'<a href="\g<0>" target="_blank">\g<0></a>', response_content)
+        # Convert Markdown to HTML
+        response_content = markdown(response.choices[0].message.content)
 
-        # Use regular expressions to find email addresses and wrap them in mailto links
-        email_pattern = r'(\S+@\S+)'
-        response_content = re.sub(email_pattern, r'<a href="mailto:\1">\1</a>', response_content)
+        # Convert URLs and emails to HTML links
+        response_content = re.sub(r'https?://[^\s,)<]+', r'<a href="\g<0>" target="_blank">\g<0></a>', response_content)
+        response_content = re.sub(r'(\S+@\S+)', r'<a href="mailto:\1">\1</a>', response_content)
 
-        # Save to the database
+
         with conn.cursor() as cur:
-            cur.execute("INSERT INTO chat_history (user_input, bot_response) VALUES (%s, %s)", (user_input, response_content))
+            cur.execute("INSERT INTO chat_history (user_input, bot_response) VALUES (%s, %s)", (user_input, Markup(response_content)))
             conn.commit()
 
-        # Return the response content wrapped with Markup for HTML rendering
         return Markup(response_content)
     except Exception as e:
-        # Return the exception message wrapped with Markup
         return Markup(str(e))
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # The static greeting message you want to display
-    greeting_message = {
-        'role': 'bot',
-        'message': "Hi there, I'm Bedzy your AI assistant. Please ask me anything about our Business School, and feel free to leave your phone number so we can give you a call to discuss your possible application with us."
-    }
-
-    # Check if the chat history is not already initialized or if it's empty
     if 'chat_history' not in session or not session['chat_history']:
-        session['chat_history'] = [greeting_message]  # Add the greeting message to the chat history
+        session['chat_history'] = [{
+            'role': 'bot',
+            'message': "Hi there, I'm Bedzy your AI assistant. Please ask me anything about the Clearing Process, and feel free to leave your phone number so we can give you a call to discuss your possible application with us."
+        }]
 
     if request.method == 'POST':
-        user_input = request.form['user_input']
+        data = request.get_json(force=True)
+        user_input = data['user_input']
         bot_response = get_chatbot_response(user_input)
-
         session['chat_history'].append({'role': 'user', 'message': user_input})
         session['chat_history'].append({'role': 'bot', 'message': bot_response})
-
-        # Ensure the session is saved
         session.modified = True
+        return jsonify(user_input=user_input, bot_response=str(bot_response))
 
     return render_template('index.html', chat_history=session['chat_history'])
 
-
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
