@@ -1,0 +1,291 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+  background: #f3f4f6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Header */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffffcc;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.nav-links a {
+  margin-left: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* Hero */
+
+.hero {
+  padding: 3.5rem 0 3rem;
+}
+
+.hero-inner {
+  display: grid;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 900px) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+
+.hero-text h1 {
+  font-size: 2.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-text p {
+  font-size: 1.05rem;
+  color: #4b5563;
+}
+
+/* AI card */
+
+.hero-ai-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.ai-header {
+  padding: 0.75rem 1rem;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ai-body {
+  padding: 1rem;
+}
+
+.ai-message {
+  font-size: 0.9rem;
+  color: #4b5563;
+  background: #f3f4f6;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ai-form textarea {
+  width: 100%;
+  min-height: 90px;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 0.75rem;
+}
+
+.ai-form button {
+  display: inline-block;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #2563eb;
+  color: #f9fafb;
+  cursor: pointer;
+}
+
+.ai-footnote {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* How it works */
+
+.how-it-works {
+  padding: 2.5rem 0;
+  background: #ffffff;
+}
+
+.how-it-works h2,
+.universities h2 {
+  margin-bottom: 1.5rem;
+}
+
+.steps {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.step h3 {
+  margin-bottom: 0.4rem;
+}
+
+.step p {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+/* Universities grid */
+
+.universities {
+  padding: 2.5rem 0 3rem;
+}
+
+.uni-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 800px) {
+  .uni-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.uni-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.uni-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.uni-location {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.uni-tagline {
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.uni-link {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  color: #2563eb;
+}
+
+/* Ads */
+
+.ad-section {
+  padding: 1.5rem 0;
+}
+
+.ad-slot {
+  border-radius: 0.75rem;
+  background: #e5e7eb;
+  border: 1px dashed #9ca3af;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.ad-slot-banner {
+  min-height: 90px;
+}
+
+.ad-slot-inline,
+.ad-slot-sidebar {
+  min-height: 250px;
+}
+
+/* University page */
+
+.uni-hero {
+  padding: 3rem 0;
+}
+
+.uni-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .uni-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.breadcrumbs {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.site-footer {
+  padding: 1.5rem 0 2rem;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Utility: visually-hidden for screen-reader labels */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

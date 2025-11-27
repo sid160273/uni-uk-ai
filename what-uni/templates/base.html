@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>{% block title %}Find the UK uni that fits you | what-uni{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block meta_description %}
+    <meta name="description"
+          content="what-uni helps you find the UK university that actually fits you, using real rankings, student satisfaction data and your own preferences.">
+    {% endblock %}
+
+    <meta name="robots" content="index,follow">
+
+    <!-- Canonical URL for SEO -->
+    <link rel="canonical" href="{{ request.url }}">
+
+    <!-- Google AdSense global script goes here ONCE your account is approved.
+         Use the exact snippet Google gives you. Example only:
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_CLIENT_ID"
+            crossorigin="anonymous"></script>
+    -->
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="container header-inner">
+        <a href="{{ url_for('index') }}" class="logo">what-uni</a>
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="{{ url_for('index') }}#how-it-works">How it works</a>
+          <a href="{{ url_for('index') }}#universities">Universities</a>
+          <a href="#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main" role="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer" id="about" role="contentinfo">
+      <div class="container">
+        <p>© 2025 what-uni. Helping you find the right university.</p>
+      </div>
+    </footer>
+  </body>
+</html>

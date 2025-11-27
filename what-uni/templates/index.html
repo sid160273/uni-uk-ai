@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Find the UK uni that actually fits you | what-uni{% endblock %}
+
+{% block meta_description %}
+<meta name="description"
+      content="Answer a few questions and our AI will match you with UK universities using Guardian, NSS and Times Higher Education data plus student reviews.">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <h1>Find the UK uni that actually fits you</h1>
+      <p>Answer a few quick questions and our AI will match you with universities using data from independent rankings and student reviews.</p>
+    </div>
+
+    <section class="hero-ai-card" aria-label="what-uni AI advisor">
+      <div class="ai-header">what-uni advisor</div>
+      <div class="ai-body">
+        <p class="ai-message">
+          Tell us your subjects, predicted grades and what you want from uni…
+        </p>
+        <form class="ai-form" action="#" method="post">
+          <label class="sr-only" for="ai-input">Describe what you're looking for</label>
+          <textarea id="ai-input" name="query"
+                    placeholder="e.g. I’m doing A-level Maths, Biology and Psychology, predicted AAB. I want a big city uni with good nightlife and strong psychology."></textarea>
+          <button type="submit">Start my match</button>
+        </form>
+        <p class="ai-footnote">Demo only for now – AI matching coming next.</p>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- HOMEPAGE TOP BANNER AD -->
+<section class="ad-section" aria-label="Sponsored content">
+  <div class="container">
+    <div class="ad-slot ad-slot-banner">
+      <!-- Google AdSense banner ad unit goes here -->
+      <!-- <ins class="adsbygoogle" ...></ins> -->
+      Top banner ad space
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <h2>How what-uni works</h2>
+    <div class="steps">
+      <article class="step">
+        <h3>1. Tell us about you</h3>
+        <p>Your subjects, grades, where you’d like to live and what matters most.</p>
+      </article>
+      <article class="step">
+        <h3>2. We crunch the data</h3>
+        <p>We combine rankings, satisfaction scores and student reviews to build your match profile.</p>
+      </article>
+      <article class="step">
+        <h3>3. Get tailored uni matches</h3>
+        <p>See your best-fit universities and explore detailed guides for each one.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- INLINE CONTENT AD -->
+<section class="ad-section" aria-label="Sponsored content">
+  <div class="container">
+    <div class="ad-slot ad-slot-inline">
+      <!-- Google AdSense in-article / responsive ad unit goes here -->
+      Inline content ad space
+    </div>
+  </div>
+</section>
+
+<section class="universities" id="universities">
+  <div class="container">
+    <h2>Explore universities</h2>
+    <div class="uni-grid">
+      {% for uni in universities %}
+        <a class="uni-card"
+           href="{{ url_for('university_page', slug=uni.slug) }}">
+          <h3>{{ uni.name }}</h3>
+          <p class="uni-location">{{ uni.location }}</p>
+          <p class="uni-tagline">{{ uni.tagline }}</p>
+          <span class="uni-link">View guide →</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

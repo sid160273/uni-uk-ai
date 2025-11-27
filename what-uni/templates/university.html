@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ uni.name }} – university guide | what-uni{% endblock %}
+
+{% block meta_description %}
+<meta name="description"
+      content="Guide to {{ uni.name }}: location, strengths, courses, rankings, student life and more to help you decide if it's the right university for you.">
+{% endblock %}
+
+{% block content %}
+<section class="uni-hero">
+  <div class="container uni-layout">
+    <article class="uni-main">
+      <p class="breadcrumbs">
+        <a href="{{ url_for('index') }}">Home</a> / Universities / {{ uni.name }}
+      </p>
+      <h1>{{ uni.name }}</h1>
+      <p class="uni-location">{{ uni.location }}</p>
+      <p class="uni-tagline">{{ uni.tagline }}</p>
+
+      <p>
+        This is a placeholder page. We’ll add rankings, courses, entry requirements,
+        student life, costs and more here for {{ uni.name }}.
+      </p>
+      <!-- Later we'll break this into SEO-friendly sections:
+           <h2>Overview</h2>, <h2>Courses & strengths</h2>, etc. -->
+    </article>
+
+    <aside class="uni-sidebar" aria-label="Sponsored content">
+      <div class="ad-slot ad-slot-sidebar">
+        <!-- Google AdSense sidebar / responsive ad unit goes here -->
+        Sidebar ad space
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
