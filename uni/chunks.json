@@ -1,0 +1,128 @@
+[
+  {
+    "StartLine": 6,
+    "EndLine": 6,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Aberdeen, Scotland\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 618,
+    "EndLine": 618,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Birmingham, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 769,
+    "EndLine": 769,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Bristol, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 973,
+    "EndLine": 973,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Cardiff, Wales\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 1346,
+    "EndLine": 1346,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Edinburgh, Scotland\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 1528,
+    "EndLine": 1528,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Glasgow, Scotland\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 1613,
+    "EndLine": 1613,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"London, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 1896,
+    "EndLine": 1896,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"London, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 2276,
+    "EndLine": 2276,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Leicester, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 2327,
+    "EndLine": 2327,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Leeds, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 3146,
+    "EndLine": 3146,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"London, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 3197,
+    "EndLine": 3197,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Belfast, Northern Ireland\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 3655,
+    "EndLine": 3655,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Sheffield, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 3807,
+    "EndLine": 3807,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Southampton, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 4183,
+    "EndLine": 4183,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Brighton, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 4353,
+    "EndLine": 4353,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"London, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 4441,
+    "EndLine": 4441,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"Norwich, England\",",
+    "AllowMultiple": false
+  },
+  {
+    "StartLine": 4995,
+    "EndLine": 4995,
+    "TargetContent": "    \"location\": \"UK\",",
+    "ReplacementContent": "    \"location\": \"York, England\",",
+    "AllowMultiple": false
+  }
+]
