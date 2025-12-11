@@ -68,9 +68,10 @@ export function SearchBox() {
 
         // Fire Google Ads conversion on first chat message (once per session)
         if (typeof window !== 'undefined' && !sessionStorage.getItem('chatConversionFired')) {
-            // @ts-ignore - gtag is defined in layout.tsx
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'conversion', {
+            // @ts-ignore - gtag is defined globally by Google Analytics script in layout.tsx
+            if (typeof window.gtag !== 'undefined') {
+                // @ts-ignore
+                window.gtag('event', 'conversion', {
                     'send_to': 'AW-17796654538/RxBECK6d2s8bEMrLjaZC',
                     'value': 1.0,
                     'currency': 'GBP'
