@@ -67,6 +67,13 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-ZYE3BGM8BM');
+
+            // Google Ads Conversion Tracking
+            gtag('event', 'conversion', {
+              'send_to': 'AW-17796654538/RxBECK6d2s8bEMrLjaZC',
+              'value': 1.0,
+              'currency': 'GBP'
+            });
           `}
         </Script>
       </head>
