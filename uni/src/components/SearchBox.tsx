@@ -66,6 +66,19 @@ export function SearchBox() {
         // Add user message immediately
         setMessages(prev => [...prev, { role: "user", content: userMessage }]);
 
+        // Fire Google Ads conversion on first chat message (once per session)
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('chatConversionFired')) {
+            // @ts-ignore - gtag is defined in layout.tsx
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'conversion', {
+                    'send_to': 'AW-17796654538/RxBECK6d2s8bEMrLjaZC',
+                    'value': 1.0,
+                    'currency': 'GBP'
+                });
+                sessionStorage.setItem('chatConversionFired', 'true');
+            }
+        }
+
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
