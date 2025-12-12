@@ -262,8 +262,8 @@ export function SearchBox() {
                 </div>
             </div>
 
-                {/* Progress Bar */}
-                <div className="md:w-64 bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl p-6 flex flex-col gap-4 h-fit md:h-[600px]">
+                {/* Progress Bar - Desktop Only */}
+                <div className="hidden md:flex md:w-64 bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl p-6 flex-col gap-4 md:h-[600px]">
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-primary" />
                         <h3 className="font-semibold text-sm">Chat Progress</h3>
