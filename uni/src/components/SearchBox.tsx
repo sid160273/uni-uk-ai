@@ -98,6 +98,16 @@ export function SearchBox() {
         setUserMessageCount(newCount);
         sessionStorage.setItem('chatProgressCount', newCount.toString());
 
+        // Track chat message in Google Analytics for record keeping
+        if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+            // @ts-ignore
+            window.gtag('event', 'chat_message', {
+                message_number: newCount,
+                user_message: userMessage,
+                chat_state: JSON.stringify(chatState),
+            });
+        }
+
         // Fire Google Ads conversion on first chat message (once per session)
         if (typeof window !== 'undefined' && !sessionStorage.getItem('chatConversionFired')) {
             // @ts-ignore - gtag is defined globally by Google Analytics script in layout.tsx
@@ -109,6 +119,20 @@ export function SearchBox() {
                     'currency': 'GBP'
                 });
                 sessionStorage.setItem('chatConversionFired', 'true');
+            }
+        }
+
+        // Fire HIGH-VALUE conversion when user completes all 5 questions (once per session)
+        if (newCount === 5 && typeof window !== 'undefined' && !sessionStorage.getItem('chatCompletedConversion')) {
+            // @ts-ignore
+            if (typeof window.gtag !== 'undefined') {
+                // @ts-ignore
+                window.gtag('event', 'conversion', {
+                    'send_to': 'AW-17796654538/RxBECK6d2s8bEMrLjaZC', // TODO: Replace with completion conversion ID
+                    'value': 5.0, // Higher value for completed chat
+                    'currency': 'GBP'
+                });
+                sessionStorage.setItem('chatCompletedConversion', 'true');
             }
         }
 
@@ -135,6 +159,17 @@ export function SearchBox() {
                 role: "ai",
                 content: data.message
             }]);
+
+            // Log AI response to Google Analytics
+            if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+                // @ts-ignore
+                window.gtag('event', 'ai_response', {
+                    message_number: newCount,
+                    ai_message: data.message,
+                    new_state: JSON.stringify(data.newState),
+                    recommendations_count: data.recommendations?.length || 0,
+                });
+            }
 
             // Update recommendations without causing scroll
             if (data.recommendations && data.recommendations.length > 0) {
