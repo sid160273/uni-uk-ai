@@ -291,6 +291,9 @@ export function SearchBox() {
                                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                             </motion.div>
 
+                            {/* Progress Label */}
+                            <span className="text-xs md:text-sm font-semibold text-primary">Progress</span>
+
                             {/* Progress Bars */}
                             <div className="flex-1 flex items-center gap-1.5">
                                 {[1, 2, 3, 4, 5].map((step) => (
