@@ -47,12 +47,28 @@ export function SearchBox() {
         }
     }, []);
 
-    const scrollToBottom = () => {
+    const scrollToLatestMessage = () => {
         if (messages.length > 1 && messagesEndRef.current) {
             const chatContainer = messagesEndRef.current.parentElement;
             if (chatContainer) {
                 requestAnimationFrame(() => {
+                    // Scroll to bottom to show the latest message
                     chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    // Small delay to let the DOM update, then scroll the latest AI message into view at the top
+                    setTimeout(() => {
+                        const allMessages = chatContainer.querySelectorAll('[data-message]');
+                        const latestAiMessage = Array.from(allMessages).reverse().find(
+                            (el) => el.getAttribute('data-role') === 'ai'
+                        );
+
+                        if (latestAiMessage) {
+                            latestAiMessage.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }, 100);
                 });
             }
         }
@@ -61,7 +77,7 @@ export function SearchBox() {
     useEffect(() => {
         // Only scroll chat messages when there are user messages (not just the initial greeting)
         if (messages.length > 1) {
-            scrollToBottom();
+            scrollToLatestMessage();
         }
     }, [messages]);
 
@@ -252,6 +268,8 @@ export function SearchBox() {
                     {messages.map((msg, idx) => (
                         <motion.div
                             key={idx}
+                            data-message
+                            data-role={msg.role}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             className={cn(
