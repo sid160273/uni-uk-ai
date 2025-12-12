@@ -133,8 +133,6 @@ export function SearchBox() {
         }
     };
 
-    const progressPercentage = (userMessageCount / 5) * 100;
-
     return (
         <div ref={chatContainerRef} className="w-full max-w-6xl mx-auto flex flex-col gap-4">
             {/* How It Works - Only show when no user messages (just the initial AI greeting) */}
@@ -164,16 +162,58 @@ export function SearchBox() {
                 </div>
             )}
 
-            {/* Chat Interface with Progress Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-stretch">
-                {/* Chat Interface */}
-                <div className="flex-1 bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[500px] md:h-[600px]">
-                {/* Header */}
-                <div className="p-4 border-b bg-muted/30 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="ml-2 text-xs font-medium text-muted-foreground">AI University Consultant</span>
+            {/* Chat Interface */}
+            <div className="bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[500px] md:h-[600px]">
+                {/* Header with Progress */}
+                <div className="p-4 border-b bg-muted/30 flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <span className="ml-2 text-xs font-medium text-muted-foreground">AI University Consultant</span>
+                    </div>
+
+                    {/* Compact Progress Bar */}
+                    {userMessageCount > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="flex items-center gap-3"
+                        >
+                            <div className="flex items-center gap-1.5">
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                <span className="text-xs font-medium text-muted-foreground">Progress:</span>
+                            </div>
+                            <div className="flex-1 flex items-center gap-2">
+                                {[1, 2, 3, 4, 5].map((step) => (
+                                    <motion.div
+                                        key={step}
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: step * 0.05 }}
+                                        className={cn(
+                                            "h-2 flex-1 rounded-full transition-all duration-300",
+                                            userMessageCount >= step
+                                                ? "bg-gradient-to-r from-primary to-violet-600"
+                                                : "bg-muted/30"
+                                        )}
+                                    />
+                                ))}
+                            </div>
+                            <span className="text-xs font-bold text-primary">
+                                {userMessageCount}/5
+                            </span>
+                            {userMessageCount >= 5 && (
+                                <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="text-sm"
+                                >
+                                    🎉
+                                </motion.span>
+                            )}
+                        </motion.div>
+                    )}
                 </div>
 
                 {/* Scrollable Messages Area */}
@@ -259,104 +299,6 @@ export function SearchBox() {
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-
-                {/* Progress Bar - Desktop Only */}
-                <div className="hidden md:flex md:w-64 bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl p-6 flex-col gap-4 md:h-[600px]">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                        <h3 className="font-semibold text-sm">Chat Progress</h3>
-                    </div>
-
-                    <div className="flex-1 flex flex-col justify-center gap-4">
-                        {/* Circular Progress */}
-                        <div className="relative w-32 h-32 mx-auto">
-                            <svg className="w-full h-full transform -rotate-90">
-                                <circle
-                                    cx="64"
-                                    cy="64"
-                                    r="56"
-                                    stroke="currentColor"
-                                    strokeWidth="8"
-                                    fill="none"
-                                    className="text-muted/20"
-                                />
-                                <motion.circle
-                                    cx="64"
-                                    cy="64"
-                                    r="56"
-                                    stroke="currentColor"
-                                    strokeWidth="8"
-                                    fill="none"
-                                    className="text-primary"
-                                    strokeDasharray={`${2 * Math.PI * 56}`}
-                                    initial={{ strokeDashoffset: 2 * Math.PI * 56 }}
-                                    animate={{
-                                        strokeDashoffset: 2 * Math.PI * 56 * (1 - progressPercentage / 100)
-                                    }}
-                                    transition={{ duration: 0.5, ease: "easeOut" }}
-                                    strokeLinecap="round"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <motion.span
-                                    key={userMessageCount}
-                                    initial={{ scale: 1.2, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    className="text-3xl font-bold text-primary"
-                                >
-                                    {userMessageCount}
-                                </motion.span>
-                                <span className="text-xs text-muted-foreground">/ 5</span>
-                            </div>
-                        </div>
-
-                        {/* Progress Steps */}
-                        <div className="space-y-2">
-                            {[1, 2, 3, 4, 5].map((step) => (
-                                <motion.div
-                                    key={step}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: step * 0.1 }}
-                                    className="flex items-center gap-3"
-                                >
-                                    <div className={cn(
-                                        "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
-                                        userMessageCount >= step
-                                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
-                                            : "bg-muted/30 text-muted-foreground"
-                                    )}>
-                                        {userMessageCount >= step ? "✓" : step}
-                                    </div>
-                                    <div className={cn(
-                                        "h-2 flex-1 rounded-full transition-all duration-300",
-                                        userMessageCount >= step
-                                            ? "bg-gradient-to-r from-primary to-violet-600"
-                                            : "bg-muted/30"
-                                    )} />
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Completion Message */}
-                        <AnimatePresence>
-                            {userMessageCount >= 5 && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-center"
-                                >
-                                    <p className="text-xs font-medium text-primary">
-                                        Great job! 🎉<br />
-                                        <span className="text-muted-foreground">You're getting the best recommendations</span>
-                                    </p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
                 </div>
             </div>
 
