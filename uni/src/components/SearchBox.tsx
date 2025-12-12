@@ -182,85 +182,12 @@ export function SearchBox() {
 
             {/* Chat Interface */}
             <div className="bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[500px] md:h-[600px]">
-                {/* Header with Progress */}
-                <div className="p-4 border-b bg-muted/30 flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
-                        <span className="ml-2 text-xs font-medium text-muted-foreground">AI University Consultant</span>
-                    </div>
-
-                    {/* Compact Progress Bar */}
-                    {userMessageCount > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            className="flex items-center gap-3 p-2 rounded-lg bg-primary/5 border border-primary/10"
-                        >
-                            <div className="flex items-center gap-1.5">
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                >
-                                    <Sparkles className="w-4 h-4 text-primary" />
-                                </motion.div>
-                                <span className="text-xs font-medium text-primary">Progress:</span>
-                            </div>
-                            <div className="flex-1 flex items-center gap-1.5">
-                                {[1, 2, 3, 4, 5].map((step) => (
-                                    <motion.div
-                                        key={step}
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{
-                                            scale: userMessageCount >= step ? [1, 1.2, 1] : 1,
-                                            opacity: 1
-                                        }}
-                                        transition={{
-                                            scale: { duration: 0.3, times: [0, 0.5, 1] },
-                                            opacity: { delay: step * 0.05 }
-                                        }}
-                                        className={cn(
-                                            "h-2.5 flex-1 rounded-full relative overflow-hidden transition-all duration-500",
-                                            userMessageCount >= step
-                                                ? "bg-gradient-to-r from-primary via-violet-600 to-primary shadow-lg shadow-primary/50"
-                                                : "bg-muted/30"
-                                        )}
-                                    >
-                                        {userMessageCount >= step && (
-                                            <motion.div
-                                                className="absolute inset-0 bg-white/30"
-                                                animate={{ x: ['-100%', '100%'] }}
-                                                transition={{
-                                                    duration: 1.5,
-                                                    repeat: Infinity,
-                                                    ease: "linear"
-                                                }}
-                                            />
-                                        )}
-                                    </motion.div>
-                                ))}
-                            </div>
-                            <motion.span
-                                key={userMessageCount}
-                                initial={{ scale: 1.5, color: "#3b82f6" }}
-                                animate={{ scale: 1, color: "#000000" }}
-                                className="text-xs font-bold"
-                            >
-                                {userMessageCount}/5
-                            </motion.span>
-                            {userMessageCount >= 5 && (
-                                <motion.span
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: "spring", bounce: 0.6 }}
-                                    className="text-sm"
-                                >
-                                    🎉
-                                </motion.span>
-                            )}
-                        </motion.div>
-                    )}
+                {/* Header */}
+                <div className="p-4 border-b bg-muted/30 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="ml-2 text-xs font-medium text-muted-foreground">AI University Consultant</span>
                 </div>
 
                 {/* Scrollable Messages Area */}
@@ -348,6 +275,73 @@ export function SearchBox() {
                             </button>
                         </div>
                     </form>
+
+                    {/* Progress Bar - Now below input for better mobile visibility */}
+                    {userMessageCount > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex items-center gap-3 p-3 bg-primary/5 border-t border-primary/10"
+                        >
+                            {/* Rotating Sparkle Icon */}
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            >
+                                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                            </motion.div>
+
+                            {/* Progress Bars */}
+                            <div className="flex-1 flex items-center gap-1.5">
+                                {[1, 2, 3, 4, 5].map((step) => (
+                                    <motion.div
+                                        key={step}
+                                        initial={{ scaleX: 0 }}
+                                        animate={{ scaleX: 1 }}
+                                        transition={{ delay: step * 0.1 }}
+                                        className={cn(
+                                            "h-2.5 md:h-3 flex-1 rounded-full relative overflow-hidden shadow-sm",
+                                            userMessageCount >= step
+                                                ? "bg-gradient-to-r from-primary via-violet-600 to-primary shadow-lg"
+                                                : "bg-muted/30"
+                                        )}
+                                    >
+                                        {/* Shimmer effect for completed bars */}
+                                        {userMessageCount >= step && (
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                                                animate={{ x: ["-100%", "100%"] }}
+                                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                            />
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            {/* Counter with bounce animation */}
+                            <motion.span
+                                key={userMessageCount}
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                                className="text-xs md:text-sm font-bold text-primary min-w-[2rem] text-center"
+                            >
+                                {userMessageCount}/5
+                            </motion.span>
+
+                            {/* Celebration emoji when complete */}
+                            {userMessageCount === 5 && (
+                                <motion.span
+                                    initial={{ scale: 0, rotate: -180 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                                    className="text-base md:text-lg"
+                                >
+                                    🎉
+                                </motion.span>
+                            )}
+                        </motion.div>
+                    )}
                 </div>
             </div>
 
