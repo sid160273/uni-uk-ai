@@ -152,7 +152,7 @@ export function SearchBox() {
     };
 
     return (
-        <div ref={chatContainerRef} className="w-full max-w-6xl mx-auto flex flex-col gap-2 md:gap-4">
+        <div ref={chatContainerRef} className="w-full max-w-6xl mx-auto flex flex-col gap-1 md:gap-3">
             {/* How It Works - Only show when no user messages (just the initial AI greeting) */}
             {messages.length === 1 && (
                 <div className="grid gap-2 md:gap-4 grid-cols-3 md:grid-cols-3 max-w-4xl mx-auto px-2">
@@ -352,7 +352,7 @@ export function SearchBox() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="space-y-2 md:space-y-4"
+                        className="space-y-1 md:space-y-3"
                     >
                         <div className="flex items-center gap-2 text-base md:text-lg font-semibold px-2">
                             <Sparkles className="w-4 h-4 text-primary" />
