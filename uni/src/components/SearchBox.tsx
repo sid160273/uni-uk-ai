@@ -99,13 +99,16 @@ export function SearchBox() {
         sessionStorage.setItem('chatProgressCount', newCount.toString());
 
         // Track chat message in Google Analytics for record keeping
-        if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
-            // @ts-ignore
-            window.gtag('event', 'chat_message', {
-                message_number: newCount,
-                user_message: userMessage,
-                chat_state: JSON.stringify(chatState),
-            });
+        if (typeof window !== 'undefined') {
+            // @ts-ignore - gtag is defined globally by Google Analytics script in layout.tsx
+            if (typeof window.gtag !== 'undefined') {
+                // @ts-ignore
+                window.gtag('event', 'chat_message', {
+                    message_number: newCount,
+                    user_message: userMessage,
+                    chat_state: JSON.stringify(chatState),
+                });
+            }
         }
 
         // Fire Google Ads conversion on first chat message (once per session)
@@ -161,14 +164,17 @@ export function SearchBox() {
             }]);
 
             // Log AI response to Google Analytics
-            if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
-                // @ts-ignore
-                window.gtag('event', 'ai_response', {
-                    message_number: newCount,
-                    ai_message: data.message,
-                    new_state: JSON.stringify(data.newState),
-                    recommendations_count: data.recommendations?.length || 0,
-                });
+            if (typeof window !== 'undefined') {
+                // @ts-ignore - gtag is defined globally by Google Analytics script in layout.tsx
+                if (typeof window.gtag !== 'undefined') {
+                    // @ts-ignore
+                    window.gtag('event', 'ai_response', {
+                        message_number: newCount,
+                        ai_message: data.message,
+                        new_state: JSON.stringify(data.newState),
+                        recommendations_count: data.recommendations?.length || 0,
+                    });
+                }
             }
 
             // Update recommendations without causing scroll
