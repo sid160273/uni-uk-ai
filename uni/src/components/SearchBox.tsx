@@ -178,35 +178,64 @@ export function SearchBox() {
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
-                            className="flex items-center gap-3"
+                            className="flex items-center gap-3 p-2 rounded-lg bg-primary/5 border border-primary/10"
                         >
                             <div className="flex items-center gap-1.5">
-                                <Sparkles className="w-4 h-4 text-primary" />
-                                <span className="text-xs font-medium text-muted-foreground">Progress:</span>
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                >
+                                    <Sparkles className="w-4 h-4 text-primary" />
+                                </motion.div>
+                                <span className="text-xs font-medium text-primary">Progress:</span>
                             </div>
-                            <div className="flex-1 flex items-center gap-2">
+                            <div className="flex-1 flex items-center gap-1.5">
                                 {[1, 2, 3, 4, 5].map((step) => (
                                     <motion.div
                                         key={step}
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        transition={{ delay: step * 0.05 }}
+                                        initial={{ scale: 0, opacity: 0 }}
+                                        animate={{
+                                            scale: userMessageCount >= step ? [1, 1.2, 1] : 1,
+                                            opacity: 1
+                                        }}
+                                        transition={{
+                                            scale: { duration: 0.3, times: [0, 0.5, 1] },
+                                            opacity: { delay: step * 0.05 }
+                                        }}
                                         className={cn(
-                                            "h-2 flex-1 rounded-full transition-all duration-300",
+                                            "h-2.5 flex-1 rounded-full relative overflow-hidden transition-all duration-500",
                                             userMessageCount >= step
-                                                ? "bg-gradient-to-r from-primary to-violet-600"
+                                                ? "bg-gradient-to-r from-primary via-violet-600 to-primary shadow-lg shadow-primary/50"
                                                 : "bg-muted/30"
                                         )}
-                                    />
+                                    >
+                                        {userMessageCount >= step && (
+                                            <motion.div
+                                                className="absolute inset-0 bg-white/30"
+                                                animate={{ x: ['-100%', '100%'] }}
+                                                transition={{
+                                                    duration: 1.5,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            />
+                                        )}
+                                    </motion.div>
                                 ))}
                             </div>
-                            <span className="text-xs font-bold text-primary">
+                            <motion.span
+                                key={userMessageCount}
+                                initial={{ scale: 1.5, color: "#3b82f6" }}
+                                animate={{ scale: 1, color: "#000000" }}
+                                className="text-xs font-bold"
+                            >
                                 {userMessageCount}/5
-                            </span>
+                            </motion.span>
                             {userMessageCount >= 5 && (
                                 <motion.span
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
+                                    initial={{ scale: 0, rotate: -180 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ type: "spring", bounce: 0.6 }}
                                     className="text-sm"
                                 >
                                     🎉
