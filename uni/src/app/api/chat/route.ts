@@ -21,9 +21,15 @@ export async function POST(request: NextRequest) {
 
     // Build context about what the user is looking for
     const userPreferences = [];
-    if (chatState?.location) userPreferences.push(`Location: ${chatState.location}`);
     if (chatState?.course) userPreferences.push(`Course: ${chatState.course}`);
+    if (chatState?.isInternational !== undefined) {
+      userPreferences.push(`Student Type: ${chatState.isInternational ? 'International' : 'UK/Domestic'}`);
+      if (chatState.isInternational && chatState.country) {
+        userPreferences.push(`Country: ${chatState.country}`);
+      }
+    }
     if (chatState?.predictedGrades) userPreferences.push(`Predicted Grades: ${chatState.predictedGrades}`);
+    if (chatState?.location) userPreferences.push(`Location: ${chatState.location}`);
     if (chatState?.vibe) userPreferences.push(`Vibe: ${chatState.vibe}`);
     if (chatState?.sports) userPreferences.push(`Interested in sports facilities`);
     if (chatState?.nightlife) userPreferences.push(`Interested in nightlife`);
@@ -66,19 +72,41 @@ ${JSON.stringify(universityKnowledge.slice(0, 30), null, 2)}
 ... and 111 more universities with similar detailed data.
 
 CONVERSATION GUIDELINES:
-1. Ask ONE focused question at a time in this order:
-   - First: What subject/course they want to study
-   - Second: Their predicted/achieved grades (A-levels, IB, etc.)
-   - Third: Location preference in the UK
-   - Fourth: Campus vibe, sports, nightlife preferences
-2. Be warm, conversational, and encouraging
-3. CRITICAL - University Names Must Be Links:
+1. CLARIFICATION FIRST - If the user's input is unclear, vague, or doesn't make sense:
+   - DON'T just say "Fascinating!" or accept it blindly
+   - Instead, politely ask for clarification
+   - Offer suggestions of what they might mean
+   - Examples:
+     * If they say "vertical medicine": "I'm not quite sure what you mean by 'vertical medicine' - did you mean Veterinary Medicine, or perhaps Medicine in general? Let me know so I can help you better!"
+     * If they say something unclear: "Just to make sure I understand correctly, could you clarify what you mean by [their input]? Are you referring to [option A] or [option B]?"
+   - Only proceed once you understand their intent
+
+2. INTERNATIONAL VS DOMESTIC STUDENTS:
+   - After they mention their course, ask: "Are you a UK/domestic student or an international student?"
+   - If INTERNATIONAL student, ask these additional questions:
+     * "Which country are you from?" (this affects entry requirements)
+     * "Do you have IB, A-levels, or another qualification?" (international qualifications vary)
+     * "Will you need university accommodation, or do you have other arrangements?"
+     * "Are you looking for universities with strong international student communities?"
+   - If DOMESTIC student, proceed with standard UK questions (A-levels, location preference, etc.)
+
+3. Ask ONE focused question at a time in this order:
+   - First: What subject/course they want to study (clarify if unclear)
+   - Second: Are they UK/domestic or international student?
+   - Third: Their predicted/achieved grades (A-levels, IB, etc.) - adjust based on international/domestic
+   - Fourth: Location preference in the UK
+   - Fifth: Campus vibe, sports, nightlife, accommodation preferences
+
+4. Be warm, conversational, and encouraging - but also helpful by seeking clarity
+
+5. CRITICAL - University Names Must Be Links:
    - WHENEVER you mention a university name, format it as a clickable link using this exact pattern:
    - [University Name](/universities/slug)
    - Example: "I'd recommend [University of Oxford](/universities/oxford)" NOT "I'd recommend University of Oxford"
    - EVERY mention of a university name must be a link - this is mandatory
    - Use the exact slug from the database (provided in the data above)
-4. When recommending universities:
+
+6. When recommending universities:
    - ALWAYS include 2-3 interesting/unique details about EACH university
    - Cite SPECIFIC details from the database:
      * Mention actual rankings (e.g., "ranked #12 in the Guardian League Table")
@@ -90,7 +118,8 @@ CONVERSATION GUIDELINES:
    - Explain WHY each university matches using real data points
    - End your recommendations with: "You can explore these universities in detail below!"
    - THEN immediately follow up with 1-2 data-driven questions to refine their search
-5. CRITICAL: When providing recommendations, ALWAYS include follow-up questions in the SAME response
+
+7. CRITICAL: When providing recommendations, ALWAYS include follow-up questions in the SAME response
    - Ask about factors they haven't mentioned yet based on our database:
      * "Is nightlife important to you? Some cities have much better nightlife scenes than others."
      * "How important are sports facilities? We have universities ranked from #1 to #100+ for sports."
@@ -101,12 +130,25 @@ CONVERSATION GUIDELINES:
      * "How important is student satisfaction? Some universities score above 85% on NSS."
      * "Are you looking for strong employability rates after graduation?"
    - These questions help you refine and improve recommendations in the next exchange
-6. Only provide 3-5 recommendations when you have: subject + grades + location
-7. Keep responses concise but informative (2-3 sentences per university when recommending)
+
+8. Only provide 3-5 recommendations when you have: subject + student type + grades + location
+9. Keep responses concise but informative (2-3 sentences per university when recommending)
 
 NEVER make up information - only use the exact data provided in your database.
 
-Current conversation stage: ${userPreferences.length === 0 ? 'Just starting - ask what subject they want to study' : userPreferences.length === 1 ? 'Ask about their predicted or achieved grades (A-levels, IB, BTECs, etc.)' : userPreferences.length === 2 ? 'Ask about location preference in the UK' : 'Ask follow-up questions or make specific recommendations with data'}${userContext}`;
+Current conversation stage: ${
+  userPreferences.length === 0
+    ? 'Just starting - ask what subject they want to study (clarify if unclear)'
+    : !chatState.isInternational && userPreferences.length === 1
+      ? 'Ask if they are a UK/domestic student or international student'
+      : userPreferences.length <= 2
+        ? chatState.isInternational
+          ? 'Ask about their qualifications (IB, A-levels, etc.) and which country they are from'
+          : 'Ask about their predicted or achieved grades (A-levels, IB, BTECs, etc.)'
+        : userPreferences.length === 3
+          ? 'Ask about location preference in the UK'
+          : 'Ask follow-up questions or make specific recommendations with data'
+}${userContext}`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini', // Cost-effective and fast
@@ -125,6 +167,23 @@ Current conversation stage: ${userPreferences.length === 0 ? 'Just starting - as
     const newState = { ...chatState };
     const lowerMsg = message.toLowerCase();
 
+    // Detect international vs domestic student
+    if (lowerMsg.includes('international') || lowerMsg.includes('overseas') || lowerMsg.includes('foreign')) {
+      newState.isInternational = true;
+    } else if (lowerMsg.includes('domestic') || lowerMsg.includes('uk student') || lowerMsg.includes('british')) {
+      newState.isInternational = false;
+    }
+
+    // Detect country (for international students)
+    const countries = ['india', 'china', 'usa', 'america', 'canada', 'nigeria', 'malaysia', 'singapore', 'hong kong', 'pakistan', 'bangladesh', 'saudi arabia', 'uae', 'kenya', 'ghana', 'south africa', 'australia', 'new zealand', 'ireland'];
+    for (const country of countries) {
+      if (lowerMsg.includes(country)) {
+        newState.country = country.charAt(0).toUpperCase() + country.slice(1);
+        newState.isInternational = true; // Mentioning a country implies international
+        break;
+      }
+    }
+
     // Update state based on user message
     if (lowerMsg.includes('london')) newState.location = 'London';
     else if (lowerMsg.includes('scotland')) newState.location = 'Scotland';
@@ -133,7 +192,8 @@ Current conversation stage: ${userPreferences.length === 0 ? 'Just starting - as
     else if (lowerMsg.includes('south')) newState.location = 'South England';
 
     // Detect course interest
-    if (lowerMsg.includes('medicine') || lowerMsg.includes('medical')) newState.course = 'Medicine';
+    if (lowerMsg.includes('veterinary') || lowerMsg.includes('vet medicine')) newState.course = 'Veterinary Medicine';
+    else if (lowerMsg.includes('medicine') || lowerMsg.includes('medical')) newState.course = 'Medicine';
     else if (lowerMsg.includes('engineering')) newState.course = 'Engineering';
     else if (lowerMsg.includes('business')) newState.course = 'Business';
     else if (lowerMsg.includes('computer') || lowerMsg.includes('computing')) newState.course = 'Computer Science';

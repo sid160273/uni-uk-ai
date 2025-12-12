@@ -15,6 +15,8 @@ interface ChatState {
     sports?: boolean;
     nightlife?: boolean;
     predictedGrades?: string;
+    isInternational?: boolean;
+    country?: string;
 }
 
 interface Message {
