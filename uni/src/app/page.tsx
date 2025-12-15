@@ -127,8 +127,21 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t py-12 bg-muted/50">
-        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.</p>
+        <div className="container mx-auto px-4 text-center space-y-4">
+          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/#about" className="hover:text-foreground transition-colors">
+              About
+            </Link>
+            <Link href="/universities" className="hover:text-foreground transition-colors">
+              Universities
+            </Link>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            &copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.
+          </p>
         </div>
       </footer>
     </main>
