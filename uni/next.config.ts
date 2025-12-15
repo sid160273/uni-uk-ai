@@ -19,6 +19,15 @@ const nextConfig: NextConfig = {
     // Disable image optimization to allow external image CDN to handle it
     unoptimized: false,
   },
+  async redirects() {
+    return [
+      {
+        source: '/universities/strathclyde',
+        destination: '/universities/strath-ac-uk',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
