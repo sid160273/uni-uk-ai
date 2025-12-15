@@ -122,7 +122,9 @@ CONVERSATION GUIDELINES:
    - [University Name](/universities/slug)
    - Example: "I'd recommend [University of Oxford](/universities/oxford)" NOT "I'd recommend University of Oxford"
    - EVERY mention of a university name must be a link - this is mandatory
-   - Use the exact slug from the database (provided in the data above)
+   - Use the EXACT slug from the database (provided in the data above) - DO NOT shorten or modify slugs
+   - IMPORTANT: For University of Strathclyde, the slug is "strath-ac-uk" NOT "strathclyde"
+   - IMPORTANT: Always look up the exact slug in the database - never guess or abbreviate
 
 8. When recommending universities:
    - ALWAYS include 2-3 interesting/unique details about EACH university
