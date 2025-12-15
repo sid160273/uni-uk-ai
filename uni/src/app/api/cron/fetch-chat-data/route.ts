@@ -1,0 +1,133 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import fs from 'fs/promises';
+import path from 'path';
+
+// This endpoint is called by Vercel Cron every 48 hours
+export async function GET(request: NextRequest) {
+  try {
+    // Verify the request is from Vercel Cron
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if GA credentials are configured
+    if (!process.env.GA4_PROPERTY_ID || !process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      return NextResponse.json(
+        { error: 'Google Analytics credentials not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Initialize the GA4 client with credentials from environment variable
+    const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+    const analyticsDataClient = new BetaAnalyticsDataClient({
+      credentials: credentials,
+    });
+
+    const propertyId = process.env.GA4_PROPERTY_ID;
+
+    // Fetch chat_message events from the last 48 hours
+    const [chatMessagesResponse] = await analyticsDataClient.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [
+        {
+          startDate: '2daysAgo',
+          endDate: 'today',
+        },
+      ],
+      dimensions: [
+        { name: 'eventName' },
+        { name: 'date' },
+        { name: 'customEvent:message_number' },
+        { name: 'customEvent:user_message' },
+        { name: 'customEvent:chat_state' },
+      ],
+      metrics: [{ name: 'eventCount' }],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'eventName',
+          stringFilter: { value: 'chat_message' },
+        },
+      },
+    });
+
+    // Fetch ai_response events from the last 48 hours
+    const [aiResponsesResponse] = await analyticsDataClient.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [
+        {
+          startDate: '2daysAgo',
+          endDate: 'today',
+        },
+      ],
+      dimensions: [
+        { name: 'eventName' },
+        { name: 'date' },
+        { name: 'customEvent:message_number' },
+        { name: 'customEvent:ai_message' },
+        { name: 'customEvent:new_state' },
+        { name: 'customEvent:recommendations_count' },
+      ],
+      metrics: [{ name: 'eventCount' }],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'eventName',
+          stringFilter: { value: 'ai_response' },
+        },
+      },
+    });
+
+    // Format the data
+    const chatData = {
+      timestamp: new Date().toISOString(),
+      period: '48_hours',
+      chat_messages: chatMessagesResponse.rows?.map((row) => ({
+        date: row.dimensionValues?.[1]?.value,
+        message_number: row.dimensionValues?.[2]?.value,
+        user_message: row.dimensionValues?.[3]?.value,
+        chat_state: row.dimensionValues?.[4]?.value,
+        count: row.metricValues?.[0]?.value,
+      })) || [],
+      ai_responses: aiResponsesResponse.rows?.map((row) => ({
+        date: row.dimensionValues?.[1]?.value,
+        message_number: row.dimensionValues?.[2]?.value,
+        ai_message: row.dimensionValues?.[3]?.value,
+        new_state: row.dimensionValues?.[4]?.value,
+        recommendations_count: row.dimensionValues?.[5]?.value,
+        count: row.metricValues?.[0]?.value,
+      })) || [],
+      summary: {
+        total_chat_messages: chatMessagesResponse.rows?.length || 0,
+        total_ai_responses: aiResponsesResponse.rows?.length || 0,
+      },
+    };
+
+    // Save to file in the data directory
+    const dataDir = path.join(process.cwd(), 'data', 'chat-logs');
+    await fs.mkdir(dataDir, { recursive: true });
+
+    const filename = `chat-data-${new Date().toISOString().split('T')[0]}.json`;
+    const filepath = path.join(dataDir, filename);
+
+    await fs.writeFile(filepath, JSON.stringify(chatData, null, 2));
+
+    // Also update a "latest" file for easy access
+    const latestPath = path.join(dataDir, 'latest.json');
+    await fs.writeFile(latestPath, JSON.stringify(chatData, null, 2));
+
+    return NextResponse.json({
+      success: true,
+      message: 'Chat data fetched and saved successfully',
+      filename: filename,
+      summary: chatData.summary,
+    });
+  } catch (error: any) {
+    console.error('Error fetching chat data:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch chat data', details: error.message },
+      { status: 500 }
+    );
+  }
+}

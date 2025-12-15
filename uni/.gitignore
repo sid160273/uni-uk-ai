@@ -37,3 +37,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# chat data logs
+/data/chat-logs/*.json
+!/data/chat-logs/README.md

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/fetch-chat-data",
+      "schedule": "0 */48 * * *"
+    }
+  ]
+}
