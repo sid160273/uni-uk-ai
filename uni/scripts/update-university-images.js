@@ -8,9 +8,9 @@ const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'YOUR_API_KEY_HERE';
 const universitiesPath = path.join(__dirname, '../src/data/universities.json');
 const universities = JSON.parse(fs.readFileSync(universitiesPath, 'utf-8'));
 
-// Find universities with old Unsplash URL format (these are likely broken)
+// Find universities with Unsplash URLs (replace all Unsplash with Pexels)
 const universitiesWithOldUrls = universities.filter(uni =>
-  uni.imageUrl.includes('auto=format')
+  uni.imageUrl.includes('images.unsplash.com')
 );
 
 console.log(`Found ${universitiesWithOldUrls.length} universities with old image URLs`);
@@ -115,10 +115,10 @@ function getImageForLocation(location) {
   return pexelsImages['default'];
 }
 
-// Update universities with old URLs
+// Update universities with Unsplash URLs
 let updatedCount = 0;
 universities.forEach(uni => {
-  if (uni.imageUrl.includes('auto=format')) {
+  if (uni.imageUrl.includes('images.unsplash.com')) {
     const newImageUrl = getImageForLocation(uni.location);
     console.log(`Updating ${uni.name} (${uni.location}): ${newImageUrl}`);
     uni.imageUrl = newImageUrl;
