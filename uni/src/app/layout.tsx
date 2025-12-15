@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   keywords: ["UK universities", "university finder", "AI university search", "UK colleges", "university rankings", "student guide"],
   authors: [{ name: "Uni-UK.AI" }],
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/logo.png",
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     title: "Uni-UK.AI - Find Your Perfect UK University",
@@ -27,11 +32,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_GB",
     siteName: "Uni-UK.AI",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Uni-UK.AI Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Uni-UK.AI - Find Your Perfect UK University",
     description: "AI-powered university discovery platform helping students find the perfect UK university.",
+    images: ["/logo.png"],
   },
 };
 
