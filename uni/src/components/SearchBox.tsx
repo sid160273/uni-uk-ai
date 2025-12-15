@@ -30,7 +30,7 @@ export function SearchBox() {
     const [messages, setMessages] = useState<Message[]>([
         {
             role: "ai",
-            content: "Hi there! 👋 I'm your AI university consultant, here to help you find the perfect UK university match.\n\nI'll guide you through a personalized journey based on your course interests, grades, location preferences, and what matters most to you in student life.\n\nLet's get started - what subject are you thinking of studying?"
+            content: "Hi there! 👋 I'm your AI university consultant, here to help you find the perfect UK university match.\n\nI'll guide you through a personalized journey based on your course interests, grades, location preferences, and what matters most to you in student life.\n\nOr if you already know which university you're interested in, just let me know and I can direct you to it!\n\nLet's get started - what subject are you thinking of studying?"
         }
     ]);
     const [chatState, setChatState] = useState<ChatState>({});
