@@ -396,7 +396,7 @@ export function SearchBox() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="space-y-1 md:space-y-3"
+                        className="space-y-1 md:space-y-2"
                     >
                         <div className="flex items-center gap-2 text-base md:text-lg font-semibold px-2">
                             <Sparkles className="w-4 h-4 text-primary" />
@@ -406,11 +406,9 @@ export function SearchBox() {
                             </span>
                         </div>
 
-                        <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-2 md:gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {recommendations.map((uni) => (
-                                <div key={uni.id}>
-                                    <UniversityCard university={uni} />
-                                </div>
+                                <UniversityCard key={uni.id} university={uni} />
                             ))}
                         </div>
                     </motion.div>

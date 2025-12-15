@@ -41,9 +41,9 @@ export function UniversityCard({ university }: UniversityCardProps) {
                 </div>
             </div>
 
-            <div className="flex flex-1 flex-col p-5">
-                <h3 className="mb-2 text-xl font-bold tracking-tight">{university.name}</h3>
-                <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+            <div className="flex flex-1 flex-col p-3 md:p-4">
+                <h3 className="mb-1.5 md:mb-2 text-lg md:text-xl font-bold tracking-tight">{university.name}</h3>
+                <p className="mb-3 md:mb-4 line-clamp-2 text-sm text-muted-foreground">
                     {university.description}
                 </p>
 
