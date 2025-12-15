@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-    title: "All Universities | Uni-UK.AI",
+    title: "All Universities | uni-uk.ai",
     description: "Browse our comprehensive list of UK universities.",
 };
 
@@ -20,7 +20,7 @@ export default function UniversitiesIndexPage() {
                     <Link href="/" className="flex items-center">
                         <Image
                             src="/logo.png"
-                            alt="Uni-UK.AI Logo"
+                            alt="uni-uk.ai Logo"
                             width={200}
                             height={40}
                             className="h-8 md:h-10 w-auto"
@@ -66,7 +66,7 @@ export default function UniversitiesIndexPage() {
             {/* Footer */}
             <footer className="border-t py-12 bg-muted/50">
                 <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-                    <p>&copy; {new Date().getFullYear()} Uni-UK.AI. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.</p>
                 </div>
             </footer>
         </div>

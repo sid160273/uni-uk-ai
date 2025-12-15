@@ -19,15 +19,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!university) {
         return {
-            title: "University Not Found | Uni-UK.AI",
+            title: "University Not Found | uni-uk.ai",
         };
     }
 
     return {
-        title: `${university.name} - Rankings, Fees & Reviews | Uni-UK.AI`,
+        title: `${university.name} - Rankings, Fees & Reviews | uni-uk.ai`,
         description: `Discover everything about ${university.name}. Rankings, entry requirements, accommodation, student life, and more. Find your perfect university match.`,
         openGraph: {
-            title: `${university.name} - Uni-UK.AI`,
+            title: `${university.name} - uni-uk.ai`,
             description: university.description.slice(0, 150) + "...",
             images: [university.imageUrl],
         },
@@ -58,7 +58,7 @@ export default async function UniversityPage({ params }: PageProps) {
                     <Link href="/" className="flex items-center">
                         <Image
                             src="/logo.png"
-                            alt="Uni-UK.AI Logo"
+                            alt="uni-uk.ai Logo"
                             width={200}
                             height={40}
                             className="h-8 md:h-10 w-auto"

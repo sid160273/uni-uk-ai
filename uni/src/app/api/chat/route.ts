@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // System prompt for the AI with full database knowledge
-    const systemPrompt = `You are an expert UK university advisor with comprehensive knowledge of all 141 UK universities listed on Uni-UK.AI.
+    const systemPrompt = `You are an expert UK university advisor with comprehensive knowledge of all 141 UK universities listed on uni-uk.ai.
 
 IMPORTANT: You have access to detailed information about each university including:
 - Exact rankings (Guardian, THE World Rankings, NSS satisfaction scores)

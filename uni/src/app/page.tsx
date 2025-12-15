@@ -15,7 +15,7 @@ export default function Home() {
           <Link href="/" className="flex items-center">
             <Image
               src="/logo.png"
-              alt="Uni-UK.AI Logo"
+              alt="uni-uk.ai Logo"
               width={200}
               height={40}
               className="h-8 md:h-10 w-auto"
@@ -82,7 +82,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">About Uni-UK.AI</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">About uni-uk.ai</h2>
               <p className="text-lg text-muted-foreground">
                 Your trusted partner in finding the perfect UK university
               </p>
@@ -116,7 +116,7 @@ export default function Home() {
               <div className="bg-card border rounded-xl p-6">
                 <h3 className="text-xl font-semibold mb-3">Always Free</h3>
                 <p className="text-muted-foreground">
-                  Uni-UK.AI is completely free to use. We're committed to helping students
+                  uni-uk.ai is completely free to use. We're committed to helping students
                   make informed decisions about their future education.
                 </p>
               </div>
@@ -128,7 +128,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t py-12 bg-muted/50">
         <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} Uni-UK.AI. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.</p>
         </div>
       </footer>
     </main>

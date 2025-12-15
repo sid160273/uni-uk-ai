@@ -14,10 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Uni-UK.AI - Find Your Perfect UK University",
+  title: "uni-uk.ai - Find Your Perfect UK University",
   description: "AI-powered university discovery platform helping students find the perfect UK university based on their interests, goals, and preferences.",
   keywords: ["UK universities", "university finder", "AI university search", "UK colleges", "university rankings", "student guide"],
-  authors: [{ name: "Uni-UK.AI" }],
+  authors: [{ name: "uni-uk.ai" }],
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -27,23 +27,23 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   openGraph: {
-    title: "Uni-UK.AI - Find Your Perfect UK University",
+    title: "uni-uk.ai - Find Your Perfect UK University",
     description: "AI-powered university discovery platform helping students find the perfect UK university based on their interests, goals, and preferences.",
     type: "website",
     locale: "en_GB",
-    siteName: "Uni-UK.AI",
+    siteName: "uni-uk.ai",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "Uni-UK.AI Logo",
+        alt: "uni-uk.ai Logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Uni-UK.AI - Find Your Perfect UK University",
+    title: "uni-uk.ai - Find Your Perfect UK University",
     description: "AI-powered university discovery platform helping students find the perfect UK university.",
     images: ["/logo.png"],
   },
