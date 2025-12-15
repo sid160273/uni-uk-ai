@@ -97,10 +97,10 @@ export default async function UniversityPage({ params }: PageProps) {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="container mx-auto px-4 py-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-12">
+                    <div className="lg:col-span-2 space-y-6">
 
                         {/* About Section */}
                         <section>
@@ -286,7 +286,7 @@ export default async function UniversityPage({ params }: PageProps) {
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-8">
+                    <div className="space-y-4">
                         {/* Key Stats Card */}
                         <div className="bg-card border rounded-xl p-6 shadow-sm sticky top-24">
                             <h3 className="font-semibold text-lg mb-4">At a Glance</h3>
