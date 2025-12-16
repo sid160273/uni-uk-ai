@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { google } from 'googleapis';
 
-// This endpoint is called by Vercel Cron every 48 hours
+// This endpoint is called by Vercel Cron every 24 hours
 export async function GET(request: NextRequest) {
   try {
     // Verify the request is from Vercel Cron
@@ -35,12 +35,12 @@ export async function GET(request: NextRequest) {
 
     const propertyId = process.env.GA4_PROPERTY_ID;
 
-    // Fetch chat_message events from the last 48 hours with full message content
+    // Fetch chat_message events from the last 24 hours with full message content
     const [chatMessagesResponse] = await analyticsDataClient.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [
         {
-          startDate: '2daysAgo',
+          startDate: '1daysAgo',
           endDate: 'today',
         },
       ],
@@ -61,12 +61,12 @@ export async function GET(request: NextRequest) {
       limit: 1000, // Increase limit to capture more conversations
     });
 
-    // Fetch ai_response events from the last 48 hours with full AI messages
+    // Fetch ai_response events from the last 24 hours with full AI messages
     const [aiResponsesResponse] = await analyticsDataClient.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [
         {
-          startDate: '2daysAgo',
+          startDate: '1daysAgo',
           endDate: 'today',
         },
       ],
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     // Format the data with full conversation content
     const chatData = {
       timestamp: new Date().toISOString(),
-      period: '48_hours',
+      period: '24_hours',
       chat_messages: chatMessagesResponse.rows?.map((row) => ({
         event_name: row.dimensionValues?.[0]?.value,
         date: row.dimensionValues?.[1]?.value,
