@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     const propertyId = process.env.GA4_PROPERTY_ID;
 
-    // Fetch chat_message events from the last 48 hours
+    // Fetch chat_message events from the last 48 hours with full message content
     const [chatMessagesResponse] = await analyticsDataClient.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [
@@ -47,6 +47,9 @@ export async function GET(request: NextRequest) {
       dimensions: [
         { name: 'eventName' },
         { name: 'date' },
+        { name: 'customEvent:message_number' },
+        { name: 'customEvent:user_message' },
+        { name: 'customEvent:chat_state' },
       ],
       metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
@@ -55,9 +58,10 @@ export async function GET(request: NextRequest) {
           stringFilter: { value: 'chat_message' },
         },
       },
+      limit: 1000, // Increase limit to capture more conversations
     });
 
-    // Fetch ai_response events from the last 48 hours
+    // Fetch ai_response events from the last 48 hours with full AI messages
     const [aiResponsesResponse] = await analyticsDataClient.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [
@@ -69,6 +73,10 @@ export async function GET(request: NextRequest) {
       dimensions: [
         { name: 'eventName' },
         { name: 'date' },
+        { name: 'customEvent:message_number' },
+        { name: 'customEvent:ai_message' },
+        { name: 'customEvent:new_state' },
+        { name: 'customEvent:recommendations_count' },
       ],
       metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
@@ -77,20 +85,28 @@ export async function GET(request: NextRequest) {
           stringFilter: { value: 'ai_response' },
         },
       },
+      limit: 1000, // Increase limit to capture more conversations
     });
 
-    // Format the data
+    // Format the data with full conversation content
     const chatData = {
       timestamp: new Date().toISOString(),
       period: '48_hours',
       chat_messages: chatMessagesResponse.rows?.map((row) => ({
         event_name: row.dimensionValues?.[0]?.value,
         date: row.dimensionValues?.[1]?.value,
+        message_number: row.dimensionValues?.[2]?.value,
+        user_message: row.dimensionValues?.[3]?.value,
+        chat_state: row.dimensionValues?.[4]?.value,
         count: row.metricValues?.[0]?.value,
       })) || [],
       ai_responses: aiResponsesResponse.rows?.map((row) => ({
         event_name: row.dimensionValues?.[0]?.value,
         date: row.dimensionValues?.[1]?.value,
+        message_number: row.dimensionValues?.[2]?.value,
+        ai_message: row.dimensionValues?.[3]?.value,
+        new_state: row.dimensionValues?.[4]?.value,
+        recommendations_count: row.dimensionValues?.[5]?.value,
         count: row.metricValues?.[0]?.value,
       })) || [],
       summary: {
@@ -110,27 +126,35 @@ export async function GET(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
-    // Prepare row data for the sheet
+    // Prepare row data for the sheet with full conversation content
     const timestamp = new Date().toISOString();
     const rows = [];
 
-    // Add chat message data
+    // Add chat message data with full content
     for (const msg of chatData.chat_messages) {
       rows.push([
         timestamp,
-        'chat_message',
+        'USER',
         msg.date,
-        msg.count,
+        msg.message_number || '',
+        msg.user_message || '',
+        msg.chat_state || '',
+        '', // Empty for AI message column
+        '', // Empty for recommendations column
       ]);
     }
 
-    // Add AI response data
+    // Add AI response data with full content
     for (const resp of chatData.ai_responses) {
       rows.push([
         timestamp,
-        'ai_response',
+        'AI',
         resp.date,
-        resp.count,
+        resp.message_number || '',
+        '', // Empty for user message column
+        resp.new_state || '',
+        resp.ai_message || '',
+        resp.recommendations_count || '',
       ]);
     }
 
@@ -139,13 +163,17 @@ export async function GET(request: NextRequest) {
       timestamp,
       'SUMMARY',
       chatData.period,
-      `Total Messages: ${chatData.summary.total_chat_message_count}, Total Responses: ${chatData.summary.total_ai_response_count}`,
+      '',
+      `Total User Messages: ${chatData.summary.total_chat_message_count}`,
+      '',
+      `Total AI Responses: ${chatData.summary.total_ai_response_count}`,
+      '',
     ]);
 
     // Append data to the sheet
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Sheet1!A:D', // Columns: Timestamp, Event Type, Date, Count
+      range: 'Sheet1!A:H', // Columns: Timestamp, Speaker, Date, Msg#, User Message, State, AI Message, Recommendations
       valueInputOption: 'RAW',
       requestBody: {
         values: rows,
