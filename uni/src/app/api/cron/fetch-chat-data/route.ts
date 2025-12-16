@@ -40,9 +40,6 @@ export async function GET(request: NextRequest) {
       dimensions: [
         { name: 'eventName' },
         { name: 'date' },
-        { name: 'customEvent:message_number' },
-        { name: 'customEvent:user_message' },
-        { name: 'customEvent:chat_state' },
       ],
       metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
@@ -65,10 +62,6 @@ export async function GET(request: NextRequest) {
       dimensions: [
         { name: 'eventName' },
         { name: 'date' },
-        { name: 'customEvent:message_number' },
-        { name: 'customEvent:ai_message' },
-        { name: 'customEvent:new_state' },
-        { name: 'customEvent:recommendations_count' },
       ],
       metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
@@ -84,23 +77,20 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
       period: '48_hours',
       chat_messages: chatMessagesResponse.rows?.map((row) => ({
+        event_name: row.dimensionValues?.[0]?.value,
         date: row.dimensionValues?.[1]?.value,
-        message_number: row.dimensionValues?.[2]?.value,
-        user_message: row.dimensionValues?.[3]?.value,
-        chat_state: row.dimensionValues?.[4]?.value,
         count: row.metricValues?.[0]?.value,
       })) || [],
       ai_responses: aiResponsesResponse.rows?.map((row) => ({
+        event_name: row.dimensionValues?.[0]?.value,
         date: row.dimensionValues?.[1]?.value,
-        message_number: row.dimensionValues?.[2]?.value,
-        ai_message: row.dimensionValues?.[3]?.value,
-        new_state: row.dimensionValues?.[4]?.value,
-        recommendations_count: row.dimensionValues?.[5]?.value,
         count: row.metricValues?.[0]?.value,
       })) || [],
       summary: {
         total_chat_messages: chatMessagesResponse.rows?.length || 0,
         total_ai_responses: aiResponsesResponse.rows?.length || 0,
+        total_chat_message_count: chatMessagesResponse.rows?.reduce((sum, row) => sum + parseInt(row.metricValues?.[0]?.value || '0'), 0) || 0,
+        total_ai_response_count: aiResponsesResponse.rows?.reduce((sum, row) => sum + parseInt(row.metricValues?.[0]?.value || '0'), 0) || 0,
       },
     };
 
