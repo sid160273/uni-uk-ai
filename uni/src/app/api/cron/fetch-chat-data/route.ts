@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import { google } from 'googleapis';
 
 // This endpoint is called by Vercel Cron every 48 hours
 export async function GET(request: NextRequest) {
@@ -14,6 +15,14 @@ export async function GET(request: NextRequest) {
     if (!process.env.GA4_PROPERTY_ID || !process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
       return NextResponse.json(
         { error: 'Google Analytics credentials not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Check if Google Sheets is configured
+    if (!process.env.GOOGLE_SHEET_ID) {
+      return NextResponse.json(
+        { error: 'Google Sheet ID not configured' },
         { status: 500 }
       );
     }
@@ -92,13 +101,64 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    // Return the data (Vercel serverless functions have read-only filesystem)
-    // In the future, this data could be sent to a database or external storage
+    // Write to Google Sheets for historical record
+    const auth = new google.auth.GoogleAuth({
+      credentials: credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+    // Prepare row data for the sheet
+    const timestamp = new Date().toISOString();
+    const rows = [];
+
+    // Add chat message data
+    for (const msg of chatData.chat_messages) {
+      rows.push([
+        timestamp,
+        'chat_message',
+        msg.date,
+        msg.count,
+      ]);
+    }
+
+    // Add AI response data
+    for (const resp of chatData.ai_responses) {
+      rows.push([
+        timestamp,
+        'ai_response',
+        resp.date,
+        resp.count,
+      ]);
+    }
+
+    // Add summary row
+    rows.push([
+      timestamp,
+      'SUMMARY',
+      chatData.period,
+      `Total Messages: ${chatData.summary.total_chat_message_count}, Total Responses: ${chatData.summary.total_ai_response_count}`,
+    ]);
+
+    // Append data to the sheet
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: 'Sheet1!A:D', // Columns: Timestamp, Event Type, Date, Count
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: rows,
+      },
+    });
+
+    // Return the data
     return NextResponse.json({
       success: true,
-      message: 'Chat data fetched successfully',
+      message: 'Chat data fetched and saved to Google Sheets successfully',
       data: chatData,
       summary: chatData.summary,
+      rowsAdded: rows.length,
     });
   } catch (error: any) {
     console.error('Error fetching chat data:', error);
