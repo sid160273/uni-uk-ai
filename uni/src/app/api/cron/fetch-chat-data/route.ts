@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
-import fs from 'fs/promises';
-import path from 'path';
 
 // This endpoint is called by Vercel Cron every 48 hours
 export async function GET(request: NextRequest) {
@@ -94,23 +92,12 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    // Save to file in the data directory
-    const dataDir = path.join(process.cwd(), 'data', 'chat-logs');
-    await fs.mkdir(dataDir, { recursive: true });
-
-    const filename = `chat-data-${new Date().toISOString().split('T')[0]}.json`;
-    const filepath = path.join(dataDir, filename);
-
-    await fs.writeFile(filepath, JSON.stringify(chatData, null, 2));
-
-    // Also update a "latest" file for easy access
-    const latestPath = path.join(dataDir, 'latest.json');
-    await fs.writeFile(latestPath, JSON.stringify(chatData, null, 2));
-
+    // Return the data (Vercel serverless functions have read-only filesystem)
+    // In the future, this data could be sent to a database or external storage
     return NextResponse.json({
       success: true,
-      message: 'Chat data fetched and saved successfully',
-      filename: filename,
+      message: 'Chat data fetched successfully',
+      data: chatData,
       summary: chatData.summary,
     });
   } catch (error: any) {
