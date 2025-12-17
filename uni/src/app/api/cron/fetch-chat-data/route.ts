@@ -170,10 +170,10 @@ export async function GET(request: NextRequest) {
       '',
     ]);
 
-    // Append data to the sheet
+    // Append data to Sheet2 (cron job backup from GA4)
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Sheet1!A:H', // Columns: Timestamp, Speaker, Date, Msg#, User Message, State, AI Message, Recommendations
+      range: 'Sheet2!A:H', // Columns: Timestamp, Speaker, Date, Msg#, User Message, State, AI Message, Recommendations
       valueInputOption: 'RAW',
       requestBody: {
         values: rows,
