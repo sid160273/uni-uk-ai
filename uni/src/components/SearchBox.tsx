@@ -111,6 +111,18 @@ export function SearchBox() {
             }
         }
 
+        // Log FULL user message directly to Google Sheets (bypasses GA4's 500 char limit)
+        fetch('/api/log-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messageType: 'USER',
+                messageNumber: newCount,
+                userMessage: userMessage,
+                chatState: chatState,
+            }),
+        }).catch(err => console.error('Failed to log user message:', err));
+
         // Fire Google Ads conversion on first chat message (once per session)
         if (typeof window !== 'undefined' && !sessionStorage.getItem('chatConversionFired')) {
             // @ts-ignore - gtag is defined globally by Google Analytics script in layout.tsx
@@ -176,6 +188,19 @@ export function SearchBox() {
                     });
                 }
             }
+
+            // Log FULL AI response directly to Google Sheets (bypasses GA4's 500 char limit)
+            fetch('/api/log-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messageType: 'AI',
+                    messageNumber: newCount,
+                    aiMessage: data.message,
+                    chatState: data.newState,
+                    recommendationsCount: data.recommendations?.length || 0,
+                }),
+            }).catch(err => console.error('Failed to log AI response:', err));
 
             // Update recommendations without causing scroll
             if (data.recommendations && data.recommendations.length > 0) {
