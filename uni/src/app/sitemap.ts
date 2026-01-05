@@ -15,6 +15,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
+  // Regional pages
+  const regions = [
+    'scotland',
+    'wales',
+    'northern-ireland',
+    'london',
+    'north-england',
+    'midlands',
+    'south-west-england',
+    'south-east-england',
+    'east-england',
+  ]
+
+  const regionUrls = regions.map((region) => ({
+    url: `${baseUrl}/regions/${region}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }))
+
   return [
     {
       url: baseUrl,
@@ -29,11 +49,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/rankings/academic`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/rankings/sports`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/rankings/satisfaction`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    ...regionUrls,
     ...universityUrls,
   ]
 }
