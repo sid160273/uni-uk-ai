@@ -1,40 +1,15 @@
 import { SearchBox } from "@/components/SearchBox";
 import { UniversityCard } from "@/components/UniversityCard";
+import { MainNavigation } from "@/components/MainNavigation";
 import { getAllUniversities } from "@/lib/data";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Home() {
   const universities = getAllUniversities();
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/logo.png"
-              alt="uni-uk.ai Logo"
-              width={200}
-              height={40}
-              className="h-8 md:h-10 w-auto"
-              priority
-            />
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <Link href="#how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
-            <Link href="#universities" className="hover:text-foreground transition-colors">Universities</Link>
-            <Link href="#about" className="hover:text-foreground transition-colors">About</Link>
-          </div>
-          <a
-            href="#search"
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors inline-block"
-          >
-            Get Started
-          </a>
-        </div>
-      </nav>
+      <MainNavigation />
 
       {/* Hero Section - Mobile Optimized */}
       <section id="search" className="relative py-4 md:py-8 min-h-screen md:min-h-[90vh] flex flex-col md:items-center justify-start md:justify-center overflow-hidden">

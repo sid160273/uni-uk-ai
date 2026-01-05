@@ -1,12 +1,14 @@
 import { getAllUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
+import { MainNavigation } from "@/components/MainNavigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { Search } from "lucide-react";
 
 export const metadata: Metadata = {
-    title: "All Universities | uni-uk.ai",
-    description: "Browse our comprehensive list of UK universities.",
+    title: "All UK Universities A-Z - Complete University Directory | uni-uk.ai",
+    description: "Browse our comprehensive directory of all 140 UK universities. Find detailed information about each institution including rankings, courses, facilities, and student life.",
+    keywords: ["UK universities list", "all universities UK", "university directory", "find universities", "UK higher education"],
 };
 
 export default function UniversitiesIndexPage() {
@@ -14,32 +16,7 @@ export default function UniversitiesIndexPage() {
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Navigation */}
-            <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center">
-                        <Image
-                            src="/logo.png"
-                            alt="uni-uk.ai Logo"
-                            width={200}
-                            height={40}
-                            className="h-8 md:h-10 w-auto"
-                            priority
-                        />
-                    </Link>
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-                        <Link href="/#how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
-                        <Link href="/universities" className="text-foreground font-semibold">Universities</Link>
-                        <Link href="/#about" className="hover:text-foreground transition-colors">About</Link>
-                    </div>
-                    <Link
-                        href="/#search"
-                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors inline-block"
-                    >
-                        Back to Chat
-                    </Link>
-                </div>
-            </nav>
+            <MainNavigation />
 
             {/* Hero Section */}
             <section className="relative py-20 overflow-hidden">

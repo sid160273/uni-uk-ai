@@ -1,11 +1,11 @@
 import { getUniversityBySlug, getAllUniversities } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, MapPin, Trophy, Users, Building, Globe, BookOpen, GraduationCap, Home, PartyPopper } from "lucide-react";
 import { RankingBadge } from "@/components/RankingBadge";
 import { HeroImage } from "@/components/HeroImage";
 import { AdSense } from "@/components/AdSense";
+import { MainNavigation } from "@/components/MainNavigation";
 import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 
@@ -52,32 +52,7 @@ export default async function UniversityPage({ params }: PageProps) {
 
     return (
         <main className="min-h-screen bg-background pb-20">
-            {/* Navigation */}
-            <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center">
-                        <Image
-                            src="/logo.png"
-                            alt="uni-uk.ai Logo"
-                            width={200}
-                            height={40}
-                            className="h-8 md:h-10 w-auto"
-                            priority
-                        />
-                    </Link>
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-                        <Link href="/#how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
-                        <Link href="/universities" className="hover:text-foreground transition-colors">Universities</Link>
-                        <Link href="/#about" className="hover:text-foreground transition-colors">About</Link>
-                    </div>
-                    <Link
-                        href="/#search"
-                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors inline-block"
-                    >
-                        Back to Chat
-                    </Link>
-                </div>
-            </nav>
+            <MainNavigation />
 
             {/* Hero Section */}
             <div className="relative h-[40vh] min-h-[400px]">
