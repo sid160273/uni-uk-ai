@@ -7,9 +7,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Generate static params for all regions
@@ -33,7 +33,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const metadata = getRegionMetadata(params.slug);
+  const { slug } = await params;
+  const metadata = getRegionMetadata(slug);
 
   if (!metadata) {
     return {
@@ -56,9 +57,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function RegionPage({ params }: PageProps) {
-  const universities = getUniversitiesByRegion(params.slug);
-  const metadata = getRegionMetadata(params.slug);
+export default async function RegionPage({ params }: PageProps) {
+  const { slug } = await params;
+  const universities = getUniversitiesByRegion(slug);
+  const metadata = getRegionMetadata(slug);
 
   if (!metadata || universities.length === 0) {
     notFound();
