@@ -1,6 +1,7 @@
 import { getUniversitiesByRegion, getRegionMetadata } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
+import { AdSense } from "@/components/AdSense";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -94,6 +95,19 @@ export default async function RegionPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* AdSense Ad Unit 1 */}
+      <section className="py-6">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <AdSense
+              adSlot="5017740535"
+              adFormat="auto"
+              style={{ display: "block" }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Universities Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
@@ -101,6 +115,19 @@ export default async function RegionPage({ params }: PageProps) {
             {universities.map((uni) => (
               <UniversityCard key={uni.id} university={uni} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AdSense Ad Unit 2 */}
+      <section className="py-6">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <AdSense
+              adSlot="5811947452"
+              adFormat="auto"
+              style={{ display: "block" }}
+            />
           </div>
         </div>
       </section>

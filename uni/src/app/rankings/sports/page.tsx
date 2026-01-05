@@ -1,6 +1,7 @@
 import { getTopSportsUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
+import { AdSense } from "@/components/AdSense";
 import { Trophy, Medal } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -65,6 +66,19 @@ export default function TopSportsPage() {
         </div>
       </section>
 
+      {/* AdSense Ad Unit 1 */}
+      <section className="py-6">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <AdSense
+              adSlot="5017740535"
+              adFormat="auto"
+              style={{ display: "block" }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Universities Grid with Rankings */}
       <section className="py-12">
         <div className="container mx-auto px-4">
@@ -78,6 +92,19 @@ export default function TopSportsPage() {
                 <UniversityCard university={uni} />
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AdSense Ad Unit 2 */}
+      <section className="py-6">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <AdSense
+              adSlot="5811947452"
+              adFormat="auto"
+              style={{ display: "block" }}
+            />
           </div>
         </div>
       </section>
