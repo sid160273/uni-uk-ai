@@ -52,6 +52,136 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Explore Universities Section */}
+      <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-violet-50/30 dark:from-primary/5 dark:via-background dark:to-violet-950/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Explore Universities</h2>
+              <p className="text-lg text-muted-foreground">
+                Browse by location, rankings, and more
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {/* Browse All */}
+              <Link
+                href="/universities"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <span className="text-2xl">📚</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">Browse All Universities</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Explore our complete directory of {universities.length} UK universities
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View all →
+                </span>
+              </Link>
+
+              {/* Top Academic */}
+              <Link
+                href="/rankings/academic"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                    <span className="text-2xl">🏆</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">Top Ranked - Academic</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Discover the highest-ranked universities by academic excellence
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View rankings →
+                </span>
+              </Link>
+
+              {/* Top Sports */}
+              <Link
+                href="/rankings/sports"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <span className="text-2xl">⚽</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">Top Ranked - Sports</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Find universities with the best sports facilities and programs
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View rankings →
+                </span>
+              </Link>
+
+              {/* Top Satisfaction */}
+              <Link
+                href="/rankings/satisfaction"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                    <span className="text-2xl">⭐</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">Student Satisfaction</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Universities rated highest by students for overall experience
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View rankings →
+                </span>
+              </Link>
+
+              {/* Scotland */}
+              <Link
+                href="/regions/scotland"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <span className="text-2xl">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">Scottish Universities</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Explore universities in Scotland with rich heritage and excellence
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View region →
+                </span>
+              </Link>
+
+              {/* London */}
+              <Link
+                href="/regions/london"
+                className="group bg-card border rounded-xl p-6 hover:shadow-lg hover:border-primary/50 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center">
+                    <span className="text-2xl">🏛️</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">London Universities</h3>
+                </div>
+                <p className="text-muted-foreground mb-3">
+                  Study in the UK's vibrant capital city with world-class institutions
+                </p>
+                <span className="text-primary font-medium group-hover:underline">
+                  View region →
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
       <section id="about" className="py-24">
         <div className="container mx-auto px-4">
