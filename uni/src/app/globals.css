@@ -194,3 +194,111 @@
     background-color: rgba(255, 255, 255, 0.15);
   }
 }
+
+/* Ezoic Consent Banner Custom Styling */
+@layer components {
+  /* Main consent dialog wrapper */
+  #ez-cookie-dialog-wrapper {
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Dialog box */
+  #ez-cookie-dialog {
+    border-radius: 1rem !important;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+
+  /* Heading styling */
+  #ez-cookie-dialog h2,
+  #ez-cookie-dialog-wrapper h2 {
+    font-size: 1.875rem !important;
+    font-weight: 700 !important;
+    line-height: 2.25rem !important;
+    margin-bottom: 1.5rem !important;
+    color: hsl(var(--foreground)) !important;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Paragraph text */
+  #ez-cookie-dialog p,
+  #ez-cookie-dialog-wrapper p,
+  #ez-cookie-dialog-wrapper div[style*="text-align"] {
+    font-size: 0.875rem !important;
+    line-height: 1.625rem !important;
+    color: hsl(var(--muted-foreground)) !important;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Button base styling */
+  #ez-cookie-dialog button,
+  #ez-cookie-dialog-wrapper button {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    border-radius: 0.5rem !important;
+    padding: 0.625rem 1.5rem !important;
+    transition: all 0.2s ease !important;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
+    cursor: pointer !important;
+  }
+
+  /* Primary button (Continue with Recommended Cookies) - Green button */
+  #ez-cookie-dialog button[style*="rgb(76, 129, 30)"],
+  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"] {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    border: none !important;
+  }
+
+  #ez-cookie-dialog button[style*="rgb(76, 129, 30)"]:hover,
+  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"]:hover {
+    opacity: 0.9 !important;
+  }
+
+  /* Secondary button (Allow Necessary Cookies) */
+  #ez-cookie-dialog button[style*="rgb(76, 129, 30)"][style*="border"],
+  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"][style*="border"] {
+    background-color: hsl(var(--secondary)) !important;
+    color: hsl(var(--secondary-foreground)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+
+  /* Outlined button (Manage Settings) */
+  #ez-cookie-dialog button[style*="border-width: 1px"],
+  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"] {
+    background-color: transparent !important;
+    border: 1px solid hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  #ez-cookie-dialog button[style*="border-width: 1px"]:hover,
+  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"]:hover {
+    background-color: hsl(var(--muted)) !important;
+  }
+
+  /* Links */
+  #ez-cookie-dialog a,
+  #ez-cookie-dialog-wrapper a {
+    color: hsl(var(--primary)) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+  }
+
+  #ez-cookie-dialog a:hover,
+  #ez-cookie-dialog-wrapper a:hover {
+    text-decoration: underline !important;
+  }
+
+  /* Container spacing */
+  #ez-cookie-dialog > div,
+  #ez-cookie-dialog-wrapper > div {
+    padding: 2rem !important;
+  }
+
+  /* Button container */
+  #ez-cookie-dialog div[style*="display: flex"],
+  #ez-cookie-dialog-wrapper div[style*="display: flex"] {
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
+  }
+}
