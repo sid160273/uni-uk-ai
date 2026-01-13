@@ -80,6 +80,19 @@ export default function RootLayout({
           data-cfasync="false"
         />
 
+        {/* Ezoic Header Script */}
+        <Script
+          async
+          src="//www.ezojs.com/ezoic/sa.min.js"
+          strategy="beforeInteractive"
+        />
+        <Script id="ezoic-standalone" strategy="beforeInteractive">
+          {`
+            window.ezstandalone = window.ezstandalone || {};
+            ezstandalone.cmd = ezstandalone.cmd || [];
+          `}
+        </Script>
+
         {/* Google AdSense */}
         <Script
           async
