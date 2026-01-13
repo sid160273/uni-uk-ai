@@ -68,12 +68,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Ezoic GateKeeper Consent Management */}
+        <Script
+          src="https://cmp.gatekeeperconsent.com/min.js"
+          strategy="beforeInteractive"
+          data-cfasync="false"
+        />
+        <Script
+          src="https://the.gatekeeperconsent.com/cmp.min.js"
+          strategy="beforeInteractive"
+          data-cfasync="false"
+        />
+
+        {/* Google AdSense */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4540315059867204"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+
+        {/* Google Analytics */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-ZYE3BGM8BM"
