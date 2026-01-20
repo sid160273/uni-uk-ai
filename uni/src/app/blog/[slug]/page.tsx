@@ -181,13 +181,16 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                       if (earliest.type === 'link') {
                         const [fullMatch, linkText, linkUrl] = earliest.match;
-                        const href = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
+                        // Handle internal links (start with /), external links (start with http), and others
+                        const isInternal = linkUrl.startsWith('/') || linkUrl.startsWith('#');
+                        const isExternal = linkUrl.startsWith('http');
+                        const href = isInternal || isExternal ? linkUrl : `https://${linkUrl}`;
                         parts.push(
                           <a
                             key={key++}
                             href={href}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            target={isInternal ? undefined : "_blank"}
+                            rel={isInternal ? undefined : "noopener noreferrer"}
                             className="text-primary hover:underline"
                           >
                             {linkText}
