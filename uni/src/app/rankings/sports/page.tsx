@@ -2,21 +2,45 @@ import { getTopSportsUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { AdSense } from "@/components/AdSense";
+import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
+import { FAQ } from "@/components/FAQ";
+import { sportsRankingFAQs } from "@/data/faq-data";
 import { Trophy, Medal } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Top Sports Universities in the UK - Best for Sports & Athletics | uni-uk.ai",
-  description: "Find the best UK universities for sports, athletics, and physical education. Featuring Loughborough, Bath, Durham, and other top sporting institutions with world-class facilities.",
+  description: "Best UK universities for sports ranked by BUCS performance. Compare Loughborough, Bath, Durham and 27 more. Find universities with top sports facilities, teams and athletic programmes.",
   keywords: ["best sports universities UK", "Loughborough sport", "athletic universities", "sports facilities", "BUCS", "university sport"],
+  alternates: {
+    canonical: "/rankings/sports",
+  },
 };
 
 export default function TopSportsPage() {
   const universities = getTopSportsUniversities(30);
 
+  const breadcrumbs = [
+    { name: "Home", url: "https://uni-uk.ai" },
+    { name: "Rankings", url: "https://uni-uk.ai/rankings/academic" },
+    { name: "Top Sports", url: "https://uni-uk.ai/rankings/sports" },
+  ];
+
+  const rankingItems = universities.map((uni) => ({
+    name: uni.name,
+    url: `https://uni-uk.ai/universities/${uni.slug}`,
+    position: uni.campusStats.sportsRanking || 0,
+  }));
+
   return (
     <main className="min-h-screen bg-background">
+      <BreadcrumbSchema items={breadcrumbs} />
+      <ItemListSchema
+        name="Top Sports Universities in the UK"
+        description="UK universities ranked by BUCS sports performance and facilities"
+        items={rankingItems}
+      />
       <MainNavigation />
 
       {/* Header */}
@@ -104,6 +128,18 @@ export default function TopSportsPage() {
               adSlot="5811947452"
               adFormat="auto"
               style={{ display: "block" }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <FAQ
+              faqs={sportsRankingFAQs}
+              title="Sports at UK Universities"
             />
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, GraduationCap, MapPin, Trophy, Star } from "lucide-react";
+import { ChevronDown, GraduationCap, MapPin, Trophy, Star, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DropdownProps {
@@ -155,6 +155,11 @@ export function MainNavigation() {
               </div>
             </Dropdown>
 
+            <Link href="/blog" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <BookOpen className="w-4 h-4" />
+              Blog
+            </Link>
+
             <Link href="/#about" className="hover:text-foreground transition-colors">
               About
             </Link>
@@ -214,6 +219,13 @@ export function MainNavigation() {
           >
             <MapPin className="w-3.5 h-3.5" />
             Wales
+          </Link>
+          <Link
+            href="/blog"
+            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            Blog
           </Link>
         </div>
       </div>

@@ -2,21 +2,45 @@ import { getTopAcademicUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { AdSense } from "@/components/AdSense";
+import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
+import { FAQ } from "@/components/FAQ";
+import { academicRankingFAQs } from "@/data/faq-data";
 import { Star, Award } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Top Academic Universities in the UK - Guardian Rankings | uni-uk.ai",
-  description: "Discover the top-ranked UK universities based on Guardian University Guide rankings. Find the best universities for academic excellence including Oxford, Cambridge, Imperial, and more.",
+  description: "Discover the top 30 UK universities ranked by Guardian University Guide 2024. Compare Oxford, Cambridge, Imperial and more by academic excellence, research quality and graduate outcomes.",
   keywords: ["top UK universities", "best universities UK", "Guardian rankings", "academic excellence", "Oxford", "Cambridge", "Russell Group"],
+  alternates: {
+    canonical: "/rankings/academic",
+  },
 };
 
 export default function TopAcademicPage() {
   const universities = getTopAcademicUniversities(30);
 
+  const breadcrumbs = [
+    { name: "Home", url: "https://uni-uk.ai" },
+    { name: "Rankings", url: "https://uni-uk.ai/rankings/academic" },
+    { name: "Top Academic", url: "https://uni-uk.ai/rankings/academic" },
+  ];
+
+  const rankingItems = universities.map((uni, index) => ({
+    name: uni.name,
+    url: `https://uni-uk.ai/universities/${uni.slug}`,
+    position: uni.rankings.guardian || index + 1,
+  }));
+
   return (
     <main className="min-h-screen bg-background">
+      <BreadcrumbSchema items={breadcrumbs} />
+      <ItemListSchema
+        name="Top Academic Universities in the UK"
+        description="UK universities ranked by Guardian University Guide academic excellence"
+        items={rankingItems}
+      />
       <MainNavigation />
 
       {/* Header */}
@@ -103,6 +127,18 @@ export default function TopAcademicPage() {
               adSlot="5811947452"
               adFormat="auto"
               style={{ display: "block" }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <FAQ
+              faqs={academicRankingFAQs}
+              title="Understanding Academic Rankings"
             />
           </div>
         </div>

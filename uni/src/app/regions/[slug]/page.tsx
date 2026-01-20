@@ -2,6 +2,7 @@ import { getUniversitiesByRegion, getRegionMetadata } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { AdSense } from "@/components/AdSense";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -36,6 +37,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const metadata = getRegionMetadata(slug);
+  const universities = getUniversitiesByRegion(slug);
 
   if (!metadata) {
     return {
@@ -43,9 +45,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const description = `Explore ${universities.length} universities in ${metadata.name}. ${metadata.description.slice(0, 100)}`;
+
   return {
     title: `${metadata.name} - Find Universities in ${metadata.name} | uni-uk.ai`,
-    description: metadata.description,
+    description: description.slice(0, 160),
+    alternates: {
+      canonical: `/regions/${slug}`,
+    },
     keywords: [
       `${metadata.name}`,
       "UK universities",
@@ -67,8 +74,15 @@ export default async function RegionPage({ params }: PageProps) {
     notFound();
   }
 
+  const breadcrumbs = [
+    { name: "Home", url: "https://uni-uk.ai" },
+    { name: "Regions", url: "https://uni-uk.ai/universities" },
+    { name: metadata.name, url: `https://uni-uk.ai/regions/${slug}` },
+  ];
+
   return (
     <main className="min-h-screen bg-background">
+      <BreadcrumbSchema items={breadcrumbs} />
       <MainNavigation />
 
       {/* Header */}

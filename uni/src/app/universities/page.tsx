@@ -7,8 +7,11 @@ import { Search } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "All UK Universities A-Z - Complete University Directory | uni-uk.ai",
-    description: "Browse our comprehensive directory of all 140 UK universities. Find detailed information about each institution including rankings, courses, facilities, and student life.",
+    description: "Complete directory of 140+ UK universities A-Z. Compare rankings, entry requirements, student satisfaction, accommodation and more. Find your perfect university match.",
     keywords: ["UK universities list", "all universities UK", "university directory", "find universities", "UK higher education"],
+    alternates: {
+        canonical: "/universities",
+    },
 };
 
 export default function UniversitiesIndexPage() {

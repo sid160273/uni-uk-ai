@@ -6,6 +6,10 @@ import { RankingBadge } from "@/components/RankingBadge";
 import { HeroImage } from "@/components/HeroImage";
 import { AdSense } from "@/components/AdSense";
 import { MainNavigation } from "@/components/MainNavigation";
+import { EducationalOrganizationSchema, BreadcrumbSchema } from "@/components/StructuredData";
+import { FAQ } from "@/components/FAQ";
+import { universityFAQs } from "@/data/faq-data";
+import { RelatedUniversities } from "@/components/RelatedUniversities";
 import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 
@@ -23,9 +27,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
+    const guardianRank = university.rankings.guardian ? `Guardian #${university.rankings.guardian}` : "";
+    const nssScore = university.rankings.nss ? `${university.rankings.nss}% satisfaction` : "";
+    const rankInfo = [guardianRank, nssScore].filter(Boolean).join(", ");
+
+    const description = `${university.name} in ${university.location}: ${rankInfo ? rankInfo + ". " : ""}Entry requirements, accommodation, student life, rankings and more. Compare with other UK universities.`;
+
     return {
         title: `${university.name} - Rankings, Fees & Reviews | uni-uk.ai`,
-        description: `Discover everything about ${university.name}. Rankings, entry requirements, accommodation, student life, and more. Find your perfect university match.`,
+        description: description.slice(0, 160),
+        alternates: {
+            canonical: `/universities/${slug}`,
+        },
         openGraph: {
             title: `${university.name} - uni-uk.ai`,
             description: university.description.slice(0, 150) + "...",
@@ -50,8 +63,23 @@ export default async function UniversityPage({ params }: PageProps) {
         notFound();
     }
 
+    const breadcrumbs = [
+        { name: "Home", url: "https://uni-uk.ai" },
+        { name: "Universities", url: "https://uni-uk.ai/universities" },
+        { name: university.name, url: `https://uni-uk.ai/universities/${slug}` },
+    ];
+
     return (
         <main className="min-h-screen bg-background pb-20">
+            <EducationalOrganizationSchema
+                name={university.name}
+                url={`https://uni-uk.ai/universities/${slug}`}
+                description={university.description}
+                location={university.location}
+                imageUrl={university.imageUrl}
+                rankings={university.rankings}
+            />
+            <BreadcrumbSchema items={breadcrumbs} />
             <MainNavigation />
 
             {/* Hero Section */}
@@ -258,6 +286,12 @@ export default async function UniversityPage({ params }: PageProps) {
                             </p>
                         </section>
 
+                        {/* FAQ Section */}
+                        <FAQ
+                            faqs={universityFAQs(university.name, university.location)}
+                            title={`Frequently Asked Questions about ${university.name}`}
+                        />
+
                     </div>
 
                     {/* Sidebar */}
@@ -358,6 +392,9 @@ export default async function UniversityPage({ params }: PageProps) {
 
                     </div>
                 </div>
+
+                {/* Related Universities */}
+                <RelatedUniversities currentUniversity={university} maxResults={4} />
             </div>
         </main>
     );

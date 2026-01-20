@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAllUniversities } from '@/lib/data'
+import { getAllBlogPosts } from '@/data/blog-posts'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://uni-uk.ai'
@@ -33,6 +34,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.9,
+  }))
+
+  // Get all blog posts
+  const blogPosts = getAllBlogPosts()
+
+  const blogUrls = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.updatedAt),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
   }))
 
   return [
@@ -72,7 +83,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
     ...regionUrls,
     ...universityUrls,
+    ...blogUrls,
   ]
 }

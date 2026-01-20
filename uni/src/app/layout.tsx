@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { EzoicRouteHandler } from "@/components/EzoicRouteHandler";
+import { OrganizationSchema, WebSiteSchema } from "@/components/StructuredData";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,10 +16,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://uni-uk.ai"),
   title: "uni-uk.ai - Find Your Perfect UK University",
-  description: "AI-powered university discovery platform helping students find the perfect UK university based on their interests, goals, and preferences.",
+  description: "Discover your ideal UK university with our AI-powered search. Compare 140+ universities by rankings, location, student satisfaction, and more. Free university finder for students.",
   keywords: ["UK universities", "university finder", "AI university search", "UK colleges", "university rankings", "student guide"],
   authors: [{ name: "uni-uk.ai" }],
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
@@ -120,6 +125,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <OrganizationSchema />
+        <WebSiteSchema />
         <EzoicRouteHandler />
         {children}
       </body>

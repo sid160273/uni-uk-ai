@@ -2,21 +2,45 @@ import { getTopSatisfactionUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { AdSense } from "@/components/AdSense";
+import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
+import { FAQ } from "@/components/FAQ";
+import { satisfactionRankingFAQs } from "@/data/faq-data";
 import { Star, Heart } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Top Student Satisfaction Universities in the UK - NSS Rankings | uni-uk.ai",
-  description: "Discover UK universities with the highest student satisfaction scores based on National Student Survey (NSS) results. Find where students are happiest and most satisfied with their experience.",
+  description: "UK universities ranked by National Student Survey (NSS) satisfaction scores. Compare 30 top-rated universities for teaching quality, student support and overall experience.",
   keywords: ["student satisfaction UK", "NSS rankings", "best student experience", "happy students", "university satisfaction"],
+  alternates: {
+    canonical: "/rankings/satisfaction",
+  },
 };
 
 export default function TopSatisfactionPage() {
   const universities = getTopSatisfactionUniversities(30);
 
+  const breadcrumbs = [
+    { name: "Home", url: "https://uni-uk.ai" },
+    { name: "Rankings", url: "https://uni-uk.ai/rankings/academic" },
+    { name: "Student Satisfaction", url: "https://uni-uk.ai/rankings/satisfaction" },
+  ];
+
+  const rankingItems = universities.map((uni, index) => ({
+    name: uni.name,
+    url: `https://uni-uk.ai/universities/${uni.slug}`,
+    position: index + 1,
+  }));
+
   return (
     <main className="min-h-screen bg-background">
+      <BreadcrumbSchema items={breadcrumbs} />
+      <ItemListSchema
+        name="Top Student Satisfaction Universities in the UK"
+        description="UK universities ranked by National Student Survey (NSS) satisfaction scores"
+        items={rankingItems}
+      />
       <MainNavigation />
 
       {/* Header */}
@@ -105,6 +129,18 @@ export default function TopSatisfactionPage() {
               adSlot="5811947452"
               adFormat="auto"
               style={{ display: "block" }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <FAQ
+              faqs={satisfactionRankingFAQs}
+              title="Understanding Student Satisfaction"
             />
           </div>
         </div>
