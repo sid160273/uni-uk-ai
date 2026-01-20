@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-12-18T07:05:45.600Z",
+  "userId": "admin",
+  "action": "budget_updated",
+  "details": {
+    "campaignId": "23139897506",
+    "campaignName": "A25-Search-Gen-All Day",
+    "oldBudget": 135,
+    "newBudget": 150,
+    "budgetResourceName": "customers/8545210000/campaignBudgets/15027226787"
+  }
+}

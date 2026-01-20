@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { google } from 'googleapis';
+import { Resend } from 'resend';
 import { fetchAllNews } from '@/lib/news-sources';
 import {
   generateBlogPost,
@@ -9,6 +10,8 @@ import {
   GeneratedBlogPost,
 } from '@/lib/blog-generator';
 import { slugExists } from '@/lib/blog-data';
+
+const ALERT_EMAIL = 'sid@coda.biz';
 
 /**
  * Automated Blog Generation Cron Endpoint
@@ -144,6 +147,10 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Error in blog generation cron:', error);
+
+    // Send failure notification email
+    await sendFailureEmail('Blog Generation Error', error.message);
+
     return NextResponse.json(
       {
         error: 'Failed to generate blog post',
@@ -152,6 +159,37 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Sends a failure notification email
+ */
+async function sendFailureEmail(subject: string, errorDetails: string): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured, skipping email notification');
+    return;
+  }
+
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: 'uni-uk.ai <alerts@uni-uk.ai>',
+      to: ALERT_EMAIL,
+      subject: `[uni-uk.ai] Cron Failed: ${subject}`,
+      html: `
+        <h2>Blog Generation Cron Failed</h2>
+        <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+        <p><strong>Error:</strong></p>
+        <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px;">${errorDetails}</pre>
+        <p>Check the Vercel logs for more details.</p>
+      `,
+    });
+
+    console.log('Failure notification email sent');
+  } catch (emailError) {
+    console.error('Failed to send notification email:', emailError);
   }
 }
 

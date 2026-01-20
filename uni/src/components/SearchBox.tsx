@@ -47,6 +47,29 @@ export function SearchBox() {
         }
     }, []);
 
+    // Track Google Click ID (gclid) for ads correlation
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gclid = urlParams.get('gclid');
+
+            if (gclid) {
+                // Store gclid in sessionStorage for correlation with chat completion
+                sessionStorage.setItem('adsClickId', gclid);
+
+                // Track ads-driven visit in Google Analytics
+                // @ts-ignore
+                if (typeof window.gtag !== 'undefined') {
+                    // @ts-ignore
+                    window.gtag('event', 'ads_driven_visit', {
+                        gclid: gclid,
+                        landing_page: window.location.pathname,
+                    });
+                }
+            }
+        }
+    }, []);
+
     const scrollToLatestMessage = () => {
         if (messages.length > 1 && messagesEndRef.current) {
             const chatContainer = messagesEndRef.current.parentElement;
@@ -139,6 +162,8 @@ export function SearchBox() {
 
         // Fire HIGH-VALUE conversion when user completes all 5 questions (once per session)
         if (newCount === 5 && typeof window !== 'undefined' && !sessionStorage.getItem('chatCompletedConversion')) {
+            const adsClickId = sessionStorage.getItem('adsClickId');
+
             // @ts-ignore
             if (typeof window.gtag !== 'undefined') {
                 // @ts-ignore
@@ -147,6 +172,16 @@ export function SearchBox() {
                     'value': 5.0, // Higher value for completed chat
                     'currency': 'GBP'
                 });
+
+                // Track ads-driven chat completion if gclid is present
+                if (adsClickId) {
+                    // @ts-ignore
+                    window.gtag('event', 'ads_chat_completion', {
+                        gclid: adsClickId,
+                        value: 5.0,
+                        currency: 'GBP'
+                    });
+                }
                 sessionStorage.setItem('chatCompletedConversion', 'true');
             }
         }
