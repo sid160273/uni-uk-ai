@@ -152,8 +152,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                       const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
                       // Check for bold text **text**
                       const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-                      // Check for plain URLs (www. or https:// or http://)
-                      const urlMatch = remaining.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/);
+                      // Check for plain URLs (www. or https:// or http://) - exclude trailing punctuation
+                      const urlMatch = remaining.match(/(https?:\/\/[^\s\)\]\,]+|www\.[^\s\)\]\,]+)/);
 
                       // Find the earliest match
                       const matches = [
@@ -215,11 +215,19 @@ export default async function BlogPostPage({ params }: PageProps) {
                     return parts.length === 1 ? parts[0] : parts;
                   };
 
-                  if (trimmed.startsWith("# ")) {
+                  // Check headings from most specific (####) to least specific (#)
+                  if (trimmed.startsWith("#### ")) {
                     return (
-                      <h1 key={index} className="text-3xl font-bold mt-8 mb-4">
-                        {parseInlineMarkdown(trimmed.slice(2))}
-                      </h1>
+                      <h4 key={index} className="text-lg font-semibold mt-4 mb-2">
+                        {parseInlineMarkdown(trimmed.slice(5))}
+                      </h4>
+                    );
+                  }
+                  if (trimmed.startsWith("### ")) {
+                    return (
+                      <h3 key={index} className="text-xl font-semibold mt-6 mb-3">
+                        {parseInlineMarkdown(trimmed.slice(4))}
+                      </h3>
                     );
                   }
                   if (trimmed.startsWith("## ")) {
@@ -229,11 +237,11 @@ export default async function BlogPostPage({ params }: PageProps) {
                       </h2>
                     );
                   }
-                  if (trimmed.startsWith("### ")) {
+                  if (trimmed.startsWith("# ")) {
                     return (
-                      <h3 key={index} className="text-xl font-semibold mt-6 mb-3">
-                        {parseInlineMarkdown(trimmed.slice(4))}
-                      </h3>
+                      <h1 key={index} className="text-3xl font-bold mt-8 mb-4">
+                        {parseInlineMarkdown(trimmed.slice(2))}
+                      </h1>
                     );
                   }
                   if (trimmed.startsWith("- ")) {
