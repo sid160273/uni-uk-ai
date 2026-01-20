@@ -23,10 +23,18 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       >
         <div className="grid md:grid-cols-2 gap-0">
           <div className="relative h-64 md:h-full min-h-[250px]">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-6xl">📚</div>
-            </div>
+            {post.imageUrl.startsWith("http") ? (
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20 opacity-30" />
           </div>
           <div className="p-6 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-3">
@@ -61,15 +69,18 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       className="group block bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all"
     >
       <div className="relative h-48">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-5xl">
-            {post.category === "Guides" && "📖"}
-            {post.category === "University Types" && "🏛️"}
-            {post.category === "International" && "🌍"}
-            {post.category === "Student Life" && "🎓"}
-          </div>
-        </div>
+        {post.imageUrl.startsWith("http") ? (
+          <Image
+            src={post.imageUrl}
+            alt={post.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10 opacity-30" />
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1 bg-background/90 backdrop-blur-sm text-xs font-medium rounded-full">
             {post.category}

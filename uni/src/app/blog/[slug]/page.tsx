@@ -148,22 +148,68 @@ export default async function BlogPostPage({ params }: PageProps) {
                     let key = 0;
 
                     while (remaining.length > 0) {
+                      // Check for markdown links [text](url)
+                      const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
                       // Check for bold text **text**
                       const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-                      if (boldMatch && boldMatch.index !== undefined) {
-                        // Add text before bold
-                        if (boldMatch.index > 0) {
-                          parts.push(remaining.slice(0, boldMatch.index));
-                        }
-                        // Add bold text
-                        parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
-                        remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
-                        continue;
+                      // Check for plain URLs (www. or https:// or http://)
+                      const urlMatch = remaining.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/);
+
+                      // Find the earliest match
+                      const matches = [
+                        linkMatch ? { type: 'link', match: linkMatch, index: linkMatch.index! } : null,
+                        boldMatch ? { type: 'bold', match: boldMatch, index: boldMatch.index! } : null,
+                        urlMatch ? { type: 'url', match: urlMatch, index: urlMatch.index! } : null,
+                      ].filter(Boolean) as { type: string; match: RegExpMatchArray; index: number }[];
+
+                      if (matches.length === 0) {
+                        parts.push(remaining);
+                        break;
                       }
 
-                      // No more matches, add remaining text
-                      parts.push(remaining);
-                      break;
+                      // Sort by index to find earliest match
+                      matches.sort((a, b) => a.index - b.index);
+                      const earliest = matches[0];
+
+                      // Add text before the match
+                      if (earliest.index > 0) {
+                        parts.push(remaining.slice(0, earliest.index));
+                      }
+
+                      if (earliest.type === 'link') {
+                        const [fullMatch, linkText, linkUrl] = earliest.match;
+                        const href = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
+                        parts.push(
+                          <a
+                            key={key++}
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {linkText}
+                          </a>
+                        );
+                        remaining = remaining.slice(earliest.index + fullMatch.length);
+                      } else if (earliest.type === 'bold') {
+                        parts.push(<strong key={key++}>{earliest.match[1]}</strong>);
+                        remaining = remaining.slice(earliest.index + earliest.match[0].length);
+                      } else if (earliest.type === 'url') {
+                        const url = earliest.match[0];
+                        const href = url.startsWith('http') ? url : `https://${url}`;
+                        parts.push(
+                          <a
+                            key={key++}
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {url}
+                          </a>
+                        );
+                        remaining = remaining.slice(earliest.index + url.length);
+                      }
                     }
 
                     return parts.length === 1 ? parts[0] : parts;
