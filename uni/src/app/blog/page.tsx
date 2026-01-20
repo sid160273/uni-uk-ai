@@ -1,4 +1,4 @@
-import { getAllBlogPosts, getAllCategories } from "@/data/blog-posts";
+import { getAllBlogPostsCombined, getAllCategoriesCombined } from "@/lib/blog-data";
 import { BlogCardList } from "@/components/BlogCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BreadcrumbSchema } from "@/components/StructuredData";
@@ -14,9 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogIndexPage() {
-  const posts = getAllBlogPosts();
-  const categories = getAllCategories();
+// Revalidate every hour to pick up new blog posts
+export const revalidate = 3600;
+
+export default async function BlogIndexPage() {
+  const posts = await getAllBlogPostsCombined();
+  const categories = await getAllCategoriesCombined();
 
   const breadcrumbs = [
     { name: "Home", url: "https://uni-uk.ai" },

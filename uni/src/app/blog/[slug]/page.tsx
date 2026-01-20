@@ -1,4 +1,4 @@
-import { getBlogPostBySlug, getAllBlogPosts, getRelatedBlogPosts } from "@/data/blog-posts";
+import { getBlogPostBySlugCombined, getAllBlogPostsCombined, getRelatedBlogPostsCombined } from "@/lib/blog-data";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BlogCard } from "@/components/BlogCard";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/StructuredData";
@@ -7,13 +7,16 @@ import Link from "next/link";
 import { Clock, Calendar, ArrowLeft, Tag } from "lucide-react";
 import type { Metadata } from "next";
 
+// Revalidate every hour to pick up new blog posts
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlugCombined(slug);
 
   if (!post) {
     return {
@@ -45,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const posts = getAllBlogPosts();
+  const posts = await getAllBlogPostsCombined();
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -53,13 +56,13 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlugCombined(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = getRelatedBlogPosts(slug, 3);
+  const relatedPosts = await getRelatedBlogPostsCombined(slug, 3);
 
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-GB", {
     day: "numeric",
