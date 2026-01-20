@@ -141,52 +141,73 @@ export default async function BlogPostPage({ params }: PageProps) {
                   const trimmed = paragraph.trim();
                   if (!trimmed) return null;
 
+                  // Helper function to parse inline markdown (bold, links)
+                  const parseInlineMarkdown = (text: string) => {
+                    const parts: React.ReactNode[] = [];
+                    let remaining = text;
+                    let key = 0;
+
+                    while (remaining.length > 0) {
+                      // Check for bold text **text**
+                      const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
+                      if (boldMatch && boldMatch.index !== undefined) {
+                        // Add text before bold
+                        if (boldMatch.index > 0) {
+                          parts.push(remaining.slice(0, boldMatch.index));
+                        }
+                        // Add bold text
+                        parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
+                        remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
+                        continue;
+                      }
+
+                      // No more matches, add remaining text
+                      parts.push(remaining);
+                      break;
+                    }
+
+                    return parts.length === 1 ? parts[0] : parts;
+                  };
+
                   if (trimmed.startsWith("# ")) {
                     return (
                       <h1 key={index} className="text-3xl font-bold mt-8 mb-4">
-                        {trimmed.slice(2)}
+                        {parseInlineMarkdown(trimmed.slice(2))}
                       </h1>
                     );
                   }
                   if (trimmed.startsWith("## ")) {
                     return (
                       <h2 key={index} className="text-2xl font-bold mt-8 mb-4">
-                        {trimmed.slice(3)}
+                        {parseInlineMarkdown(trimmed.slice(3))}
                       </h2>
                     );
                   }
                   if (trimmed.startsWith("### ")) {
                     return (
                       <h3 key={index} className="text-xl font-semibold mt-6 mb-3">
-                        {trimmed.slice(4)}
+                        {parseInlineMarkdown(trimmed.slice(4))}
                       </h3>
-                    );
-                  }
-                  if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
-                    return (
-                      <p key={index} className="font-semibold my-4">
-                        {trimmed.slice(2, -2)}
-                      </p>
                     );
                   }
                   if (trimmed.startsWith("- ")) {
                     return (
                       <li key={index} className="ml-4 text-muted-foreground">
-                        {trimmed.slice(2)}
+                        {parseInlineMarkdown(trimmed.slice(2))}
                       </li>
                     );
                   }
                   if (/^\d+\./.test(trimmed)) {
                     return (
                       <li key={index} className="ml-4 text-muted-foreground list-decimal">
-                        {trimmed.replace(/^\d+\.\s*/, "")}
+                        {parseInlineMarkdown(trimmed.replace(/^\d+\.\s*/, ""))}
                       </li>
                     );
                   }
 
                   return (
                     <p key={index} className="text-muted-foreground leading-relaxed my-4">
-                      {trimmed}
+                      {parseInlineMarkdown(trimmed)}
                     </p>
                   );
                 })}

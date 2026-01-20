@@ -10,6 +10,8 @@ declare global {
 // Track ad click as conversion
 export const trackAdClick = (adSlot?: string, adUnit?: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('📊 Tracking ad click:', { adSlot, adUnit });
+
     window.gtag('event', 'ad_click', {
       event_category: 'advertisement',
       event_label: adSlot || adUnit || 'unknown',
@@ -24,38 +26,54 @@ export const trackAdClick = (adSlot?: string, adUnit?: string) => {
       event_label: 'ad_click',
       value: 1,
     });
+
+    console.log('✅ Ad click events sent to GA4');
+  } else {
+    console.warn('⚠️ gtag not available for tracking');
   }
 };
 
 // Track ad impression
 export const trackAdImpression = (adSlot?: string, adUnit?: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('👁️ Tracking ad impression:', { adSlot, adUnit });
+
     window.gtag('event', 'ad_impression', {
       event_category: 'advertisement',
       event_label: adSlot || adUnit || 'unknown',
       value: 0.1,
     });
+
+    console.log('✅ Ad impression event sent to GA4');
   }
 };
 
 // Track Ezoic ad loaded
 export const trackEzoicAdLoaded = (placementId: number) => {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('📊 Tracking Ezoic ad loaded:', placementId);
+
     window.gtag('event', 'ezoic_ad_loaded', {
       event_category: 'advertisement',
       event_label: `placement_${placementId}`,
       value: 0.1,
     });
+
+    console.log('✅ Ezoic ad loaded event sent to GA4');
   }
 };
 
 // Track AdSense ad loaded
 export const trackAdSenseLoaded = (adSlot: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('📊 Tracking AdSense ad loaded:', adSlot);
+
     window.gtag('event', 'adsense_loaded', {
       event_category: 'advertisement',
       event_label: adSlot,
       value: 0.1,
     });
+
+    console.log('✅ AdSense ad loaded event sent to GA4');
   }
 };

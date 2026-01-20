@@ -36,22 +36,50 @@ export function AdSense({
   }, [adSlot]);
 
   useEffect(() => {
-    // Track clicks on the ad container
+    // Track potential ad clicks using blur detection
+    // When user clicks an ad in iframe, they leave the page (blur event)
     const adElement = adRef.current;
     if (!adElement) return;
 
-    const handleClick = (e: MouseEvent) => {
-      // Check if click is on an iframe (ad content)
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'IFRAME' || target.closest('iframe')) {
-        trackAdClick(adSlot, 'adsense');
+    let mouseOverAd = false;
+    let blurTimeout: NodeJS.Timeout;
+
+    const handleMouseEnter = () => {
+      mouseOverAd = true;
+    };
+
+    const handleMouseLeave = () => {
+      mouseOverAd = false;
+    };
+
+    const handleBlur = () => {
+      // If mouse was over ad when page lost focus, likely an ad click
+      if (mouseOverAd) {
+        // Small delay to avoid false positives
+        blurTimeout = setTimeout(() => {
+          trackAdClick(adSlot, 'adsense');
+        }, 100);
       }
     };
 
-    adElement.addEventListener('click', handleClick, true);
+    const handleFocus = () => {
+      // User came back, cancel the tracking
+      if (blurTimeout) {
+        clearTimeout(blurTimeout);
+      }
+    };
+
+    adElement.addEventListener('mouseenter', handleMouseEnter);
+    adElement.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
-      adElement.removeEventListener('click', handleClick, true);
+      adElement.removeEventListener('mouseenter', handleMouseEnter);
+      adElement.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      if (blurTimeout) clearTimeout(blurTimeout);
     };
   }, [adSlot]);
 
