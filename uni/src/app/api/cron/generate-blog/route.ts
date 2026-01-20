@@ -11,7 +11,7 @@ import {
 } from '@/lib/blog-generator';
 import { slugExists } from '@/lib/blog-data';
 
-const ALERT_EMAIL = 'sid@coda.biz';
+const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
 /**
  * Automated Blog Generation Cron Endpoint
@@ -175,7 +175,7 @@ async function sendFailureEmail(subject: string, errorDetails: string): Promise<
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: 'uni-uk.ai <alerts@uni-uk.ai>',
+      from: 'uni-uk.ai <onboarding@resend.dev>',
       to: ALERT_EMAIL,
       subject: `[uni-uk.ai] Cron Failed: ${subject}`,
       html: `
