@@ -7,8 +7,8 @@ import Link from "next/link";
 import { Clock, Calendar, ArrowLeft, Tag } from "lucide-react";
 import type { Metadata } from "next";
 
-// Revalidate every hour to pick up new blog posts
-export const revalidate = 3600;
+// Force dynamic rendering to always show fresh content
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ slug: string }>;

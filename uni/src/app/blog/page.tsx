@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Revalidate every hour to pick up new blog posts
-export const revalidate = 3600;
+// Force dynamic rendering to always show fresh content
+export const dynamic = 'force-dynamic';
 
 export default async function BlogIndexPage() {
   const posts = await getAllBlogPostsCombined();
