@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next'
 import { getAllUniversities } from '@/lib/data'
-import { getAllBlogPosts } from '@/data/blog-posts'
+import { getAllBlogPostsCombined, getAllCategoriesCombined } from '@/lib/blog-data'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://uni-uk.ai'
 
   // Get all universities
@@ -36,14 +36,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }))
 
-  // Get all blog posts
-  const blogPosts = getAllBlogPosts()
+  // Get all blog posts (static + dynamic from Google Sheets)
+  const blogPosts = await getAllBlogPostsCombined()
 
   const blogUrls = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt),
-    changeFrequency: 'monthly' as const,
+    changeFrequency: 'weekly' as const,
     priority: 0.7,
+  }))
+
+  // Get blog categories for category pages
+  const categories = await getAllCategoriesCombined()
+
+  const categoryUrls = categories.map((category) => ({
+    url: `${baseUrl}/blog/category/${category.toLowerCase().replace(/\s+/g, '-')}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
   }))
 
   return [
@@ -92,5 +102,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...regionUrls,
     ...universityUrls,
     ...blogUrls,
+    ...categoryUrls,
   ]
 }

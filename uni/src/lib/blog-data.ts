@@ -234,3 +234,45 @@ export async function slugExists(slug: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Gets all news source URLs that have already been used for blog posts
+ */
+export async function getUsedNewsSourceUrls(): Promise<Set<string>> {
+  const usedUrls = new Set<string>();
+
+  try {
+    const dynamicPosts = await fetchBlogPostsFromSheets();
+    for (const post of dynamicPosts) {
+      if (post.newsSource) {
+        // Normalize URL by removing trailing slashes and query params
+        const normalizedUrl = normalizeUrl(post.newsSource);
+        usedUrls.add(normalizedUrl);
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching used news sources:', error);
+  }
+
+  return usedUrls;
+}
+
+/**
+ * Normalizes a URL for comparison (removes query params, trailing slashes, etc.)
+ */
+function normalizeUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    // Remove common tracking parameters
+    parsed.searchParams.delete('utm_source');
+    parsed.searchParams.delete('utm_medium');
+    parsed.searchParams.delete('utm_campaign');
+    parsed.searchParams.delete('at_medium');
+    parsed.searchParams.delete('at_campaign');
+    // Return pathname + remaining params
+    return `${parsed.hostname}${parsed.pathname}`.replace(/\/$/, '').toLowerCase();
+  } catch {
+    // If URL parsing fails, just normalize the string
+    return url.replace(/\/$/, '').toLowerCase();
+  }
+}

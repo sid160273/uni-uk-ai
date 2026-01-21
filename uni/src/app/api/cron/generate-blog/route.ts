@@ -9,7 +9,7 @@ import {
   selectBestTopic,
   GeneratedBlogPost,
 } from '@/lib/blog-generator';
-import { slugExists } from '@/lib/blog-data';
+import { slugExists, getUsedNewsSourceUrls } from '@/lib/blog-data';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
 
     // Step 1: Fetch news from RSS feeds
     console.log('Fetching news from RSS feeds...');
-    const newsItems = await fetchAllNews();
+    const allNewsItems = await fetchAllNews();
 
-    if (newsItems.length === 0) {
+    if (allNewsItems.length === 0) {
       return NextResponse.json({
         success: false,
         message: 'No relevant news items found',
@@ -59,7 +59,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`Found ${newsItems.length} relevant news items`);
+    // Step 1b: Filter out news stories we've already covered
+    console.log('Checking for duplicate news stories...');
+    const usedUrls = await getUsedNewsSourceUrls();
+    const newsItems = allNewsItems.filter(item => {
+      const normalizedUrl = `${new URL(item.link).hostname}${new URL(item.link).pathname}`.replace(/\/$/, '').toLowerCase();
+      return !usedUrls.has(normalizedUrl);
+    });
+
+    console.log(`Found ${allNewsItems.length} news items, ${newsItems.length} are new (${allNewsItems.length - newsItems.length} duplicates filtered)`);
+
+    if (newsItems.length === 0) {
+      return NextResponse.json({
+        success: false,
+        message: 'All news items have already been covered',
+        totalFound: allNewsItems.length,
+        duplicatesFiltered: allNewsItems.length,
+        duration: Date.now() - startTime,
+      });
+    }
 
     // Step 2: Select the best topic
     console.log('Selecting best topic...');
