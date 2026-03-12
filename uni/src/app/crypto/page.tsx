@@ -119,7 +119,7 @@ export default async function CryptoDashboard() {
             {" "}🪙
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Click any coin to see its chart and get instant AI analysis — everything is connected
+            Pick a coin, watch the chart, get AI insights — all in one place
           </p>
         </div>
       </section>

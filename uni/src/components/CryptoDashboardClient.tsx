@@ -156,11 +156,14 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
     const prompt = `Tell me about ${coin.name} (${coin.symbol.toUpperCase()}). It's currently at ${formatPrice(coin.current_price)}, ${direction} ${Math.abs(change).toFixed(2)}% today. What's driving this and what should I know?`;
     sendMessage(prompt);
 
-    // Scroll to chat on mobile
+    // On mobile: scroll to chart first so they see it change, then chat loads below
     if (window.innerWidth < 1024) {
-      setTimeout(() => {
-        chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
+      const chartEl = document.getElementById("chart");
+      if (chartEl) {
+        setTimeout(() => {
+          chartEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     }
   }, [sendMessage]);
 
@@ -171,11 +174,55 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
 
   return (
     <>
+      {/* ═══ HOW IT WORKS — 3-step guide ═══ */}
+      <section className="container mx-auto px-4 pb-4">
+        <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-yellow-50 dark:from-yellow-950/20 dark:via-orange-950/20 dark:to-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 md:p-5">
+          <div className="grid grid-cols-3 gap-3 md:gap-6">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-yellow-500 text-white font-bold text-lg md:text-xl mb-2">
+                1
+              </div>
+              <p className="text-xs md:text-sm font-bold">Pick a Coin</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 hidden sm:block">
+                Click any coin below
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-500 text-white font-bold text-lg md:text-xl mb-2">
+                2
+              </div>
+              <p className="text-xs md:text-sm font-bold">See the Chart</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 hidden sm:block">
+                Live price graph updates
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-500 text-white font-bold text-lg md:text-xl mb-2">
+                3
+              </div>
+              <p className="text-xs md:text-sm font-bold">AI Explains</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 hidden sm:block">
+                Get instant analysis
+              </p>
+            </div>
+          </div>
+          {/* Connecting arrows on desktop */}
+          <div className="hidden md:flex justify-center items-center gap-1 mt-3 text-muted-foreground text-xs">
+            <span>📊 Table</span>
+            <span className="text-yellow-500">→</span>
+            <span>📈 Chart</span>
+            <span className="text-orange-500">→</span>
+            <span>🤖 AI Chat</span>
+            <span className="text-muted-foreground/50 ml-2">— everything is connected</span>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ CHART (switches when you click a coin) ═══ */}
-      <section className="container mx-auto px-4 pb-6">
+      <section className="container mx-auto px-4 pb-6" id="chart">
         {selectedCoin && (
           <CryptoChart
-            key={selectedCoin.id} // force remount on coin change
+            key={selectedCoin.id}
             coinId={selectedCoin.id}
             coinName={selectedCoin.name}
             coinSymbol={selectedCoin.symbol}
@@ -183,12 +230,23 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             change24h={selectedCoin.price_change_percentage_24h}
           />
         )}
-        {/* Hint */}
-        <div className="flex items-center justify-center gap-2 mt-3">
-          <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
-            👆 Click any coin below to view its chart &amp; get AI analysis
-          </span>
-        </div>
+
+        {/* Mobile: show selected coin indicator + jump-to-chat button */}
+        {selectedCoin && messages.length > 0 && (
+          <div className="lg:hidden flex items-center justify-between mt-3 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-lg px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <img src={selectedCoin.image} alt={selectedCoin.name} className="w-5 h-5 rounded-full" />
+              <span className="text-sm font-bold">{selectedCoin.symbol.toUpperCase()}</span>
+              <span className="text-xs text-muted-foreground">selected</span>
+            </div>
+            <button
+              onClick={() => chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="text-xs bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-3 py-1.5 rounded-full font-medium"
+            >
+              See AI Analysis ↓
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ═══ TWO-COLUMN LAYOUT ═══ */}
@@ -200,7 +258,15 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">📊 Market Overview</h2>
-                <span className="text-xs text-muted-foreground">Click a coin to explore • Prices in GBP</span>
+                <div className="flex items-center gap-2">
+                  {selectedCoin && (
+                    <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 px-2 py-0.5 rounded-full font-medium hidden md:inline-flex items-center gap-1">
+                      <img src={selectedCoin.image} alt="" className="w-3.5 h-3.5 rounded-full" />
+                      {selectedCoin.symbol.toUpperCase()}
+                    </span>
+                  )}
+                  <span className="text-[10px] md:text-xs text-muted-foreground">👆 Click a coin • GBP</span>
+                </div>
               </div>
 
               <div className="bg-card border rounded-xl overflow-hidden">
@@ -363,13 +429,15 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             <div className="lg:sticky lg:top-20 space-y-6">
 
               <div id="chat" ref={chatSectionRef}>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <h2 className="text-xl font-bold">🤖 Crypto AI</h2>
-                  <span className="text-xs text-muted-foreground">• Live market data</span>
-                  {selectedCoin && (
-                    <span className="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">
-                      Viewing: {selectedCoin.symbol.toUpperCase()}
+                  {selectedCoin ? (
+                    <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5">
+                      <img src={selectedCoin.image} alt="" className="w-4 h-4 rounded-full" />
+                      Analysing {selectedCoin.name}
                     </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">• Pick a coin above</span>
                   )}
                 </div>
 
@@ -455,7 +523,7 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                         </div>
                         <div>
                           <p className="text-sm font-medium">Crypto AI Assistant</p>
-                          <p className="text-xs text-muted-foreground">Click a coin or ask me anything</p>
+                          <p className="text-xs text-muted-foreground">Click a coin in the table — I&apos;ll explain it instantly</p>
                         </div>
                       </div>
 
