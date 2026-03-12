@@ -2,8 +2,9 @@
 User-agent: *
 Allow: /
 
+# Block internal/API routes from indexing
+Disallow: /api/
+Disallow: /test-analytics
+
 # Sitemap location
 Sitemap: https://uni-uk.ai/sitemap.xml
-
-# Crawl delay (optional, adjust as needed)
-Crawl-delay: 1

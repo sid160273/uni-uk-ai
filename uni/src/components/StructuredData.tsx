@@ -1,15 +1,19 @@
-import Script from "next/script";
-
 // Organization Schema for uni-uk.ai brand
 export function OrganizationSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://uni-uk.ai/#organization",
     name: "uni-uk.ai",
     url: "https://uni-uk.ai",
-    logo: "https://uni-uk.ai/logo.png",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://uni-uk.ai/logo.png",
+      width: 512,
+      height: 512,
+    },
     description:
-      "AI-powered university discovery platform helping students find the perfect UK university based on their interests, goals, and preferences.",
+      "AI-powered platform for UK university discovery, rankings, and trending education news. Helping students find the perfect university with comprehensive data and insights.",
     sameAs: [],
     contactPoint: {
       "@type": "ContactPoint",
@@ -31,10 +35,14 @@ export function WebSiteSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://uni-uk.ai/#website",
     name: "uni-uk.ai",
     url: "https://uni-uk.ai",
     description:
-      "Find your perfect UK university with AI-powered search and comprehensive university data.",
+      "AI-powered UK university discovery platform with rankings, trending education news, and comprehensive university data.",
+    publisher: {
+      "@id": "https://uni-uk.ai/#organization",
+    },
     potentialAction: {
       "@type": "SearchAction",
       target: {
