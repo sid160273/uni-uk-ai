@@ -1,11 +1,8 @@
 import { MainNavigation } from "@/components/MainNavigation";
 import { CryptoTicker } from "@/components/CryptoTicker";
-import { CryptoChart } from "@/components/CryptoChart";
-import { MiniSparkline } from "@/components/CryptoChart";
-import { CryptoSearchBox } from "@/components/CryptoSearchBox";
-import { AdPlaceholder } from "@/components/AdPlaceholder";
+import { CryptoDashboardClient } from "@/components/CryptoDashboardClient";
 import { BreadcrumbSchema } from "@/components/StructuredData";
-import { fetchTopCoins, fetchTrendingCoins, formatPrice, formatLargeNumber } from "@/lib/crypto-sources";
+import { fetchTopCoins, fetchTrendingCoins, formatPrice } from "@/lib/crypto-sources";
 import { getCryptoPosts } from "@/lib/crypto-data";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -50,13 +47,41 @@ export default async function CryptoDashboard() {
     getCryptoPosts(),
   ]);
 
-  const topCoin = coins[0];
-  const recentPosts = cryptoPosts.slice(0, 5);
-
   const breadcrumbs = [
     { name: "Home", url: "https://uni-uk.ai" },
     { name: "Crypto", url: "https://uni-uk.ai/crypto" },
   ];
+
+  // Serialize coin data for client component (strip non-serializable fields)
+  const serializedCoins = coins.map((c) => ({
+    id: c.id,
+    symbol: c.symbol,
+    name: c.name,
+    image: c.image,
+    current_price: c.current_price,
+    price_change_percentage_24h: c.price_change_percentage_24h || 0,
+    price_change_percentage_7d_in_currency: c.price_change_percentage_7d_in_currency || 0,
+    market_cap: c.market_cap,
+    total_volume: c.total_volume,
+    sparkline_in_7d_price: c.sparkline_in_7d?.price?.slice(-24) || [],
+  }));
+
+  const serializedTrending = trendingCoins.slice(0, 6).map((c) => ({
+    id: c.id,
+    name: c.name,
+    symbol: c.symbol,
+    thumb: c.thumb,
+    large: c.large,
+    market_cap_rank: c.market_cap_rank || 0,
+  }));
+
+  const serializedPosts = cryptoPosts.slice(0, 5).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.excerpt,
+    coins: p.coins,
+    readingTime: p.readingTime,
+  }));
 
   return (
     <main className="min-h-screen bg-background">
@@ -94,227 +119,17 @@ export default async function CryptoDashboard() {
             {" "}🪙
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Live prices, trending coins and AI-powered analysis — your one-stop crypto command centre
+            Click any coin to see its chart and get instant AI analysis — everything is connected
           </p>
         </div>
       </section>
 
-      {/* Bitcoin Chart - Full Width */}
-      {topCoin && (
-        <section className="container mx-auto px-4 pb-6">
-          <CryptoChart
-            coinId={topCoin.id}
-            coinName={topCoin.name}
-            coinSymbol={topCoin.symbol}
-            currentPrice={topCoin.current_price}
-            change24h={topCoin.price_change_percentage_24h}
-          />
-        </section>
-      )}
-
-      {/* Main Content: Two columns */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-
-          {/* LEFT: Market Data */}
-          <div className="lg:col-span-7 space-y-6">
-
-            {/* Top Coins Table */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">📊 Market Overview</h2>
-                <span className="text-xs text-muted-foreground">Prices in GBP</span>
-              </div>
-
-              <div className="bg-card border rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-muted/50 text-xs text-muted-foreground">
-                        <th className="text-left p-3 font-medium">#</th>
-                        <th className="text-left p-3 font-medium">Coin</th>
-                        <th className="text-right p-3 font-medium">Price</th>
-                        <th className="text-right p-3 font-medium">24h</th>
-                        <th className="text-right p-3 font-medium hidden md:table-cell">7d</th>
-                        <th className="text-right p-3 font-medium hidden lg:table-cell">Market Cap</th>
-                        <th className="text-right p-3 font-medium hidden md:table-cell">7d Chart</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {coins.map((coin, i) => {
-                        const change24h = coin.price_change_percentage_24h || 0;
-                        const change7d = coin.price_change_percentage_7d_in_currency || 0;
-                        return (
-                          <tr key={coin.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                            <td className="p-3 text-muted-foreground font-medium">{i + 1}</td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-2">
-                                <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" />
-                                <div>
-                                  <span className="font-bold">{coin.name}</span>
-                                  <span className="text-xs text-muted-foreground ml-1.5">{coin.symbol.toUpperCase()}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-3 text-right font-mono font-medium">{formatPrice(coin.current_price)}</td>
-                            <td className={`p-3 text-right font-medium ${change24h >= 0 ? "text-green-600" : "text-red-600"}`}>
-                              {change24h >= 0 ? "▲" : "▼"} {Math.abs(change24h).toFixed(2)}%
-                            </td>
-                            <td className={`p-3 text-right font-medium hidden md:table-cell ${change7d >= 0 ? "text-green-600" : "text-red-600"}`}>
-                              {change7d >= 0 ? "▲" : "▼"} {Math.abs(change7d).toFixed(2)}%
-                            </td>
-                            <td className="p-3 text-right hidden lg:table-cell text-muted-foreground">
-                              {formatLargeNumber(coin.market_cap)}
-                            </td>
-                            <td className="p-3 text-right hidden md:table-cell">
-                              <div className="flex justify-end">
-                                <MiniSparkline
-                                  data={coin.sparkline_in_7d?.price?.slice(-24) || []}
-                                  positive={change7d >= 0}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <AdPlaceholder id="401" format="horizontal" />
-
-            {/* Trending Coins */}
-            {trendingCoins.length > 0 && (
-              <div>
-                <h2 className="text-xl font-bold mb-4">🔥 Trending Coins</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {trendingCoins.slice(0, 6).map((coin, i) => (
-                    <div
-                      key={coin.id}
-                      className="bg-card border rounded-xl p-4 hover:shadow-md transition-all"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <img src={coin.large || coin.thumb} alt={coin.name} className="w-8 h-8 rounded-full" />
-                        <div>
-                          <p className="font-bold text-sm">{coin.name}</p>
-                          <p className="text-xs text-muted-foreground">{coin.symbol.toUpperCase()}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Rank #{coin.market_cap_rank || "?"}</span>
-                        <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded-full">
-                          🔥 #{i + 1}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <AdPlaceholder id="402" format="horizontal" />
-
-            {/* Crypto News */}
-            {recentPosts.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">📰 Crypto News</h2>
-                  <Link href="/crypto/news" className="text-sm text-primary hover:underline font-medium">
-                    See all →
-                  </Link>
-                </div>
-                <div className="space-y-3">
-                  {recentPosts.map((post) => (
-                    <Link
-                      key={post.slug}
-                      href={`/crypto/news#${post.slug}`}
-                      className="group flex gap-4 bg-card border-l-4 border-l-yellow-500 rounded-xl p-4 hover:shadow-md transition-all"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {post.coins.slice(0, 3).map((coin) => (
-                            <span
-                              key={coin}
-                              className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded-full"
-                            >
-                              {coin}
-                            </span>
-                          ))}
-                        </div>
-                        <h3 className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-2">
-                          {post.title}
-                        </h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{post.excerpt}</p>
-                        <span className="text-xs text-primary font-medium mt-1 inline-block">
-                          📖 {post.readingTime} min read
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT: Chat + Extras */}
-          <div className="lg:col-span-5 mt-8 lg:mt-0">
-            <div className="lg:sticky lg:top-20 space-y-6">
-
-              {/* Chat */}
-              <div id="chat">
-                <div className="flex items-center gap-2 mb-3">
-                  <h2 className="text-xl font-bold">🤖 Crypto AI</h2>
-                  <span className="text-xs text-muted-foreground">• Live market data</span>
-                </div>
-                <CryptoSearchBox />
-              </div>
-
-              <AdPlaceholder id="403" format="rectangle" />
-
-              {/* Quick Stats */}
-              {coins.length >= 3 && (
-                <div className="bg-card border rounded-xl p-5">
-                  <h3 className="font-bold mb-3">⚡ Quick Stats</h3>
-                  <div className="space-y-3">
-                    {coins.slice(0, 5).map((coin) => (
-                      <div key={coin.id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <img src={coin.image} alt={coin.name} className="w-5 h-5 rounded-full" />
-                          <span className="text-sm font-medium">{coin.symbol.toUpperCase()}</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm font-mono">{formatPrice(coin.current_price)}</span>
-                          <span
-                            className={`text-xs ml-2 ${
-                              (coin.price_change_percentage_24h || 0) >= 0 ? "text-green-600" : "text-red-600"
-                            }`}
-                          >
-                            {(coin.price_change_percentage_24h || 0) >= 0 ? "+" : ""}
-                            {(coin.price_change_percentage_24h || 0).toFixed(1)}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Back to main site */}
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 border rounded-xl p-5 text-center">
-                <p className="text-sm font-medium mb-2">Also on uni-uk.ai</p>
-                <Link
-                  href="/"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                  🔥 Trending News
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ═══ Interactive Dashboard (chart + table + chat all linked) ═══ */}
+      <CryptoDashboardClient
+        coins={serializedCoins}
+        trendingCoins={serializedTrending}
+        recentPosts={serializedPosts}
+      />
 
       {/* Disclaimer */}
       <section className="container mx-auto px-4 py-4">
