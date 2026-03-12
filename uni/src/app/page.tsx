@@ -2,6 +2,7 @@ import { SearchBox } from "@/components/SearchBox";
 import { MainNavigation } from "@/components/MainNavigation";
 import { TrendingTicker } from "@/components/TrendingTicker";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
+import { TrendChart } from "@/components/TrendChart";
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import Link from "next/link";
 
@@ -270,43 +271,14 @@ export default async function Home() {
               {/* Ad Slot - Sidebar */}
               <AdPlaceholder id="201" format="rectangle" />
 
-              {/* Trending Search Volume Visualization */}
+              {/* Interactive Trend Chart */}
               {trendingStories.length > 0 && (
-                <div className="bg-card border rounded-xl p-5">
-                  <h3 className="font-bold mb-4">📊 Trend Heatmap</h3>
-                  <div className="space-y-2.5">
-                    {trendingStories.slice(0, 5).map((story, i) => {
-                      const barWidth = Math.max(30, 100 - i * 15);
-                      const colors = CATEGORY_COLORS[story.category] || CATEGORY_COLORS['Breaking'];
-                      const barColors = [
-                        'from-red-500 to-orange-500',
-                        'from-orange-500 to-amber-500',
-                        'from-amber-500 to-yellow-500',
-                        'from-yellow-500 to-lime-500',
-                        'from-lime-500 to-green-500',
-                      ];
-                      return (
-                        <Link key={story.slug} href={`/blog/${story.slug}`} className="group block">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-bold text-muted-foreground w-4">#{i + 1}</span>
-                            <span className="text-xs font-medium group-hover:text-primary transition-colors line-clamp-1 flex-1">
-                              {CATEGORY_EMOJI[story.category]} {story.title}
-                            </span>
-                          </div>
-                          <div className="ml-6 h-3 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full bg-gradient-to-r ${barColors[i]} transition-all duration-500`}
-                              style={{ width: `${barWidth}%` }}
-                            />
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-3 text-center">
-                    Relative search interest • Updated every 30 min
-                  </p>
-                </div>
+                <TrendChart stories={trendingStories.map(s => ({
+                  title: s.title,
+                  slug: s.slug,
+                  category: s.category,
+                  publishedAt: s.publishedAt,
+                }))} />
               )}
 
               {/* Category Quick Links */}
