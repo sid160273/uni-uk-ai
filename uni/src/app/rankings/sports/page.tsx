@@ -10,11 +10,25 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Top Sports Universities in the UK - Best for Sports & Athletics | uni-uk.ai",
-  description: "Best UK universities for sports ranked by BUCS performance. Compare Loughborough, Bath, Durham and 27 more. Find universities with top sports facilities, teams and athletic programmes.",
-  keywords: ["best sports universities UK", "Loughborough sport", "athletic universities", "sports facilities", "BUCS", "university sport"],
+  title: "Best Sports Universities UK 2026 | BUCS Rankings & Facilities",
+  description: "Best UK universities for sports ranked by BUCS performance. Compare Loughborough, Bath, Durham and more for sports facilities, teams and athletic programmes.",
+  keywords: ["best sports universities UK", "BUCS rankings 2026", "Loughborough sport", "athletic universities", "sports facilities", "university sport", "student athletes"],
   alternates: {
     canonical: "/rankings/sports",
+  },
+  openGraph: {
+    title: "Best Sports Universities UK | BUCS Rankings | uni-uk.ai",
+    description: "Top 30 UK universities for sports ranked by BUCS performance. Compare facilities, teams and athletic programmes.",
+    type: "website",
+    url: "https://uni-uk.ai/rankings/sports",
+    siteName: "uni-uk.ai",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Best Sports Universities UK Rankings" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Best Sports Universities UK 2026 | BUCS Rankings",
+    description: "Compare Loughborough, Bath, Durham and more for sports facilities, teams and athletic programmes.",
+    images: ["/logo.png"],
   },
 };
 

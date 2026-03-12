@@ -18,10 +18,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://uni-uk.ai"),
-  title: "uni-uk.ai - Learn What's Happening Right Now",
-  description: "Your one-stop shop to understand what's trending. AI-powered stories on the topics everyone is searching for — sports, politics, entertainment, tech, and more. Updated every 30 minutes.",
-  keywords: ["trending news", "what's trending", "trending topics", "current events", "breaking news", "trending stories", "news today", "AI news"],
+  title: {
+    default: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+    template: "%s | uni-uk.ai",
+  },
+  description: "Discover what's trending right now with AI-powered stories updated every 30 minutes. Breaking news, trending topics, sports, politics, entertainment and tech.",
+  keywords: ["trending news", "what's trending", "trending topics", "trending stories today", "current events", "breaking news", "news today", "AI news", "trending now", "what's happening today"],
   authors: [{ name: "uni-uk.ai" }],
+  creator: "uni-uk.ai",
+  publisher: "uni-uk.ai",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   alternates: {
     canonical: "/",
   },
@@ -38,25 +54,27 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   openGraph: {
-    title: "uni-uk.ai - Learn What's Happening Right Now",
-    description: "AI-powered trending news platform. Understand what the world is searching for with clear, insightful stories updated every 30 minutes.",
+    title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+    description: "AI-powered trending news platform. Discover what everyone is searching for with clear, insightful stories updated every 30 minutes.",
     type: "website",
     locale: "en_GB",
+    url: "https://uni-uk.ai",
     siteName: "uni-uk.ai",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "uni-uk.ai Logo",
+        alt: "uni-uk.ai - Trending News & Stories Updated Every 30 Minutes",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "uni-uk.ai - Learn What's Happening Right Now",
-    description: "AI-powered trending news. Understand what the world is searching for, updated every 30 minutes.",
+    title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+    description: "AI-powered trending news. Discover what everyone is searching for, updated every 30 minutes.",
     images: ["/logo.png"],
+    creator: "@uniukai",
   },
 };
 

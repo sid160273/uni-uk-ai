@@ -48,13 +48,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = `Explore ${universities.length} universities in ${metadata.name}. ${metadata.description.slice(0, 100)}`;
 
   return {
-    title: `${metadata.name} - Find Universities in ${metadata.name} | uni-uk.ai`,
+    title: `Universities in ${metadata.name} 2026 | Compare Rankings & Courses`,
     description: description.slice(0, 160),
     alternates: {
       canonical: `/regions/${slug}`,
     },
     keywords: [
-      `${metadata.name}`,
+      `universities in ${metadata.name}`,
+      `${metadata.name} universities`,
       "UK universities",
       "university finder",
       "student guide",
@@ -62,6 +63,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       metadata.name.toLowerCase().includes('wales') ? "Welsh universities" : "",
       metadata.name.toLowerCase().includes('london') ? "London universities" : "",
     ].filter(Boolean),
+    openGraph: {
+      title: `Universities in ${metadata.name} | Compare & Choose | uni-uk.ai`,
+      description: description.slice(0, 160),
+      type: "website",
+      url: `https://uni-uk.ai/regions/${slug}`,
+      siteName: "uni-uk.ai",
+      images: [{ url: "/logo.png", width: 512, height: 512, alt: `Universities in ${metadata.name}` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Universities in ${metadata.name} 2026 | uni-uk.ai`,
+      description: description.slice(0, 160),
+      images: ["/logo.png"],
+    },
   };
 }
 

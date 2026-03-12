@@ -30,10 +30,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const categoryName = slugToName(category);
 
   return {
-    title: `${categoryName} Trending Stories | uni-uk.ai`,
-    description: `Latest trending ${categoryName.toLowerCase()} stories — what everyone is searching for right now. AI-powered insights updated every 30 minutes.`,
+    title: `${categoryName} Trending Stories Today | What's Trending in ${categoryName}`,
+    description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news. Discover what everyone is searching for right now with AI-powered insights, updated every 30 minutes.`,
+    keywords: [`${categoryName.toLowerCase()} news`, "trending stories today", "what's trending", `trending ${categoryName.toLowerCase()}`, "breaking news", "news today"],
     alternates: {
       canonical: `/blog/category/${category}`,
+    },
+    openGraph: {
+      title: `${categoryName} Trending Stories Today | uni-uk.ai`,
+      description: `Latest trending ${categoryName.toLowerCase()} stories — what everyone is searching for right now. AI-powered insights updated every 30 minutes.`,
+      type: "website",
+      url: `https://uni-uk.ai/blog/category/${category}`,
+      siteName: "uni-uk.ai",
+      images: [
+        {
+          url: "/logo.png",
+          width: 512,
+          height: 512,
+          alt: `${categoryName} Trending Stories on uni-uk.ai`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${categoryName} Trending Stories Today | uni-uk.ai`,
+      description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news, updated every 30 minutes.`,
+      images: ["/logo.png"],
     },
   };
 }

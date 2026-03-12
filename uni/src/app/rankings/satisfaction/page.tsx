@@ -10,11 +10,25 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Top Student Satisfaction Universities in the UK - NSS Rankings | uni-uk.ai",
-  description: "UK universities ranked by National Student Survey (NSS) satisfaction scores. Compare 30 top-rated universities for teaching quality, student support and overall experience.",
-  keywords: ["student satisfaction UK", "NSS rankings", "best student experience", "happy students", "university satisfaction"],
+  title: "Best Student Satisfaction Universities UK 2026 | NSS Rankings",
+  description: "UK universities ranked by NSS satisfaction scores. Compare 30 top-rated universities for teaching quality, student support and overall student experience.",
+  keywords: ["student satisfaction UK", "NSS rankings 2026", "best student experience", "university satisfaction", "teaching quality", "student support"],
   alternates: {
     canonical: "/rankings/satisfaction",
+  },
+  openGraph: {
+    title: "Best Student Satisfaction Universities UK | NSS Rankings | uni-uk.ai",
+    description: "30 top UK universities ranked by National Student Survey satisfaction scores. Find where students are happiest.",
+    type: "website",
+    url: "https://uni-uk.ai/rankings/satisfaction",
+    siteName: "uni-uk.ai",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Student Satisfaction Rankings UK" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Best Student Satisfaction Universities UK 2026",
+    description: "UK universities ranked by NSS satisfaction scores. Compare teaching quality, student support and experience.",
+    images: ["/logo.png"],
   },
 };
 

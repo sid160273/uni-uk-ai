@@ -6,11 +6,32 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 
 export const metadata: Metadata = {
-    title: "All UK Universities A-Z - Complete University Directory | uni-uk.ai",
-    description: "Complete directory of 140+ UK universities A-Z. Compare rankings, entry requirements, student satisfaction, accommodation and more. Find your perfect university match.",
-    keywords: ["UK universities list", "all universities UK", "university directory", "find universities", "UK higher education"],
+    title: "All UK Universities A-Z | Complete University Directory 2026",
+    description: "Browse 140+ UK universities A-Z. Compare rankings, entry requirements, student satisfaction and accommodation. Find your perfect university match today.",
+    keywords: ["UK universities list", "all universities UK", "university directory", "find universities", "UK higher education", "university rankings", "best UK universities"],
     alternates: {
         canonical: "/universities",
+    },
+    openGraph: {
+        title: "All UK Universities A-Z | Complete Directory | uni-uk.ai",
+        description: "Complete directory of 140+ UK universities. Compare rankings, entry requirements, student satisfaction, accommodation and more.",
+        type: "website",
+        url: "https://uni-uk.ai/universities",
+        siteName: "uni-uk.ai",
+        images: [
+            {
+                url: "/logo.png",
+                width: 512,
+                height: 512,
+                alt: "UK Universities Directory - uni-uk.ai",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "All UK Universities A-Z | Complete Directory",
+        description: "Browse 140+ UK universities. Compare rankings, entry requirements, student satisfaction and more.",
+        images: ["/logo.png"],
     },
 };
 

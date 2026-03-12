@@ -24,25 +24,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const truncatedExcerpt = post.excerpt.length > 160 ? post.excerpt.slice(0, 157) + "..." : post.excerpt;
+
   return {
-    title: `${post.title} | uni-uk.ai Blog`,
-    description: post.excerpt,
+    title: `${post.title} | Trending ${post.category} News`,
+    description: truncatedExcerpt,
+    keywords: [...post.tags, "trending news", post.category.toLowerCase(), "what's trending"],
+    authors: [{ name: post.author }],
     alternates: {
       canonical: `/blog/${slug}`,
     },
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: truncatedExcerpt,
       type: "article",
+      url: `https://uni-uk.ai/blog/${slug}`,
+      siteName: "uni-uk.ai",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [post.author],
       tags: post.tags,
+      images: post.imageUrl ? [
+        {
+          url: post.imageUrl.startsWith("http") ? post.imageUrl : `https://uni-uk.ai${post.imageUrl}`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ] : [{ url: "/logo.png", width: 512, height: 512, alt: "uni-uk.ai" }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.excerpt,
+      description: truncatedExcerpt,
+      images: post.imageUrl ? [post.imageUrl.startsWith("http") ? post.imageUrl : `https://uni-uk.ai${post.imageUrl}`] : ["/logo.png"],
     },
   };
 }

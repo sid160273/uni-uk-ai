@@ -86,6 +86,18 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Interactive Trend Chart - Full Width */}
+      {trendingStories.length > 0 && (
+        <section className="container mx-auto px-4 py-6">
+          <TrendChart stories={trendingStories.map(s => ({
+            title: s.title,
+            slug: s.slug,
+            category: s.category,
+            publishedAt: s.publishedAt,
+          }))} />
+        </section>
+      )}
+
       {/* === MAIN CONTENT: Two-column on desktop === */}
       <div className="container mx-auto px-4 py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
@@ -270,16 +282,6 @@ export default async function Home() {
 
               {/* Ad Slot - Sidebar */}
               <AdPlaceholder id="201" format="rectangle" />
-
-              {/* Interactive Trend Chart */}
-              {trendingStories.length > 0 && (
-                <TrendChart stories={trendingStories.map(s => ({
-                  title: s.title,
-                  slug: s.slug,
-                  category: s.category,
-                  publishedAt: s.publishedAt,
-                }))} />
-              )}
 
               {/* Category Quick Links */}
               <div className="bg-card border rounded-xl p-5">

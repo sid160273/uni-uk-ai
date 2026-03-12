@@ -3,8 +3,23 @@ import Image from "next/image";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy | uni-uk.ai",
-    description: "Privacy policy for uni-uk.ai - Learn how we handle your data and protect your privacy in compliance with GDPR.",
+    title: "Privacy Policy | GDPR Compliance & Data Protection",
+    description: "uni-uk.ai privacy policy. Learn how we handle your data, protect your privacy and comply with GDPR and UK data protection laws.",
+    alternates: {
+        canonical: "/privacy",
+    },
+    openGraph: {
+        title: "Privacy Policy | uni-uk.ai",
+        description: "Learn how uni-uk.ai handles your data and protects your privacy in compliance with GDPR and UK data protection laws.",
+        type: "website",
+        url: "https://uni-uk.ai/privacy",
+        siteName: "uni-uk.ai",
+    },
+    twitter: {
+        card: "summary",
+        title: "Privacy Policy | uni-uk.ai",
+        description: "Learn how uni-uk.ai handles your data and protects your privacy in compliance with GDPR.",
+    },
 };
 
 export default function PrivacyPage() {

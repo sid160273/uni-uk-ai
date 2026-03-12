@@ -34,14 +34,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const description = `${university.name} in ${university.location}: ${rankInfo ? rankInfo + ". " : ""}Entry requirements, accommodation, student life, rankings and more. Compare with other UK universities.`;
 
     return {
-        title: `${university.name} - Rankings, Fees & Reviews | uni-uk.ai`,
+        title: `${university.name} | Rankings, Entry Requirements & Reviews 2026`,
         description: description.slice(0, 160),
+        keywords: [university.name, `${university.name} rankings`, `${university.name} entry requirements`, "UK university", university.location],
         alternates: {
             canonical: `/universities/${slug}`,
         },
         openGraph: {
-            title: `${university.name} - uni-uk.ai`,
-            description: university.description.slice(0, 150) + "...",
+            title: `${university.name} | Rankings, Fees & Student Reviews`,
+            description: description.slice(0, 160),
+            type: "website",
+            url: `https://uni-uk.ai/universities/${slug}`,
+            siteName: "uni-uk.ai",
+            images: [
+                {
+                    url: university.imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: `${university.name} campus`,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${university.name} | Rankings & Reviews`,
+            description: description.slice(0, 160),
             images: [university.imageUrl],
         },
     };

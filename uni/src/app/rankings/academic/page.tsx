@@ -10,11 +10,25 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Top Academic Universities in the UK - Guardian Rankings | uni-uk.ai",
-  description: "Discover the top 30 UK universities ranked by Guardian University Guide 2024. Compare Oxford, Cambridge, Imperial and more by academic excellence, research quality and graduate outcomes.",
-  keywords: ["top UK universities", "best universities UK", "Guardian rankings", "academic excellence", "Oxford", "Cambridge", "Russell Group"],
+  title: "Top 30 UK Universities 2026 | Guardian Academic Rankings",
+  description: "Discover the top 30 UK universities ranked by the Guardian University Guide. Compare Oxford, Cambridge, Imperial and more by academic excellence and graduate outcomes.",
+  keywords: ["top UK universities", "best universities UK", "Guardian rankings 2026", "academic excellence", "Oxford", "Cambridge", "Russell Group", "university league table"],
   alternates: {
     canonical: "/rankings/academic",
+  },
+  openGraph: {
+    title: "Top 30 UK Universities | Guardian Academic Rankings | uni-uk.ai",
+    description: "Top 30 UK universities ranked by Guardian University Guide. Compare academic excellence, research quality and graduate outcomes.",
+    type: "website",
+    url: "https://uni-uk.ai/rankings/academic",
+    siteName: "uni-uk.ai",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Top UK Universities Rankings" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Top 30 UK Universities 2026 | Guardian Rankings",
+    description: "Compare Oxford, Cambridge, Imperial and more by academic excellence and graduate outcomes.",
+    images: ["/logo.png"],
   },
 };
 

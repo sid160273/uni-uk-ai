@@ -6,11 +6,33 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Trending Stories - What's Happening Now | uni-uk.ai",
+  title: "Trending Stories Today | What's Trending Now | Breaking News",
   description:
-    "AI-powered trending stories on what everyone is searching for. Sports, politics, entertainment, tech and more — updated every 30 minutes.",
+    "Read the latest trending stories and breaking news. AI-powered coverage of what everyone is searching for — sports, politics, entertainment, tech. Updated every 30 minutes.",
+  keywords: ["trending stories today", "what's trending", "trending news", "breaking news", "trending topics", "news today", "latest stories"],
   alternates: {
     canonical: "/blog",
+  },
+  openGraph: {
+    title: "Trending Stories Today | What's Trending Now | uni-uk.ai",
+    description: "AI-powered trending stories on the topics everyone is searching for. Sports, politics, entertainment, tech and more — updated every 30 minutes.",
+    type: "website",
+    url: "https://uni-uk.ai/blog",
+    siteName: "uni-uk.ai",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "uni-uk.ai Trending Stories",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trending Stories Today | What's Trending Now",
+    description: "AI-powered trending stories updated every 30 minutes. Sports, politics, entertainment, tech and more.",
+    images: ["/logo.png"],
   },
 };
 
