@@ -24,18 +24,19 @@ interface TrendChartProps {
   stories: TrendStory[];
 }
 
-const CATEGORY_LINE_COLORS: Record<string, string> = {
-  Sports: "#3b82f6",
-  Politics: "#8b5cf6",
-  Entertainment: "#ec4899",
-  Technology: "#06b6d4",
-  Business: "#22c55e",
-  Science: "#6366f1",
-  Health: "#10b981",
-  World: "#f59e0b",
-  Culture: "#f43f5e",
-  Breaking: "#ef4444",
-};
+// Maximally distinct colors for each line position (not category-based)
+const LINE_COLORS = [
+  "#ef4444", // red - #1 story
+  "#3b82f6", // blue - #2
+  "#22c55e", // green - #3
+  "#f59e0b", // amber - #4
+  "#8b5cf6", // purple - #5
+  "#06b6d4", // cyan - #6
+  "#ec4899", // pink - #7
+  "#f97316", // orange - #8
+  "#14b8a6", // teal - #9
+  "#a855f7", // violet - #10
+];
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Sports: "⚽",
@@ -237,8 +238,7 @@ export function TrendChart({ stories }: TrendChartProps) {
               }
             />
             {displayStories.map((story, i) => {
-              const color =
-                CATEGORY_LINE_COLORS[story.category] || "#6366f1";
+              const color = LINE_COLORS[i % LINE_COLORS.length];
               return (
                 <Line
                   key={story.slug}
@@ -246,11 +246,11 @@ export function TrendChart({ stories }: TrendChartProps) {
                   dataKey={story.slug}
                   name={story.title}
                   stroke={color}
-                  strokeWidth={activeLines.has(story.slug) ? 2.5 : 0}
+                  strokeWidth={activeLines.has(story.slug) ? 3 : 0}
                   dot={false}
                   activeDot={
                     activeLines.has(story.slug)
-                      ? { r: 5, strokeWidth: 2, fill: "#fff", stroke: color }
+                      ? { r: 6, strokeWidth: 2, fill: "#fff", stroke: color }
                       : false
                   }
                   opacity={activeLines.has(story.slug) ? 1 : 0}
