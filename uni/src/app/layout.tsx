@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { EzoicRouteHandler } from "@/components/EzoicRouteHandler";
 import { OrganizationSchema, WebSiteSchema } from "@/components/StructuredData";
+import { AdScripts } from "@/components/AdScripts";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,9 +18,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://uni-uk.ai"),
-  title: "uni-uk.ai - Find Your Perfect UK University",
-  description: "Discover your ideal UK university with our AI-powered search. Compare 140+ universities by rankings, location, student satisfaction, and more. Free university finder for students.",
-  keywords: ["UK universities", "university finder", "AI university search", "UK colleges", "university rankings", "student guide"],
+  title: "uni-uk.ai - Learn What's Happening Right Now",
+  description: "Your one-stop shop to understand what's trending. AI-powered stories on the topics everyone is searching for — sports, politics, entertainment, tech, and more. Updated every 30 minutes.",
+  keywords: ["trending news", "what's trending", "trending topics", "current events", "breaking news", "trending stories", "news today", "AI news"],
   authors: [{ name: "uni-uk.ai" }],
   alternates: {
     canonical: "/",
@@ -37,8 +38,8 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   openGraph: {
-    title: "uni-uk.ai - Find Your Perfect UK University",
-    description: "AI-powered university discovery platform helping students find the perfect UK university based on their interests, goals, and preferences.",
+    title: "uni-uk.ai - Learn What's Happening Right Now",
+    description: "AI-powered trending news platform. Understand what the world is searching for with clear, insightful stories updated every 30 minutes.",
     type: "website",
     locale: "en_GB",
     siteName: "uni-uk.ai",
@@ -53,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "uni-uk.ai - Find Your Perfect UK University",
-    description: "AI-powered university discovery platform helping students find the perfect UK university.",
+    title: "uni-uk.ai - Learn What's Happening Right Now",
+    description: "AI-powered trending news. Understand what the world is searching for, updated every 30 minutes.",
     images: ["/logo.png"],
   },
 };
@@ -99,14 +100,6 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Google AdSense */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4540315059867204"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-
         {/* Google Analytics */}
         <Script
           async
@@ -121,6 +114,7 @@ export default function RootLayout({
             gtag('config', 'G-ZYE3BGM8BM');
           `}
         </Script>
+
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -128,6 +122,7 @@ export default function RootLayout({
         <OrganizationSchema />
         <WebSiteSchema />
         <EzoicRouteHandler />
+        <AdScripts />
         {children}
       </body>
     </html>

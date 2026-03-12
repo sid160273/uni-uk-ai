@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, GraduationCap, MapPin, Trophy, Star, BookOpen } from "lucide-react";
+import { ChevronDown, Flame, Newspaper, GraduationCap, Zap, MapPin, Trophy, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DropdownProps {
@@ -53,19 +53,20 @@ function Dropdown({ title, icon, children }: DropdownProps) {
   );
 }
 
-export function MainNavigation() {
-  const regions = [
-    { name: "Scotland", slug: "scotland", count: 16 },
-    { name: "Wales", slug: "wales", count: 7 },
-    { name: "Northern Ireland", slug: "northern-ireland", count: 2 },
-    { name: "London", slug: "london", count: 27 },
-    { name: "North England", slug: "north-england", count: 20 },
-    { name: "Midlands", slug: "midlands", count: 13 },
-    { name: "South West England", slug: "south-west-england", count: 12 },
-    { name: "South East England", slug: "south-east-england", count: 9 },
-    { name: "East England", slug: "east-england", count: 9 },
-  ];
+const categories = [
+  { name: "Sports", slug: "sports", icon: "&#9917;" },
+  { name: "Politics", slug: "politics", icon: "&#127963;" },
+  { name: "Entertainment", slug: "entertainment", icon: "&#127916;" },
+  { name: "Technology", slug: "technology", icon: "&#128187;" },
+  { name: "Business", slug: "business", icon: "&#128200;" },
+  { name: "Science", slug: "science", icon: "&#128300;" },
+  { name: "Health", slug: "health", icon: "&#129657;" },
+  { name: "World", slug: "world", icon: "&#127758;" },
+  { name: "Culture", slug: "culture", icon: "&#127912;" },
+  { name: "Breaking", slug: "breaking", icon: "&#128680;" },
+];
 
+export function MainNavigation() {
   return (
     <nav className="border-b bg-background/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4">
@@ -84,7 +85,36 @@ export function MainNavigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <Dropdown title="Browse Universities" icon={<GraduationCap className="w-4 h-4" />}>
+            <Link href="/#trending" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <Flame className="w-4 h-4 text-red-500" />
+              Trending
+            </Link>
+
+            <Dropdown title="Categories" icon={<Newspaper className="w-4 h-4" />}>
+              <div className="p-2">
+                <Link
+                  href="/blog"
+                  className="block px-4 py-2 hover:bg-muted rounded-md transition-colors font-semibold text-foreground"
+                >
+                  All Stories
+                </Link>
+                <div className="my-2 border-t" />
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/blog/category/${cat.slug}`}
+                    className="block px-4 py-2 hover:bg-muted rounded-md transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span dangerouslySetInnerHTML={{ __html: cat.icon }} />
+                      <span>{cat.name}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </Dropdown>
+
+            <Dropdown title="Universities" icon={<GraduationCap className="w-4 h-4" />}>
               <div className="p-2">
                 <Link
                   href="/universities"
@@ -92,140 +122,90 @@ export function MainNavigation() {
                 >
                   <div className="flex items-center justify-between">
                     <span>All Universities A-Z</span>
-                    <span className="text-xs text-muted-foreground ml-2">(140)</span>
+                    <span className="text-xs text-muted-foreground ml-2">(140+)</span>
                   </div>
                 </Link>
                 <div className="my-2 border-t" />
-                <div className="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase">
-                  By Region
-                </div>
-                {regions.map((region) => (
-                  <Link
-                    key={region.slug}
-                    href={`/regions/${region.slug}`}
-                    className="block px-4 py-2 hover:bg-muted rounded-md transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
+                <div className="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase">Rankings</div>
+                <Link href="/rankings/academic" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>Top Academic</span>
+                  </div>
+                </Link>
+                <Link href="/rankings/sports" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-blue-500" />
+                    <span>Top Sports</span>
+                  </div>
+                </Link>
+                <Link href="/rankings/satisfaction" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-green-500" />
+                    <span>Student Satisfaction</span>
+                  </div>
+                </Link>
+                <div className="my-2 border-t" />
+                <div className="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase">Regions</div>
+                {[
+                  { name: "London", slug: "london" },
+                  { name: "Scotland", slug: "scotland" },
+                  { name: "Wales", slug: "wales" },
+                  { name: "North England", slug: "north-england" },
+                  { name: "Midlands", slug: "midlands" },
+                ].map((region) => (
+                  <Link key={region.slug} href={`/regions/${region.slug}`} className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
                       <span>{region.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">({region.count})</span>
                     </div>
                   </Link>
                 ))}
               </div>
             </Dropdown>
 
-            <Dropdown title="Top Ranked" icon={<Trophy className="w-4 h-4" />}>
-              <div className="p-2">
-                <Link
-                  href="/rankings/academic"
-                  className="block px-4 py-3 hover:bg-muted rounded-md transition-colors"
-                >
-                  <div className="font-semibold text-foreground flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    Top Academic
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Highest Guardian rankings
-                  </div>
-                </Link>
-                <Link
-                  href="/rankings/sports"
-                  className="block px-4 py-3 hover:bg-muted rounded-md transition-colors"
-                >
-                  <div className="font-semibold text-foreground flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-blue-500" />
-                    Top for Sports
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Best sports facilities & teams
-                  </div>
-                </Link>
-                <Link
-                  href="/rankings/satisfaction"
-                  className="block px-4 py-3 hover:bg-muted rounded-md transition-colors"
-                >
-                  <div className="font-semibold text-foreground flex items-center gap-2">
-                    <Star className="w-4 h-4 text-green-500" />
-                    Top Student Satisfaction
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Highest NSS scores
-                  </div>
-                </Link>
-              </div>
-            </Dropdown>
-
-            <Link href="/blog" className="hover:text-foreground transition-colors flex items-center gap-1">
-              <BookOpen className="w-4 h-4" />
-              Blog
-            </Link>
-
             <Link href="/#about" className="hover:text-foreground transition-colors">
               About
             </Link>
           </div>
 
-          {/* Mobile Menu Button & CTA */}
+          {/* CTA */}
           <div className="flex items-center gap-2">
             <a
               href="/#search"
-              className="bg-primary text-primary-foreground px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-primary/90 transition-colors"
+              className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-1"
             >
-              Find a Uni
+              <Zap className="w-3.5 h-3.5" />
+              What&apos;s Trending?
             </a>
           </div>
         </div>
 
-        {/* Mobile Navigation - Below */}
+        {/* Mobile Navigation */}
         <div className="lg:hidden border-t py-2 flex gap-2 overflow-x-auto scrollbar-hide text-xs">
+          <Link
+            href="/#trending"
+            className="whitespace-nowrap px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors flex items-center gap-1 font-medium"
+          >
+            <Flame className="w-3.5 h-3.5" />
+            Trending
+          </Link>
+          {categories.slice(0, 5).map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/blog/category/${cat.slug}`}
+              className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
+            >
+              <span className="text-sm" dangerouslySetInnerHTML={{ __html: cat.icon }} />
+              {cat.name}
+            </Link>
+          ))}
           <Link
             href="/universities"
             className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
           >
             <GraduationCap className="w-3.5 h-3.5" />
-            All Unis
-          </Link>
-          <Link
-            href="/rankings/academic"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <Star className="w-3.5 h-3.5" />
-            Top Academic
-          </Link>
-          <Link
-            href="/rankings/sports"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <Trophy className="w-3.5 h-3.5" />
-            Top Sports
-          </Link>
-          <Link
-            href="/regions/scotland"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            Scotland
-          </Link>
-          <Link
-            href="/regions/london"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            London
-          </Link>
-          <Link
-            href="/regions/wales"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            Wales
-          </Link>
-          <Link
-            href="/blog"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            Blog
+            Universities
           </Link>
         </div>
       </div>
