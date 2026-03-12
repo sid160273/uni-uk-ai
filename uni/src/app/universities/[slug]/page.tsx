@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, MapPin, Trophy, Users, Building, Globe, BookOpen, GraduationCap, Home, PartyPopper } from "lucide-react";
 import { RankingBadge } from "@/components/RankingBadge";
 import { HeroImage } from "@/components/HeroImage";
-import { AdSense } from "@/components/AdSense";
+import { Ad } from "@/components/Ad";
 import { MainNavigation } from "@/components/MainNavigation";
 import { EducationalOrganizationSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { FAQ } from "@/components/FAQ";
@@ -124,13 +124,9 @@ export default async function UniversityPage({ params }: PageProps) {
                             </div>
                         </section>
 
-                        {/* AdSense Ad Unit 1 - First Horizontal */}
+                        {/* Ad Unit 1 - Horizontal */}
                         <div className="w-full">
-                            <AdSense
-                                adSlot="5017740535"
-                                adFormat="auto"
-                                style={{ display: "block" }}
-                            />
+                            <Ad size="leaderboard" />
                         </div>
 
                         {/* Rankings & Reputation */}
@@ -266,13 +262,9 @@ export default async function UniversityPage({ params }: PageProps) {
                             </p>
                         </section>
 
-                        {/* AdSense Ad Unit 2 - Second Horizontal */}
+                        {/* Ad Unit 2 - Rectangle */}
                         <div className="w-full">
-                            <AdSense
-                                adSlot="5811947452"
-                                adFormat="auto"
-                                style={{ display: "block" }}
-                            />
+                            <Ad size="rectangle" />
                         </div>
 
                         {/* Admissions */}
@@ -381,13 +373,9 @@ export default async function UniversityPage({ params }: PageProps) {
                             </a>
                         </div>
 
-                        {/* AdSense Ad Unit 3 - Vertical 1 */}
+                        {/* Ad Unit 3 - Sidebar */}
                         <div className="w-full">
-                            <AdSense
-                                adSlot="4285622107"
-                                adFormat="auto"
-                                style={{ display: "block" }}
-                            />
+                            <Ad size="skyscraper" />
                         </div>
 
                     </div>

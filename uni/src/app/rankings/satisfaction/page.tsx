@@ -1,7 +1,7 @@
 import { getTopSatisfactionUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
-import { AdSense } from "@/components/AdSense";
+import { Ad } from "@/components/Ad";
 import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
 import { FAQ } from "@/components/FAQ";
 import { satisfactionRankingFAQs } from "@/data/faq-data";
@@ -91,15 +91,11 @@ export default function TopSatisfactionPage() {
         </div>
       </section>
 
-      {/* AdSense Ad Unit 1 */}
+      {/* Ad Unit 1 */}
       <section className="py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <AdSense
-              adSlot="5017740535"
-              adFormat="auto"
-              style={{ display: "block" }}
-            />
+            <Ad size="leaderboard" />
           </div>
         </div>
       </section>
@@ -121,15 +117,11 @@ export default function TopSatisfactionPage() {
         </div>
       </section>
 
-      {/* AdSense Ad Unit 2 */}
+      {/* Ad Unit 2 */}
       <section className="py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <AdSense
-              adSlot="5811947452"
-              adFormat="auto"
-              style={{ display: "block" }}
-            />
+            <Ad size="rectangle" />
           </div>
         </div>
       </section>
