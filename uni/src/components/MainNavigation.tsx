@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Flame, Newspaper, GraduationCap, Zap, MapPin, Trophy, Star } from "lucide-react";
+import { ChevronDown, Flame, Newspaper, GraduationCap, Zap, MapPin, Trophy, Star, Bitcoin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DropdownProps {
@@ -164,6 +164,11 @@ export function MainNavigation() {
               </div>
             </Dropdown>
 
+            <Link href="/crypto" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <Bitcoin className="w-4 h-4 text-yellow-500" />
+              Crypto
+            </Link>
+
             <Link href="/#about" className="hover:text-foreground transition-colors">
               About
             </Link>
@@ -200,6 +205,13 @@ export function MainNavigation() {
               {cat.name}
             </Link>
           ))}
+          <Link
+            href="/crypto"
+            className="whitespace-nowrap px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors flex items-center gap-1 font-medium"
+          >
+            <Bitcoin className="w-3.5 h-3.5" />
+            Crypto
+          </Link>
           <Link
             href="/universities"
             className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"

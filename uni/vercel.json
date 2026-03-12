@@ -5,6 +5,10 @@
       "schedule": "*/10 * * * *"
     },
     {
+      "path": "/api/cron/fetch-crypto",
+      "schedule": "0 * * * *"
+    },
+    {
       "path": "/api/cron/fetch-chat-data",
       "schedule": "0 0 * * *"
     },

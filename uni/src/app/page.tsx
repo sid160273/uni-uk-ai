@@ -70,7 +70,7 @@ export default async function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
               </span>
-              Updated every 30 minutes
+              Updated every 10 minutes
             </div>
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
               Learn What&apos;s Happening{' '}
@@ -327,7 +327,7 @@ export default async function Home() {
                 <div className="text-3xl mb-2">⚡</div>
                 <h3 className="font-bold mb-2">Real-Time</h3>
                 <p className="text-sm text-muted-foreground">
-                  Updated every 30 minutes with what&apos;s trending right now
+                  Updated every 10 minutes with what&apos;s trending right now
                 </p>
               </div>
 
@@ -372,12 +372,15 @@ export default async function Home() {
             <Link href="/blog" className="hover:text-foreground transition-colors">
               All Stories
             </Link>
+            <Link href="/crypto" className="hover:text-foreground transition-colors">
+              Crypto
+            </Link>
             <Link href="/universities" className="hover:text-foreground transition-colors">
               Universities
             </Link>
           </div>
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} uni-uk.ai • Powered by AI 🤖 • Updated every 30 minutes
+            &copy; {new Date().getFullYear()} uni-uk.ai • Powered by AI 🤖 • Updated every 10 minutes
           </p>
         </div>
       </footer>

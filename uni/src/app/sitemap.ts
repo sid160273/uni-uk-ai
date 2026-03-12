@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { getAllUniversities } from '@/lib/data'
 import { getAllBlogPostsCombined, getAllCategoriesCombined } from '@/lib/blog-data'
+import { getCryptoPosts } from '@/lib/crypto-data'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://uni-uk.ai'
@@ -103,5 +104,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...universityUrls,
     ...blogUrls,
     ...categoryUrls,
+    {
+      url: `${baseUrl}/crypto`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/crypto/news`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.8,
+    },
   ]
 }
