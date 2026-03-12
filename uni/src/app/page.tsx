@@ -98,6 +98,37 @@ export default async function Home() {
         </section>
       )}
 
+      {/* MOBILE: AI Chat + Categories right after chart */}
+      <section className="container mx-auto px-4 py-6 lg:hidden">
+        <div className="space-y-6">
+          <div id="search-mobile">
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-xl font-bold">🤖 Ask AI</h2>
+              <span className="text-xs text-muted-foreground">• Knows all trending topics</span>
+            </div>
+            <SearchBox />
+          </div>
+
+          <div className="bg-card border rounded-xl p-5">
+            <h3 className="font-bold mb-3">🏷️ Browse Categories</h3>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(CATEGORY_EMOJI).map(([cat, emoji]) => {
+                const colors = CATEGORY_COLORS[cat] || CATEGORY_COLORS['Breaking'];
+                return (
+                  <Link
+                    key={cat}
+                    href={`/blog/category/${cat.toLowerCase()}`}
+                    className={`${colors.bg} ${colors.text} px-3 py-1.5 rounded-full text-xs font-bold hover:shadow-md transition-all hover:scale-105`}
+                  >
+                    {emoji} {cat}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* === MAIN CONTENT: Two-column on desktop === */}
       <div className="container mx-auto px-4 py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
@@ -267,8 +298,8 @@ export default async function Home() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Chat + Extras (Desktop) */}
-          <div className="lg:col-span-5 mt-8 lg:mt-0">
+          {/* RIGHT COLUMN: Chat + Extras (Desktop only - mobile version is above) */}
+          <div className="hidden lg:block lg:col-span-5">
             <div className="lg:sticky lg:top-20 space-y-6">
 
               {/* Chat Section */}

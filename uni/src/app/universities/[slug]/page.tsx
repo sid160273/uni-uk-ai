@@ -118,6 +118,80 @@ export default async function UniversityPage({ params }: PageProps) {
             </div>
 
             <div className="container mx-auto px-4 py-6">
+                {/* MOBILE: At a Glance card promoted to top */}
+                <div className="lg:hidden mb-6">
+                    <div className="bg-card border rounded-xl p-5 shadow-sm">
+                        <h3 className="font-semibold text-lg mb-4">At a Glance</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            {university.locationStats && (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <Building className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Cost of Living</span>
+                                    </div>
+                                    <span className={cn(
+                                        "font-medium px-2 py-0.5 rounded text-sm text-right",
+                                        university.locationStats.costOfLiving === "High" && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+                                        university.locationStats.costOfLiving === "Medium" && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+                                        university.locationStats.costOfLiving === "Low" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                                    )}>
+                                        {university.locationStats.costOfLiving}
+                                    </span>
+
+                                    <div className="flex items-center gap-2">
+                                        <PartyPopper className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Nightlife</span>
+                                    </div>
+                                    <div className="flex justify-end items-center">
+                                        {[...Array(5)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className={cn(
+                                                    "h-2 w-2 rounded-full mx-0.5",
+                                                    i < university.locationStats.nightlife ? "bg-primary" : "bg-muted"
+                                                )}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Users className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Vibe</span>
+                                    </div>
+                                    <span className="font-medium text-sm text-right">{university.locationStats.vibe}</span>
+                                </>
+                            )}
+                            {university.campusStats && (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <Trophy className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Sports</span>
+                                    </div>
+                                    <span className="font-medium text-sm text-right">
+                                        {university.campusStats.sportsRanking ? `#${university.campusStats.sportsRanking}` : "N/A"}
+                                    </span>
+
+                                    <div className="flex items-center gap-2">
+                                        <Globe className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Intl. Students</span>
+                                    </div>
+                                    <span className="font-medium text-sm text-right">
+                                        {university.campusStats.internationalStudents ? `${university.campusStats.internationalStudents}%` : "N/A"}
+                                    </span>
+                                </>
+                            )}
+                        </div>
+                        <a
+                            href={`https://${university.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full mt-4 bg-primary text-primary-foreground py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block text-center text-sm"
+                        >
+                            Visit Website
+                        </a>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
@@ -303,8 +377,8 @@ export default async function UniversityPage({ params }: PageProps) {
 
                     </div>
 
-                    {/* Sidebar */}
-                    <div className="space-y-4">
+                    {/* Sidebar (Desktop only - mobile version shown above hero) */}
+                    <div className="hidden lg:block space-y-4">
                         {/* Key Stats Card */}
                         <div className="bg-card border rounded-xl p-6 shadow-sm sticky top-24">
                             <h3 className="font-semibold text-lg mb-4">At a Glance</h3>
