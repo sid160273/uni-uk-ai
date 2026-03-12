@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { getAllUniversities, University } from '@/lib/data';
+import { getAllBlogPostsCombined } from '@/lib/blog-data';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,287 +17,111 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const universities = getAllUniversities();
-
-    // Build context about what the user is looking for
-    const userPreferences = [];
-    if (chatState?.course) userPreferences.push(`Course: ${chatState.course}`);
-    if (chatState?.isInternational !== undefined) {
-      userPreferences.push(`Student Type: ${chatState.isInternational ? 'International' : 'UK/Domestic'}`);
-      if (chatState.isInternational && chatState.country) {
-        userPreferences.push(`Country: ${chatState.country}`);
-      }
+    // Fetch current trending stories for context
+    let trendingContext = '';
+    let trendingStories: any[] = [];
+    try {
+      const allPosts = await getAllBlogPostsCombined();
+      trendingStories = allPosts.slice(0, 10);
+      trendingContext = trendingStories.map((post, i) =>
+        `${i + 1}. "${post.title}" (${post.category}) — ${post.excerpt} [Read more](/blog/${post.slug})`
+      ).join('\n');
+    } catch (error) {
+      console.error('Error fetching trending stories for chat:', error);
     }
-    if (chatState?.predictedGrades) userPreferences.push(`Predicted Grades: ${chatState.predictedGrades}`);
-    if (chatState?.location) userPreferences.push(`Location: ${chatState.location}`);
-    if (chatState?.vibe) userPreferences.push(`Vibe: ${chatState.vibe}`);
-    if (chatState?.sports) userPreferences.push(`Interested in sports facilities`);
-    if (chatState?.nightlife) userPreferences.push(`Interested in nightlife`);
 
-    const userContext = userPreferences.length > 0
-      ? `\n\nUser Preferences So Far:\n${userPreferences.join('\n')}`
-      : '';
+    // Build conversation context
+    const topicsDiscussed = chatState?.topicsDiscussed || [];
 
-    // Create detailed university database for AI knowledge
-    const universityKnowledge = universities.map(uni => ({
-      name: uni.name,
-      location: uni.location,
-      description: uni.description?.substring(0, 300) || 'No description available',
-      features: uni.features?.join(', ') || 'N/A',
-      rankings: `Guardian: ${uni.rankings?.guardian || 'N/A'}, THE World: ${uni.rankings?.the || 'N/A'}, NSS: ${uni.rankings?.nss || 'N/A'}%`,
-      costOfLiving: uni.locationStats?.costOfLiving || 'N/A',
-      nightlife: `${uni.locationStats?.nightlife || 'N/A'}/5`,
-      vibe: uni.locationStats?.vibe || 'N/A',
-      sportsRanking: uni.campusStats?.sportsRanking || 'N/A',
-      internationalStudents: uni.campusStats?.internationalStudents ? `${uni.campusStats.internationalStudents}%` : 'N/A',
-      entryRequirements: uni.entryRequirements?.substring(0, 150) || 'Varies by course',
-      slug: uni.slug // For generating URLs
-    }));
+    const systemPrompt = `You are the AI behind uni-uk.ai — a sharp, engaging news assistant that helps people understand what's trending RIGHT NOW.
 
-    // System prompt for the AI with full database knowledge
-    const systemPrompt = `You are an expert UK university advisor with comprehensive knowledge of all 141 UK universities listed on uni-uk.ai.
+YOUR PERSONALITY:
+- You're like a brilliant, well-informed friend who always knows what's going on
+- Conversational, witty, and insightful — never dry or robotic
+- You explain complex stories simply without being condescending
+- You have genuine opinions and analysis, not just facts
+- You're excited about connecting people to what matters
 
-CRITICAL: STAY ON TOPIC - You ONLY help with UK university searches. You do NOT:
-- Discuss football academies, sports teams, or becoming a professional athlete (unless they're asking about Sports Science/Management degrees)
-- Respond to spam, random numbers, phone numbers, or social media handles
-- Answer questions about topics unrelated to UK universities and education
-- Engage with messages in languages other than English (politely ask them to use English)
-- Respond to promotional content, advertisements, or irrelevant requests
+WHAT YOU DO:
+- Help people learn about trending topics and current events
+- Provide context, background, and analysis on any trending story
+- Connect different stories and explain why they matter
+- Suggest related topics they might find interesting
+- Direct people to our detailed articles for deeper reading
 
-If a user asks about something COMPLETELY unrelated to UK universities, respond warmly but redirect:
-- Be friendly and understanding, not dismissive
-- Examples of polite redirects:
-  * "I appreciate you reaching out! However, I'm specifically designed to help students find the perfect UK university. I'd love to help you explore university options - what subject are you interested in studying?"
-  * "Thanks for your message! While I can't help with that particular topic, I'm an expert on UK universities and would be happy to help you find the right course and university for your goals. What are you looking to study?"
-  * "I can see you're looking for something specific, but my expertise is in helping students choose UK universities. Let me help you with that instead - what field of study interests you?"
-- Be warm, professional, and always offer to help with university search
-- Never be rude or dismissive, even to spam - stay polite and redirect
-
-IMPORTANT: You have access to detailed information about each university including:
-- Exact rankings (Guardian, THE World Rankings, NSS satisfaction scores)
-- Entry requirements and typical A-level offers
-- Accommodation options
-- Location statistics (cost of living, nightlife ratings, campus vibe)
-- Sports rankings and facilities
-- International student percentages
-- Detailed descriptions and unique features
-- Travel information and accessibility
-
-YOUR UNIVERSITY DATABASE (use this information when making recommendations):
-${JSON.stringify(universityKnowledge.slice(0, 30), null, 2)}
-... and 111 more universities with similar detailed data.
+CURRENT TOP TRENDING STORIES (use these to inform your responses):
+${trendingContext || 'No stories loaded yet — tell the user to check back soon!'}
 
 CONVERSATION GUIDELINES:
-1. CLARIFICATION FIRST - If the user's input is unclear, vague, or doesn't make sense:
-   - DON'T just say "Fascinating!" or accept it blindly
-   - Instead, politely ask for clarification
-   - Offer suggestions of what they might mean
-   - Examples:
-     * If they say "vertical medicine": "I'm not quite sure what you mean by 'vertical medicine' - did you mean Veterinary Medicine, or perhaps Medicine in general? Let me know so I can help you better!"
-     * If they say something unclear: "Just to make sure I understand correctly, could you clarify what you mean by [their input]? Are you referring to [option A] or [option B]?"
-   - Only proceed once you understand their intent
+1. If someone asks about a specific topic, check if it's in our trending stories and reference the article
+2. If they ask "what's trending?" or similar, give them a punchy summary of the top stories
+3. Always link to relevant articles using markdown: [Article Title](/blog/slug)
+4. Be opinionated — share your analysis of WHY things are trending
+5. If asked about something not in our stories, still be helpful and knowledgeable
+6. Keep responses concise but insightful — 2-4 paragraphs max
+7. End responses with a question or suggestion to keep the conversation going
+8. When listing multiple stories, use bullet points for readability
 
-2. DIRECT UNIVERSITY SEARCHES - If user asks about a SPECIFIC university by name:
-   - Search your database for that university
-   - Provide a brief overview (2-3 sentences) highlighting key features from the database
-   - Include the clickable link to that university's page: [University Name](/universities/slug)
-   - Then ask if they'd like to know more about it, or if they want to explore similar universities
-   - Example: "Great! [University of Manchester](/universities/manchester) is a Russell Group university ranked #24 in the Guardian League Table with excellent research facilities and a vibrant city campus. It has a diverse international community (45% international students) and strong programs across sciences and humanities. Would you like to explore similar universities, or would you like me to help you find the perfect course match at Manchester?"
+FORMATTING:
+- Use markdown for links, bold, and bullet points
+- When mentioning a trending story, ALWAYS link to it
+- Keep paragraphs short and punchy
 
-3. INTERNATIONAL VS DOMESTIC STUDENTS:
-   - After they mention their course, ask: "Are you a UK/domestic student or an international student?"
-   - If INTERNATIONAL student, ask these additional questions (USE BULLET POINTS for better readability):
-     Format your response like: "Great! Since you're an international student, I'd like to understand your situation better. Could you help me with a few details:
-     - Which country are you from? (this affects entry requirements)
-     - Do you have IB, A-levels, or another qualification?
-     - Will you need university accommodation, or do you have other arrangements?
-     - Are you looking for universities with strong international student communities?"
-   - ALWAYS use bullet points or numbered lists when asking 2+ questions in the same response
-   - If DOMESTIC student, proceed with standard UK questions (A-levels, location preference, etc.)
+STAY ON BRAND:
+- You are uni-uk.ai's trending news assistant
+- If someone asks unrelated questions, be friendly but redirect: "I'm all about what's trending right now! Speaking of which, have you seen [topic]?"
+- Never be dismissive — always be warm and redirect to trending content
 
-4. Ask ONE focused question at a time in this order:
-   - First: What subject/course they want to study (clarify if unclear)
-   - Second: Are they UK/domestic or international student?
-   - Third: Their predicted/achieved grades (A-levels, IB, etc.) - adjust based on international/domestic
-   - Fourth: Location preference in the UK
-   - Fifth: Campus vibe, sports, nightlife, accommodation preferences
-
-5. FORMATTING RULE - When you need to ask multiple questions in ONE response:
-   - ALWAYS use markdown bullet points (- ) or numbered lists (1. )
-   - Add a friendly intro sentence before the bulleted questions
-   - This makes your questions much easier to read and scan
-   - Example: "I'd love to learn more about your preferences:
-     - What are your predicted grades?
-     - Do you prefer city or campus environments?
-     - Is cost of living a concern?"
-
-6. Be warm, conversational, and encouraging - but also helpful by seeking clarity
-
-7. CRITICAL - University Names Must Be Links:
-   - WHENEVER you mention a university name, format it as a clickable link using this exact pattern:
-   - [University Name](/universities/slug)
-   - Example: "I'd recommend [University of Oxford](/universities/oxford)" NOT "I'd recommend University of Oxford"
-   - EVERY mention of a university name must be a link - this is mandatory
-   - Use the EXACT slug from the database (provided in the data above) - DO NOT shorten or modify slugs
-   - IMPORTANT: For University of Strathclyde, the slug is "strath-ac-uk" NOT "strathclyde"
-   - IMPORTANT: Always look up the exact slug in the database - never guess or abbreviate
-
-8. When recommending universities:
-   - ALWAYS include 2-3 interesting/unique details about EACH university
-   - Cite SPECIFIC details from the database:
-     * Mention actual rankings (e.g., "ranked #12 in the Guardian League Table")
-     * Reference real features (e.g., "offers excellent sports facilities with a ranking of #25")
-     * Quote entry requirements (e.g., "typically requires AAB-BBB at A-level")
-     * Match their grades to entry requirements
-     * Describe the actual vibe (e.g., "has a 'Historic & Friendly' atmosphere")
-     * Add interesting facts (e.g., "has a vibrant nightlife scene with 5/5 rating" or "18% international students")
-   - Explain WHY each university matches using real data points
-   - End your recommendations with: "You can explore these universities in detail below!"
-   - THEN immediately follow up with 1-2 data-driven questions to refine their search
-
-9. CRITICAL: When providing recommendations, ALWAYS include follow-up questions in the SAME response
-   - Ask about factors they haven't mentioned yet based on our database:
-     * "Is nightlife important to you? Some cities have much better nightlife scenes than others."
-     * "How important are sports facilities? We have universities ranked from #1 to #100+ for sports."
-     * "Will you be living in university accommodation, renting privately, or with family?"
-     * "Are you interested in a campus with a high international student population?"
-     * "Does cost of living matter? Some cities are much more affordable than others."
-     * "Would you prefer a city vibe, campus town feel, or historic university atmosphere?"
-     * "How important is student satisfaction? Some universities score above 85% on NSS."
-     * "Are you looking for strong employability rates after graduation?"
-   - These questions help you refine and improve recommendations in the next exchange
-   - REMEMBER: Use bullet points when asking 2+ questions (see rule #5)
-
-10. Only provide 3-5 recommendations when you have: subject + student type + grades + location
-11. Keep responses concise but informative (2-3 sentences per university when recommending)
-
-NEVER make up information - only use the exact data provided in your database.
-
-Current conversation stage: ${
-  userPreferences.length === 0
-    ? 'Just starting - ask what subject they want to study (clarify if unclear)'
-    : !chatState.isInternational && userPreferences.length === 1
-      ? 'Ask if they are a UK/domestic student or international student'
-      : userPreferences.length <= 2
-        ? chatState.isInternational
-          ? 'Ask about their qualifications (IB, A-levels, etc.) and which country they are from'
-          : 'Ask about their predicted or achieved grades (A-levels, IB, BTECs, etc.)'
-        : userPreferences.length === 3
-          ? 'Ask about location preference in the UK'
-          : 'Ask follow-up questions or make specific recommendations with data'
-}${userContext}`;
+Topics discussed so far: ${topicsDiscussed.join(', ') || 'None yet'}`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Cost-effective and fast
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
       ],
       temperature: 0.7,
-      max_tokens: 1200, // Increased for detailed responses with interesting facts AND follow-up questions
+      max_tokens: 1200,
     });
 
     const aiResponse = completion.choices[0]?.message?.content ||
-      "I'm here to help you find the perfect university! What are you most interested in studying?";
+      "Hey! I'm here to help you catch up on what's trending. Ask me about any topic or say 'what's trending?' to get started!";
 
-    // Extract preferences from the conversation
+    // Update state — track what topics have been discussed
     const newState = { ...chatState };
     const lowerMsg = message.toLowerCase();
 
-    // Detect international vs domestic student
-    if (lowerMsg.includes('international') || lowerMsg.includes('overseas') || lowerMsg.includes('foreign')) {
-      newState.isInternational = true;
-    } else if (lowerMsg.includes('domestic') || lowerMsg.includes('uk student') || lowerMsg.includes('british')) {
-      newState.isInternational = false;
-    }
+    if (!newState.topicsDiscussed) newState.topicsDiscussed = [];
 
-    // Detect country (for international students)
-    const countries = ['india', 'china', 'usa', 'america', 'canada', 'nigeria', 'malaysia', 'singapore', 'hong kong', 'pakistan', 'bangladesh', 'saudi arabia', 'uae', 'kenya', 'ghana', 'south africa', 'australia', 'new zealand', 'ireland'];
-    for (const country of countries) {
-      if (lowerMsg.includes(country)) {
-        newState.country = country.charAt(0).toUpperCase() + country.slice(1);
-        newState.isInternational = true; // Mentioning a country implies international
-        break;
+    // Detect topics from the message
+    for (const story of trendingStories) {
+      const titleWords = story.title.toLowerCase().split(/\s+/);
+      const matchCount = titleWords.filter((word: string) =>
+        word.length > 3 && lowerMsg.includes(word)
+      ).length;
+
+      if (matchCount >= 2 && !newState.topicsDiscussed.includes(story.title)) {
+        newState.topicsDiscussed.push(story.title);
       }
     }
 
-    // Update state based on user message
-    if (lowerMsg.includes('london')) newState.location = 'London';
-    else if (lowerMsg.includes('scotland')) newState.location = 'Scotland';
-    else if (lowerMsg.includes('wales')) newState.location = 'Wales';
-    else if (lowerMsg.includes('north')) newState.location = 'North England';
-    else if (lowerMsg.includes('south')) newState.location = 'South England';
-
-    // Detect course interest
-    if (lowerMsg.includes('veterinary') || lowerMsg.includes('vet medicine')) newState.course = 'Veterinary Medicine';
-    else if (lowerMsg.includes('medicine') || lowerMsg.includes('medical')) newState.course = 'Medicine';
-    else if (lowerMsg.includes('engineering')) newState.course = 'Engineering';
-    else if (lowerMsg.includes('business')) newState.course = 'Business';
-    else if (lowerMsg.includes('computer') || lowerMsg.includes('computing')) newState.course = 'Computer Science';
-    else if (lowerMsg.includes('art')) newState.course = 'Arts';
-    else if (lowerMsg.includes('law')) newState.course = 'Law';
-    else if (lowerMsg.includes('nursing')) newState.course = 'Nursing';
-    else if (lowerMsg.includes('psychology')) newState.course = 'Psychology';
-
-    // Detect grades (A-levels, IB, etc.)
-    if (lowerMsg.match(/a\*a\*a|aaa|aab|abb|bbb|abc|bbc|ccc/i)) {
-      newState.predictedGrades = message.match(/[a-c\*]{3,}/i)?.[0] || '';
-    } else if (lowerMsg.includes('ib') || lowerMsg.match(/\d{2}\s*points?/)) {
-      newState.predictedGrades = message.match(/(ib\s*)?\d{2}\s*points?/i)?.[0] || 'IB';
-    }
-
-    // Detect interests
-    if (lowerMsg.includes('sport') || lowerMsg.includes('gym') || lowerMsg.includes('athletic')) newState.sports = true;
-    if (lowerMsg.includes('nightlife') || lowerMsg.includes('party') || lowerMsg.includes('club')) newState.nightlife = true;
-
-    // Extract university names mentioned in AI response to show as cards
-    let recommendations: University[] = [];
-
-    // Try to extract university names from AI response
-    const mentionedUniversities = universities.filter(uni =>
-      aiResponse.toLowerCase().includes(uni.name.toLowerCase())
-    );
-
-    if (mentionedUniversities.length > 0) {
-      // Show universities that AI specifically mentioned
-      recommendations = mentionedUniversities.slice(0, 5);
-    } else {
-      // Fallback: Use Fuse.js search based on user preferences
-      const Fuse = (await import('fuse.js')).default;
-      const searchTerms = [];
-      if (newState.location) searchTerms.push(newState.location);
-      if (newState.course) searchTerms.push(newState.course);
-
-      if (searchTerms.length > 0) {
-        const fuse = new Fuse(universities, {
-          keys: [
-            { name: 'name', weight: 0.4 },
-            { name: 'location', weight: 0.3 },
-            { name: 'description', weight: 0.2 },
-            { name: 'features', weight: 0.1 },
-          ],
-          threshold: 0.4,
-        });
-
-        const results = fuse.search(searchTerms.join(' '));
-        recommendations = results.slice(0, 8).map(r => r.item);
-
-        // Apply intelligent filters
-        if (newState.sports) {
-          recommendations = recommendations.filter(u => (u.campusStats.sportsRanking || 100) < 50);
-        }
-        if (newState.nightlife) {
-          recommendations = recommendations.filter(u => u.locationStats.nightlife >= 4);
-        }
-
-        // Limit to top 5
-        recommendations = recommendations.slice(0, 5);
-      }
-    }
+    // Build recommendations from trending stories mentioned in the response
+    const recommendations = trendingStories
+      .filter(story => aiResponse.toLowerCase().includes(story.title.toLowerCase().split(' ')[0]))
+      .slice(0, 5)
+      .map((story: any) => ({
+        id: story.slug,
+        name: story.title,
+        slug: story.slug,
+        location: story.category,
+        description: story.excerpt,
+        imageUrl: story.imageUrl,
+        category: story.category,
+      }));
 
     return NextResponse.json({
       message: aiResponse,
-      recommendations: recommendations.slice(0, 5),
+      recommendations,
       newState,
     });
 
