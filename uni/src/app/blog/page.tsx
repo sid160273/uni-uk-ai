@@ -6,9 +6,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "UK University Guides & Advice - Blog | uni-uk.ai",
+  title: "Trending Stories - What's Happening Now | uni-uk.ai",
   description:
-    "Expert guides on choosing UK universities, UCAS applications, student life, accommodation, and more. Free advice for students and parents.",
+    "AI-powered trending stories on what everyone is searching for. Sports, politics, entertainment, tech and more — updated every 30 minutes.",
   alternates: {
     canonical: "/blog",
   },
@@ -36,11 +36,10 @@ export default async function BlogIndexPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              University Guides & Advice
+              Trending Stories
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Expert insights to help you navigate university applications, student
-              life, and make informed decisions about your education.
+              AI-powered stories on the topics everyone is searching for right now — updated every 30 minutes.
             </p>
           </div>
         </div>
@@ -73,27 +72,20 @@ export default async function BlogIndexPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-br from-blue-50 to-violet-50 dark:from-blue-950/20 dark:to-violet-950/20">
+      <section className="py-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Ready to find your perfect university?
+            Want to know more about what&apos;s trending?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Use our AI-powered search to discover universities that match your interests,
-            goals, and preferences.
+            Ask our AI assistant about any trending topic — get context, background, and analysis instantly.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             >
-              Try AI Search
-            </Link>
-            <Link
-              href="/universities"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-background border rounded-lg font-medium hover:bg-muted transition-colors"
-            >
-              Browse Universities
+              Ask Our AI
             </Link>
           </div>
         </div>

@@ -309,27 +309,26 @@ export default async function BlogPostPage({ params }: PageProps) {
       )}
 
       {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-br from-blue-50 to-violet-50 dark:from-blue-950/20 dark:to-violet-950/20">
+      <section className="py-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Find your perfect UK university
+            Want to know more about what&apos;s trending?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Use our AI-powered search to discover universities that match your
-            interests and goals.
+            Ask our AI assistant about any trending topic, or explore all the stories everyone is searching for right now.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             >
-              Try AI Search
+              Ask Our AI
             </Link>
             <Link
-              href="/universities"
+              href="/blog"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-background border rounded-lg font-medium hover:bg-muted transition-colors"
             >
-              Browse Universities
+              See All Trending Stories
             </Link>
           </div>
         </div>
