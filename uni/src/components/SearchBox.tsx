@@ -1,22 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Sparkles, Send, User, Bot } from "lucide-react";
-import { UniversityCard } from "./UniversityCard";
+import { Search, Sparkles, Send, User, Bot, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { University } from "@/lib/data";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
 interface ChatState {
-    location?: string;
-    course?: string;
-    vibe?: string;
-    sports?: boolean;
-    nightlife?: boolean;
-    predictedGrades?: string;
-    isInternational?: boolean;
-    country?: string;
+    topicsDiscussed?: string[];
 }
 
 interface Message {
@@ -24,20 +15,70 @@ interface Message {
     content: string;
 }
 
+const QUICK_TOPICS = [
+    { label: "What's trending?", emoji: "\uD83D\uDD25", color: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100" },
+    { label: "Sports news", emoji: "\u26BD", color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
+    { label: "Entertainment", emoji: "\uD83C\uDFAC", color: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
+    { label: "Politics", emoji: "\uD83C\uDFDB\uFE0F", color: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100" },
+    { label: "Tech", emoji: "\uD83D\uDCBB", color: "bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100" },
+    { label: "World news", emoji: "\uD83C\uDF0D", color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" },
+];
+
+const PLACEHOLDERS = [
+    "Ask about any trending topic...",
+    "What's the latest in sports?",
+    "Why is everyone talking about...",
+];
+
+const CATEGORY_COLORS: Record<string, string> = {
+    Sports: "border-l-blue-500",
+    Entertainment: "border-l-pink-500",
+    Politics: "border-l-purple-500",
+    Technology: "border-l-cyan-500",
+    Tech: "border-l-cyan-500",
+    World: "border-l-amber-500",
+    Business: "border-l-green-500",
+    Science: "border-l-teal-500",
+    Health: "border-l-emerald-500",
+};
+
+const CATEGORY_EMOJIS: Record<string, string> = {
+    Sports: "\u26BD",
+    Entertainment: "\uD83C\uDFAC",
+    Politics: "\uD83C\uDFDB\uFE0F",
+    Technology: "\uD83D\uDCBB",
+    Tech: "\uD83D\uDCBB",
+    World: "\uD83C\uDF0D",
+    Business: "\uD83D\uDCBC",
+    Science: "\uD83D\uDD2C",
+    Health: "\uD83C\uDFE5",
+    Trending: "\uD83D\uDD25",
+};
+
 export function SearchBox() {
     const [query, setQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
             role: "ai",
-            content: "Hi there! 👋 I'm your AI university consultant, here to help you find the perfect UK university match.\n\nI'll guide you through a personalized journey based on your course interests, grades, location preferences, and what matters most to you in student life.\n\nOr if you already know which university you're interested in, just let me know and I can direct you to it!\n\nLet's get started - what subject are you thinking of studying?"
+            content: "Hey! I'm your AI news assistant, here to help you understand what's trending right now.\n\nAsk me about any topic in the news, or just say **\"what's trending?\"** and I'll catch you up on the biggest stories everyone is searching for.\n\nWhat would you like to know about?"
         }
     ]);
     const [chatState, setChatState] = useState<ChatState>({});
-    const [recommendations, setRecommendations] = useState<University[]>([]);
+    const [recommendations, setRecommendations] = useState<any[]>([]);
     const [userMessageCount, setUserMessageCount] = useState(0);
+    const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Cycle through placeholders
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setPlaceholderIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Load progress from sessionStorage on mount
     useEffect(() => {
@@ -252,31 +293,42 @@ export function SearchBox() {
         }
     };
 
+    const handleQuickTopic = (topic: string) => {
+        setQuery(topic);
+        // Auto-submit after a tick so the state updates
+        setTimeout(() => {
+            const form = inputRef.current?.closest('form');
+            if (form) {
+                form.requestSubmit();
+            }
+        }, 50);
+    };
+
     return (
         <div ref={chatContainerRef} className="w-full max-w-6xl mx-auto flex flex-col gap-1 md:gap-3">
             {/* How It Works - Only show when no user messages (just the initial AI greeting) */}
             {messages.length === 1 && (
                 <div className="grid gap-2 md:gap-4 grid-cols-3 md:grid-cols-3 max-w-4xl mx-auto px-2">
-                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-primary/20">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
-                            <span className="text-sm md:text-lg font-bold text-primary">1</span>
+                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-red-200">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
+                            <span className="text-sm md:text-lg font-bold text-red-600">1</span>
                         </div>
-                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Share Goals</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">Tell us about your course and grades</p>
+                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Ask Anything</h3>
+                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">Ask about any trending topic</p>
                     </div>
-                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-primary/20">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
-                            <span className="text-sm md:text-lg font-bold text-primary">2</span>
+                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-red-200">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
+                            <span className="text-sm md:text-lg font-bold text-red-600">2</span>
                         </div>
-                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Get Matched</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">Receive tailored recommendations</p>
+                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Get Insights</h3>
+                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">AI-powered context and analysis</p>
                     </div>
-                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-primary/20">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
-                            <span className="text-sm md:text-lg font-bold text-primary">3</span>
+                    <div className="text-center p-2 md:p-3 bg-card/50 rounded-lg border border-red-200">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2">
+                            <span className="text-sm md:text-lg font-bold text-red-600">3</span>
                         </div>
-                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Explore & Apply</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">View detailed university profiles</p>
+                        <h3 className="text-xs md:text-sm font-semibold mb-0.5 md:mb-1">Go Deeper</h3>
+                        <p className="text-[10px] md:text-xs text-muted-foreground hidden md:block">Read full stories on every topic</p>
                     </div>
                 </div>
             )}
@@ -285,10 +337,16 @@ export function SearchBox() {
             <div className="bg-background/80 backdrop-blur-xl border rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[500px] md:h-[600px]">
                 {/* Header */}
                 <div className="p-4 border-b bg-muted/30 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="ml-2 text-xs font-medium text-muted-foreground">AI University Consultant</span>
+                    <motion.span
+                        className="inline-block w-2.5 h-2.5 rounded-full bg-red-500"
+                        animate={{ opacity: [1, 0.4, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Live</span>
+                    <span className="mx-1 text-muted-foreground/30">|</span>
+                    <span className="text-xs font-semibold text-foreground">AI News Assistant</span>
+                    <span className="text-sm">&#10024;</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground hidden md:inline">Powered by AI &bull; Updated every 30 min</span>
                 </div>
 
                 {/* Scrollable Messages Area */}
@@ -300,24 +358,49 @@ export function SearchBox() {
                             data-role={msg.role}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
+                            transition={idx === 0 ? { duration: 0.6, ease: "easeOut" } : undefined}
                             className={cn(
                                 "flex gap-4",
                                 msg.role === "user" ? "flex-row-reverse" : "flex-row"
                             )}
                         >
-                            <div className={cn(
-                                "w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                                msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-white text-primary border"
-                            )}>
-                                {msg.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
-                            </div>
+                            {/* Avatar */}
+                            {msg.role === "user" ? (
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm bg-primary text-primary-foreground">
+                                    <User className="w-5 h-5" />
+                                </div>
+                            ) : (
+                                <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                                    {isLoading && idx === messages.length - 1 ? null : (
+                                        <>
+                                            <span className="text-2xl" role="img" aria-label="robot">&#129302;</span>
+                                        </>
+                                    )}
+                                    {idx === messages.length - 1 && idx > 0 && !isLoading && (
+                                        <motion.div
+                                            className="absolute inset-0 rounded-full border-2 border-primary/30"
+                                            initial={{ scale: 0.8, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 0 }}
+                                            transition={{ duration: 1 }}
+                                        />
+                                    )}
+                                </div>
+                            )}
 
-                            <div className={cn(
-                                "p-4 rounded-2xl text-sm md:text-base max-w-[80%] shadow-sm",
-                                msg.role === "user"
-                                    ? "bg-primary text-primary-foreground rounded-tr-none"
-                                    : "bg-white border rounded-tl-none"
-                            )}>
+                            {/* Message bubble */}
+                            <motion.div
+                                className={cn(
+                                    "p-4 rounded-2xl text-sm md:text-base max-w-[80%] shadow-sm",
+                                    msg.role === "user"
+                                        ? "bg-primary text-primary-foreground rounded-tr-none"
+                                        : "rounded-tl-none border bg-gradient-to-br from-white to-slate-50"
+                                )}
+                                {...(idx === 0 ? {
+                                    initial: { opacity: 0, y: 8 },
+                                    animate: { opacity: 1, y: 0 },
+                                    transition: { duration: 0.5, delay: 0.2 }
+                                } : {})}
+                            >
                                 <div className={cn(
                                     "whitespace-pre-wrap leading-relaxed markdown-content",
                                     msg.role === "user" && "markdown-content-dark"
@@ -326,23 +409,33 @@ export function SearchBox() {
                                         {msg.content}
                                     </ReactMarkdown>
                                 </div>
-                            </div>
+                            </motion.div>
                         </motion.div>
                     ))}
 
+                    {/* Loading indicator */}
                     {isLoading && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="flex gap-4"
                         >
-                            <div className="w-8 h-8 rounded-full bg-white text-primary border flex items-center justify-center shrink-0">
-                                <Sparkles className="w-5 h-5 animate-spin" />
+                            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                                <span className="text-2xl" role="img" aria-label="robot">&#129302;</span>
+                                <motion.div
+                                    className="absolute inset-0 rounded-full border-2 border-primary/40"
+                                    animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                />
                             </div>
-                            <div className="bg-white border p-4 rounded-2xl rounded-tl-none flex items-center gap-2">
-                                <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                                <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                                <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                            <div className="bg-gradient-to-br from-white to-slate-50 border p-4 rounded-2xl rounded-tl-none flex items-center gap-2">
+                                <motion.span
+                                    className="text-sm font-medium bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
+                                    animate={{ backgroundPosition: ["0% center", "200% center"] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                >
+                                    &#129504; Thinking...
+                                </motion.span>
                             </div>
                         </motion.div>
                     )}
@@ -352,9 +445,10 @@ export function SearchBox() {
                 {/* Input Area */}
                 <div className="p-4 bg-background border-t">
                     <form onSubmit={handleSearch} onFocus={(e) => e.stopPropagation()} className="relative group">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
                         <div className="relative flex items-center bg-background rounded-lg border shadow-sm">
                             <input
+                                ref={inputRef}
                                 type="text"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
@@ -362,11 +456,16 @@ export function SearchBox() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                 }}
-                                placeholder="Type your message..."
+                                placeholder={PLACEHOLDERS[placeholderIndex]}
                                 className="flex-1 bg-transparent border-none px-4 py-3 text-base focus:ring-0 placeholder:text-muted-foreground/50"
                                 disabled={isLoading}
                                 autoComplete="off"
                             />
+                            {query.trim() && (
+                                <span className="text-[10px] text-muted-foreground/60 mr-1 hidden md:inline">
+                                    Enter &#8629;
+                                </span>
+                            )}
                             <button
                                 type="submit"
                                 disabled={isLoading || !query.trim()}
@@ -376,6 +475,31 @@ export function SearchBox() {
                             </button>
                         </div>
                     </form>
+
+                    {/* Quick Topic Chips - show when input is empty and no conversation yet */}
+                    {!query.trim() && messages.length <= 2 && !isLoading && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex flex-wrap gap-1.5 mt-2.5 justify-center"
+                        >
+                            {QUICK_TOPICS.map((topic) => (
+                                <button
+                                    key={topic.label}
+                                    type="button"
+                                    onClick={() => handleQuickTopic(`${topic.emoji} ${topic.label}`)}
+                                    className={cn(
+                                        "px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer",
+                                        "hover:shadow-md hover:scale-105 active:scale-95",
+                                        topic.color
+                                    )}
+                                >
+                                    {topic.emoji} {topic.label}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
 
                     {/* Progress Bar - Now below input for better mobile visibility */}
                     {userMessageCount > 0 && (
@@ -441,7 +565,7 @@ export function SearchBox() {
                                     transition={{ type: "spring", stiffness: 200, damping: 10 }}
                                     className="text-base md:text-lg"
                                 >
-                                    🎉
+                                    &#127881;
                                 </motion.span>
                             )}
                         </motion.div>
@@ -459,16 +583,36 @@ export function SearchBox() {
                         className="space-y-1 md:space-y-2"
                     >
                         <div className="flex items-center gap-2 text-base md:text-lg font-semibold px-2">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <h2>Recommendations</h2>
+                            <Flame className="w-4 h-4 text-red-500" />
+                            <h2>Related Stories</h2>
                             <span className="text-xs font-normal text-muted-foreground ml-2 hidden md:inline">
-                                Based on your preferences
+                                Dive deeper into these topics
                             </span>
                         </div>
 
                         <div className="grid gap-2 md:gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                            {recommendations.map((uni) => (
-                                <UniversityCard key={uni.id} university={uni} />
+                            {recommendations.map((story: any, storyIdx: number) => (
+                                <a
+                                    key={story.slug}
+                                    href={`/blog/${story.slug}`}
+                                    className={cn(
+                                        "group bg-card border rounded-xl p-4 hover:shadow-lg hover:border-primary/50 transition-all relative border-l-4",
+                                        CATEGORY_COLORS[story.category] || "border-l-red-500"
+                                    )}
+                                >
+                                    {storyIdx === 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                            &#128293; Hot
+                                        </span>
+                                    )}
+                                    <span className="text-xs font-medium text-red-600">
+                                        {CATEGORY_EMOJIS[story.category] || "&#128196;"} {story.category}
+                                    </span>
+                                    <h3 className="font-semibold mt-1 group-hover:text-primary transition-colors line-clamp-2 text-sm">
+                                        {story.name}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{story.description}</p>
+                                </a>
                             ))}
                         </div>
                     </motion.div>
