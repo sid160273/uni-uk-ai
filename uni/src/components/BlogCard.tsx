@@ -1,11 +1,33 @@
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";
-import { Clock, Calendar, Tag } from "lucide-react";
+import { useState } from "react";
+import { Clock, Calendar } from "lucide-react";
 import { BlogPost } from "@/data/blog-posts";
 
 interface BlogCardProps {
   post: BlogPost;
   featured?: boolean;
+}
+
+function PostImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const [error, setError] = useState(false);
+
+  if (!src || !src.startsWith("http") || error) {
+    return (
+      <div className={`bg-gradient-to-br from-primary/20 to-violet-600/20 ${className || ""}`} />
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`object-cover ${className || ""}`}
+      onError={() => setError(true)}
+      loading="lazy"
+    />
+  );
 }
 
 export function BlogCard({ post, featured = false }: BlogCardProps) {
@@ -22,18 +44,12 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
         className="group block bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all"
       >
         <div className="grid md:grid-cols-2 gap-0">
-          <div className="relative h-64 md:h-full min-h-[250px]">
-            {post.imageUrl.startsWith("http") ? (
-              <Image
-                src={post.imageUrl}
-                alt={post.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20" />
-            )}
+          <div className="relative h-64 md:h-full min-h-[250px] overflow-hidden">
+            <PostImage
+              src={post.imageUrl}
+              alt={post.title}
+              className="absolute inset-0 w-full h-full"
+            />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20 opacity-30" />
           </div>
           <div className="p-6 flex flex-col justify-center">
@@ -68,18 +84,12 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       href={`/blog/${post.slug}`}
       className="group block bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all"
     >
-      <div className="relative h-48">
-        {post.imageUrl.startsWith("http") ? (
-          <Image
-            src={post.imageUrl}
-            alt={post.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10" />
-        )}
+      <div className="relative h-48 overflow-hidden">
+        <PostImage
+          src={post.imageUrl}
+          alt={post.title}
+          className="absolute inset-0 w-full h-full"
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10 opacity-30" />
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1 bg-background/90 backdrop-blur-sm text-xs font-medium rounded-full">
