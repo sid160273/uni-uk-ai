@@ -206,110 +206,146 @@
   }
 }
 
-/* Ezoic Consent Banner Custom Styling */
+/* Ezoic / GateKeeper Consent Banner — Editorial Override */
 @layer components {
-  /* Main consent dialog wrapper */
-  #ez-cookie-dialog-wrapper {
+  /* Target both old ez-cookie and GateKeeper fc- selectors */
+
+  /* Main dialog wrapper — remove rounded corners, use editorial shadow */
+  #ez-cookie-dialog-wrapper,
+  #ez-cookie-dialog,
+  .fc-consent-root .fc-dialog,
+  .fc-dialog-container,
+  .fc-dialog-overlay .fc-dialog {
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgb(0 0 0 / 0.1) !important;
+    border: 1px solid hsl(0 0% 90%) !important;
     font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
   }
 
-  /* Dialog box */
-  #ez-cookie-dialog {
-    border-radius: 1rem !important;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
-    border: 1px solid hsl(var(--border)) !important;
-  }
-
-  /* Heading styling */
+  /* Heading — editorial serif */
   #ez-cookie-dialog h2,
-  #ez-cookie-dialog-wrapper h2 {
-    font-size: 1.875rem !important;
+  #ez-cookie-dialog-wrapper h2,
+  .fc-dialog h1,
+  .fc-dialog h2,
+  .fc-dialog-headline {
+    font-family: var(--font-display) !important;
+    font-size: 1.5rem !important;
     font-weight: 700 !important;
-    line-height: 2.25rem !important;
-    margin-bottom: 1.5rem !important;
-    color: hsl(var(--foreground)) !important;
-    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.01em !important;
+    color: hsl(0 0% 9%) !important;
+    margin-bottom: 1rem !important;
   }
 
-  /* Paragraph text */
+  /* Body text */
   #ez-cookie-dialog p,
   #ez-cookie-dialog-wrapper p,
-  #ez-cookie-dialog-wrapper div[style*="text-align"] {
-    font-size: 0.875rem !important;
-    line-height: 1.625rem !important;
-    color: hsl(var(--muted-foreground)) !important;
+  #ez-cookie-dialog-wrapper div[style*="text-align"],
+  .fc-dialog p,
+  .fc-dialog .fc-message-content,
+  .fc-dialog-body {
+    font-size: 0.8125rem !important;
+    line-height: 1.6 !important;
+    color: hsl(0 0% 45%) !important;
     font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
   }
 
-  /* Button base styling */
+  /* All buttons — editorial: square, uppercase, tracked */
   #ez-cookie-dialog button,
-  #ez-cookie-dialog-wrapper button {
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    border-radius: 0.5rem !important;
-    padding: 0.625rem 1.5rem !important;
+  #ez-cookie-dialog-wrapper button,
+  .fc-dialog button,
+  .fc-cta-consent,
+  .fc-cta-manage-options,
+  .fc-button {
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1.5rem !important;
     transition: all 0.2s ease !important;
     font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif !important;
     cursor: pointer !important;
   }
 
-  /* Primary button (Continue with Recommended Cookies) - Green button */
+  /* Primary button — solid black */
   #ez-cookie-dialog button[style*="rgb(76, 129, 30)"],
-  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"] {
-    background-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary-foreground)) !important;
-    border: none !important;
+  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"],
+  .fc-cta-consent,
+  .fc-button.fc-primary-button,
+  .fc-dialog button[style*="background"] {
+    background-color: hsl(0 0% 9%) !important;
+    color: hsl(0 0% 100%) !important;
+    border: 1px solid hsl(0 0% 9%) !important;
   }
 
   #ez-cookie-dialog button[style*="rgb(76, 129, 30)"]:hover,
-  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"]:hover {
-    opacity: 0.9 !important;
+  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"]:hover,
+  .fc-cta-consent:hover,
+  .fc-button.fc-primary-button:hover {
+    opacity: 0.85 !important;
   }
 
-  /* Secondary button (Allow Necessary Cookies) */
-  #ez-cookie-dialog button[style*="rgb(76, 129, 30)"][style*="border"],
-  #ez-cookie-dialog-wrapper button[style*="rgb(76, 129, 30)"][style*="border"] {
-    background-color: hsl(var(--secondary)) !important;
-    color: hsl(var(--secondary-foreground)) !important;
-    border: 1px solid hsl(var(--border)) !important;
-  }
-
-  /* Outlined button (Manage Settings) */
+  /* Secondary / outlined button — Manage Settings */
   #ez-cookie-dialog button[style*="border-width: 1px"],
-  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"] {
+  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"],
+  .fc-cta-manage-options,
+  .fc-button.fc-secondary-button {
     background-color: transparent !important;
-    border: 1px solid hsl(var(--border)) !important;
-    color: hsl(var(--foreground)) !important;
+    border: 1px solid hsl(0 0% 80%) !important;
+    color: hsl(0 0% 9%) !important;
   }
 
   #ez-cookie-dialog button[style*="border-width: 1px"]:hover,
-  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"]:hover {
-    background-color: hsl(var(--muted)) !important;
+  #ez-cookie-dialog-wrapper button[style*="border-width: 1px"]:hover,
+  .fc-cta-manage-options:hover,
+  .fc-button.fc-secondary-button:hover {
+    background-color: hsl(0 0% 96%) !important;
   }
 
-  /* Links */
+  /* Links — editorial underline style */
   #ez-cookie-dialog a,
-  #ez-cookie-dialog-wrapper a {
-    color: hsl(var(--primary)) !important;
+  #ez-cookie-dialog-wrapper a,
+  .fc-dialog a {
+    color: hsl(0 0% 9%) !important;
     text-decoration: none !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
+    font-size: 0.6875rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
   }
 
   #ez-cookie-dialog a:hover,
-  #ez-cookie-dialog-wrapper a:hover {
+  #ez-cookie-dialog-wrapper a:hover,
+  .fc-dialog a:hover {
     text-decoration: underline !important;
   }
 
   /* Container spacing */
   #ez-cookie-dialog > div,
-  #ez-cookie-dialog-wrapper > div {
+  #ez-cookie-dialog-wrapper > div,
+  .fc-dialog-content {
     padding: 2rem !important;
   }
 
   /* Button container */
   #ez-cookie-dialog div[style*="display: flex"],
-  #ez-cookie-dialog-wrapper div[style*="display: flex"] {
-    gap: 0.75rem !important;
+  #ez-cookie-dialog-wrapper div[style*="display: flex"],
+  .fc-dialog-buttons,
+  .fc-footer-buttons {
+    gap: 0.5rem !important;
     flex-wrap: wrap !important;
+  }
+
+  /* Overlay — darker, editorial */
+  .fc-dialog-overlay {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(2px) !important;
+  }
+
+  /* Toggle switches — monochrome */
+  .fc-toggle:checked,
+  .fc-toggle.fc-active {
+    background-color: hsl(0 0% 9%) !important;
   }
 }
