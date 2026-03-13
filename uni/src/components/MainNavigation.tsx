@@ -2,17 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { ChevronDown, Flame, Newspaper, GraduationCap, Zap, MapPin, Trophy, Star, Bitcoin } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DropdownProps {
   title: string;
-  icon?: React.ReactNode;
   children: React.ReactNode;
 }
 
-function Dropdown({ title, icon, children }: DropdownProps) {
+function NavDropdown({ title, children }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,30 +20,22 @@ function Dropdown({ title, icon, children }: DropdownProps) {
         setIsOpen(false);
       }
     }
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
   return (
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 hover:text-foreground transition-colors py-2"
+        className="flex items-center gap-1 hover:text-foreground transition-colors tracking-editorial uppercase text-[11px] font-semibold"
         aria-expanded={isOpen}
       >
-        {icon && <span className="mr-1">{icon}</span>}
         {title}
-        <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
+        <ChevronDown className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} />
       </button>
-
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-background border rounded-lg shadow-xl z-50 min-w-[280px] max-h-[70vh] overflow-y-auto">
+        <div className="absolute top-full left-0 mt-2 bg-background border border-border shadow-lg z-50 min-w-[240px]">
           {children}
         </div>
       )}
@@ -54,99 +44,74 @@ function Dropdown({ title, icon, children }: DropdownProps) {
 }
 
 const categories = [
-  { name: "Sports", slug: "sports", icon: "&#9917;" },
-  { name: "Politics", slug: "politics", icon: "&#127963;" },
-  { name: "Entertainment", slug: "entertainment", icon: "&#127916;" },
-  { name: "Technology", slug: "technology", icon: "&#128187;" },
-  { name: "Business", slug: "business", icon: "&#128200;" },
-  { name: "Science", slug: "science", icon: "&#128300;" },
-  { name: "Health", slug: "health", icon: "&#129657;" },
-  { name: "World", slug: "world", icon: "&#127758;" },
-  { name: "Culture", slug: "culture", icon: "&#127912;" },
-  { name: "Breaking", slug: "breaking", icon: "&#128680;" },
+  "Sports", "Politics", "Entertainment", "Technology",
+  "Business", "Science", "Health", "World", "Culture", "Breaking",
 ];
 
 export function MainNavigation() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <nav className="border-b bg-background/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+    <nav className="border-b border-border bg-background sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        {/* Top Bar */}
-        <div className="h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <Image
-              src="/logo.png"
-              alt="uni-uk.ai Logo"
-              width={200}
-              height={40}
-              className="h-8 md:h-10 w-auto"
-              priority
-            />
+        {/* Top bar */}
+        <div className="h-14 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <span className="font-display text-2xl md:text-3xl font-black tracking-tight">
+              uni-uk<span className="text-destructive">.ai</span>
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <Link href="/#trending" className="hover:text-foreground transition-colors flex items-center gap-1">
-              <Flame className="w-4 h-4 text-red-500" />
+          {/* Desktop Nav */}
+          <div className="hidden lg:flex items-center gap-6 text-muted-foreground">
+            <Link href="/" className="tracking-editorial uppercase text-[11px] font-semibold hover:text-foreground transition-colors">
               Trending
             </Link>
 
-            <Dropdown title="Categories" icon={<Newspaper className="w-4 h-4" />}>
-              <div className="p-2">
+            <NavDropdown title="Categories">
+              <div className="py-1">
                 <Link
                   href="/blog"
-                  className="block px-4 py-2 hover:bg-muted rounded-md transition-colors font-semibold text-foreground"
+                  className="block px-4 py-2 text-sm font-semibold hover:bg-muted transition-colors"
                 >
                   All Stories
                 </Link>
-                <div className="my-2 border-t" />
+                <div className="border-t border-border" />
                 {categories.map((cat) => (
                   <Link
-                    key={cat.slug}
-                    href={`/blog/category/${cat.slug}`}
-                    className="block px-4 py-2 hover:bg-muted rounded-md transition-colors"
+                    key={cat}
+                    href={`/blog/category/${cat.toLowerCase()}`}
+                    className="block px-4 py-2 text-sm hover:bg-muted transition-colors"
                   >
-                    <div className="flex items-center gap-2">
-                      <span dangerouslySetInnerHTML={{ __html: cat.icon }} />
-                      <span>{cat.name}</span>
-                    </div>
+                    {cat}
                   </Link>
                 ))}
               </div>
-            </Dropdown>
+            </NavDropdown>
 
-            <Dropdown title="Universities" icon={<GraduationCap className="w-4 h-4" />}>
-              <div className="p-2">
-                <Link
-                  href="/universities"
-                  className="block px-4 py-2 hover:bg-muted rounded-md transition-colors font-semibold text-foreground"
-                >
-                  <div className="flex items-center justify-between">
-                    <span>All Universities A-Z</span>
-                    <span className="text-xs text-muted-foreground ml-2">(140+)</span>
-                  </div>
+            <NavDropdown title="Universities">
+              <div className="py-1">
+                <Link href="/universities" className="block px-4 py-2 text-sm font-semibold hover:bg-muted transition-colors">
+                  All Universities A-Z
                 </Link>
-                <div className="my-2 border-t" />
-                <div className="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase">Rankings</div>
-                <Link href="/rankings/academic" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span>Top Academic</span>
-                  </div>
+                <div className="border-t border-border" />
+                <div className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-editorial">
+                  Rankings
+                </div>
+                <Link href="/rankings/academic" className="block px-4 py-2 text-sm hover:bg-muted transition-colors">
+                  Top Academic
                 </Link>
-                <Link href="/rankings/sports" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-blue-500" />
-                    <span>Top Sports</span>
-                  </div>
+                <Link href="/rankings/sports" className="block px-4 py-2 text-sm hover:bg-muted transition-colors">
+                  Top Sports
                 </Link>
-                <Link href="/rankings/satisfaction" className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-green-500" />
-                    <span>Student Satisfaction</span>
-                  </div>
+                <Link href="/rankings/satisfaction" className="block px-4 py-2 text-sm hover:bg-muted transition-colors">
+                  Student Satisfaction
                 </Link>
-                <div className="my-2 border-t" />
-                <div className="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase">Regions</div>
+                <div className="border-t border-border" />
+                <div className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-editorial">
+                  Regions
+                </div>
                 {[
                   { name: "London", slug: "london" },
                   { name: "Scotland", slug: "scotland" },
@@ -154,73 +119,114 @@ export function MainNavigation() {
                   { name: "North England", slug: "north-england" },
                   { name: "Midlands", slug: "midlands" },
                 ].map((region) => (
-                  <Link key={region.slug} href={`/regions/${region.slug}`} className="block px-4 py-2 hover:bg-muted rounded-md transition-colors">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>{region.name}</span>
-                    </div>
+                  <Link key={region.slug} href={`/regions/${region.slug}`} className="block px-4 py-2 text-sm hover:bg-muted transition-colors">
+                    {region.name}
                   </Link>
                 ))}
               </div>
-            </Dropdown>
+            </NavDropdown>
 
-            <Link href="/crypto" className="hover:text-foreground transition-colors flex items-center gap-1">
-              <Bitcoin className="w-4 h-4 text-yellow-500" />
+            <Link href="/crypto" className="tracking-editorial uppercase text-[11px] font-semibold hover:text-foreground transition-colors">
               Crypto
             </Link>
 
-            <Link href="/#about" className="hover:text-foreground transition-colors">
+            <Link href="/#about" className="tracking-editorial uppercase text-[11px] font-semibold hover:text-foreground transition-colors">
               About
             </Link>
           </div>
 
-          {/* CTA */}
-          <div className="flex items-center gap-2">
+          {/* Right side */}
+          <div className="flex items-center gap-3">
             <a
               href="/#search"
-              className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-1"
+              className="hidden sm:inline-flex bg-foreground text-background px-4 py-2 text-xs font-semibold uppercase tracking-editorial hover:opacity-80 transition-opacity"
             >
-              <Zap className="w-3.5 h-3.5" />
-              What&apos;s Trending?
+              Ask AI
             </a>
+            <button
+              className="lg:hidden p-2 hover:bg-muted transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        <div className="lg:hidden border-t py-2 flex gap-2 overflow-x-auto scrollbar-hide text-xs">
-          <Link
-            href="/#trending"
-            className="whitespace-nowrap px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors flex items-center gap-1 font-medium"
-          >
-            <Flame className="w-3.5 h-3.5" />
-            Trending
-          </Link>
-          {categories.slice(0, 5).map((cat) => (
+        {/* Category bar - desktop */}
+        <div className="hidden lg:flex items-center gap-6 border-t border-border py-2 overflow-x-auto scrollbar-hide">
+          <span className="text-destructive text-[11px] font-bold uppercase tracking-editorial shrink-0">
+            Featured
+          </span>
+          {["Sports", "Politics", "Business", "Technology", "Science", "Culture"].map((cat) => (
             <Link
-              key={cat.slug}
-              href={`/blog/category/${cat.slug}`}
-              className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
+              key={cat}
+              href={`/blog/category/${cat.toLowerCase()}`}
+              className="text-[11px] font-medium uppercase tracking-editorial text-muted-foreground hover:text-foreground transition-colors shrink-0"
             >
-              <span className="text-sm" dangerouslySetInnerHTML={{ __html: cat.icon }} />
-              {cat.name}
+              {cat}
             </Link>
           ))}
           <Link
             href="/crypto"
-            className="whitespace-nowrap px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors flex items-center gap-1 font-medium"
+            className="text-[11px] font-medium uppercase tracking-editorial text-muted-foreground hover:text-foreground transition-colors shrink-0"
           >
-            <Bitcoin className="w-3.5 h-3.5" />
             Crypto
           </Link>
           <Link
             href="/universities"
-            className="whitespace-nowrap px-3 py-1.5 bg-muted rounded-md hover:bg-muted/80 transition-colors flex items-center gap-1"
+            className="text-[11px] font-medium uppercase tracking-editorial text-muted-foreground hover:text-foreground transition-colors shrink-0"
           >
-            <GraduationCap className="w-3.5 h-3.5" />
             Universities
           </Link>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="lg:hidden border-t border-border bg-background">
+          <div className="container mx-auto px-4 py-4 space-y-1">
+            <Link href="/" onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-semibold border-b border-border">
+              Trending Now
+            </Link>
+            <Link href="/blog" onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-semibold border-b border-border">
+              All Stories
+            </Link>
+            <Link href="/crypto" onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-semibold border-b border-border">
+              Crypto
+            </Link>
+            <Link href="/universities" onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-semibold border-b border-border">
+              Universities
+            </Link>
+            <div className="pt-2">
+              <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-editorial mb-2">
+                Categories
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={`/blog/category/${cat.toLowerCase()}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="px-3 py-1.5 border border-border text-xs font-medium hover:bg-muted transition-colors"
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="pt-3">
+              <a
+                href="/#search"
+                onClick={() => setMobileOpen(false)}
+                className="block w-full bg-foreground text-background text-center py-2.5 text-sm font-semibold uppercase tracking-editorial"
+              >
+                Ask AI
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
