@@ -15,6 +15,7 @@ import {
 export interface DynamicBlogPost extends BlogPost {
   newsSource?: string;
   status?: 'published' | 'draft';
+  _sheetRow?: number; // Internal: row index for tiebreaking sort
 }
 
 /**
@@ -67,14 +68,15 @@ async function fetchBlogPostsFromSheets(): Promise<DynamicBlogPost[]> {
           excerpt: row[2] || '',
           content: row[3] || '',
           author: row[4] || 'uni-uk.ai Team',
-          publishedAt: row[5] || new Date().toISOString().split('T')[0],
-          updatedAt: row[6] || row[5] || new Date().toISOString().split('T')[0],
+          publishedAt: row[5] || new Date().toISOString(),
+          updatedAt: row[6] || row[5] || new Date().toISOString(),
           imageUrl: row[7] || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=630&fit=crop',
           category: row[8] || 'News',
           tags: parseJsonArray(row[9]),
           readingTime: parseInt(row[10], 10) || 5,
           newsSource: row[11] || '',
           status: status as 'published' | 'draft',
+          _sheetRow: i,
         };
 
         // Basic validation
@@ -145,10 +147,14 @@ export async function getAllBlogPostsCombined(): Promise<DynamicBlogPost[]> {
   }
 
   // Convert to array and sort by date (newest first)
+  // When dates are equal (e.g. same-day YYYY-MM-DD), use sheet row as tiebreaker
   const allPosts = Array.from(slugMap.values());
-  allPosts.sort((a, b) =>
-    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
+  allPosts.sort((a, b) => {
+    const timeDiff = new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    if (timeDiff !== 0) return timeDiff;
+    // Higher sheet row = more recent = should come first
+    return (b._sheetRow ?? 0) - (a._sheetRow ?? 0);
+  });
 
   return allPosts;
 }

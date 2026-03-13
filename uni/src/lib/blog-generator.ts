@@ -205,7 +205,7 @@ Remember: Output ONLY the JSON object, no other text.`;
 
     const parsed = JSON.parse(jsonText);
 
-    const now = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
     const blogPost: GeneratedBlogPost = {
       slug: generateSlug(parsed.title),
       title: parsed.title,
