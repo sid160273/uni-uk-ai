@@ -1,6 +1,7 @@
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BlogCard } from "@/components/BlogCard";
+import { AdPlaceholder } from "@/components/AdPlaceholder";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -88,6 +89,15 @@ export default async function BlogPostPage({ params }: PageProps) {
     .slice(0, 3)
     .map(s => s.post);
 
+  // Sidebar: latest stories (excluding current + related)
+  const relatedSlugs = new Set([slug, ...relatedPosts.map(p => p.slug)]);
+  const sidebarStories = allPosts
+    .filter(p => !relatedSlugs.has(p.slug))
+    .slice(0, 5);
+
+  // Get unique categories for sidebar
+  const categories = [...new Set(allPosts.map(p => p.category))].slice(0, 10);
+
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -114,69 +124,78 @@ export default async function BlogPostPage({ params }: PageProps) {
       <BreadcrumbSchema items={breadcrumbs} />
       <MainNavigation />
 
-      {/* Article Header */}
-      <article>
-        <header className="py-10 border-b border-border">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <Link
-                href="/blog"
-                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground mb-6 transition-colors"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                All Stories
-              </Link>
-
-              <div className="mb-4">
-                <Link
-                  href={`/blog/category/${post.category.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="text-[11px] font-bold uppercase tracking-editorial text-destructive hover:underline"
-                >
-                  {post.category}
-                </Link>
-              </div>
-
-              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight">
-                {post.title}
-              </h1>
-
-              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">{post.excerpt}</p>
-
-              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border pt-4">
-                <span className="font-semibold text-foreground">{post.author}</span>
-                <span className="text-border">|</span>
-                <span>{formattedDate}</span>
-                <span className="text-border">|</span>
-                <span>{post.readingTime} min read</span>
-              </div>
+      {/* Hero Image — full width like Wired */}
+      {post.imageUrl && post.imageUrl.startsWith("http") && (
+        <div className="w-full bg-muted">
+          <div className="container mx-auto">
+            <div className="relative aspect-[21/9] md:aspect-[3/1] overflow-hidden">
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        {/* Article Content */}
-        <div className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
+      {/* Article + Sidebar Layout */}
+      <article>
+        <div className="container mx-auto px-4 py-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-10">
+
+            {/* LEFT COLUMN: Article */}
+            <div className="lg:col-span-8">
+              {/* Header */}
+              <header className="mb-8">
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground mb-6 transition-colors"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  All Stories
+                </Link>
+
+                <div className="mb-3">
+                  <Link
+                    href={`/blog/category/${post.category.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-[11px] font-bold uppercase tracking-editorial text-destructive hover:underline"
+                  >
+                    {post.category}
+                  </Link>
+                </div>
+
+                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-5 leading-[1.1]">
+                  {post.title}
+                </h1>
+
+                <p className="text-lg text-muted-foreground mb-5 leading-relaxed">{post.excerpt}</p>
+
+                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-b border-border py-3">
+                  <span className="font-semibold text-foreground">{post.author}</span>
+                  <span className="text-border">|</span>
+                  <span>{formattedDate}</span>
+                  <span className="text-border">|</span>
+                  <span>{post.readingTime} min read</span>
+                </div>
+              </header>
+
+              {/* Article Content */}
               <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display">
                 {post.content.split("\n").map((paragraph, index) => {
                   const trimmed = paragraph.trim();
                   if (!trimmed) return null;
 
-                  // Helper function to parse inline markdown (bold, links)
                   const parseInlineMarkdown = (text: string) => {
                     const parts: React.ReactNode[] = [];
                     let remaining = text;
                     let key = 0;
 
                     while (remaining.length > 0) {
-                      // Check for markdown links [text](url)
                       const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
-                      // Check for bold text **text**
                       const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-                      // Check for plain URLs: http(s)://, www., or bare domains (e.g. discoveruni.gov.uk, lnat.ac.uk)
                       const urlMatch = remaining.match(/(https?:\/\/[^\s\)\]\,]+|www\.[^\s\)\]\,]+|[a-z0-9][-a-z0-9]*\.(com|co\.uk|org|org\.uk|net|edu|gov|gov\.uk|ac\.uk|io|ai|nhs\.uk|me|info)(\/[^\s\)\]\,]*)?)/);
 
-                      // Find the earliest match
                       const matches = [
                         linkMatch ? { type: 'link', match: linkMatch, index: linkMatch.index! } : null,
                         boldMatch ? { type: 'bold', match: boldMatch, index: boldMatch.index! } : null,
@@ -188,18 +207,15 @@ export default async function BlogPostPage({ params }: PageProps) {
                         break;
                       }
 
-                      // Sort by index to find earliest match
                       matches.sort((a, b) => a.index - b.index);
                       const earliest = matches[0];
 
-                      // Add text before the match
                       if (earliest.index > 0) {
                         parts.push(remaining.slice(0, earliest.index));
                       }
 
                       if (earliest.type === 'link') {
                         const [fullMatch, linkText, linkUrl] = earliest.match;
-                        // Detect external domains that might be missing protocol
                         const looksExternal = /^(www\.|[a-z0-9-]+\.(com|co\.uk|org|org\.uk|net|edu|gov|gov\.uk|ac\.uk|io|ai|nhs\.uk|me|info|bbc|news))/.test(linkUrl);
                         const isExternal = linkUrl.startsWith('http') || looksExternal;
                         const isInternal = !isExternal && (linkUrl.startsWith('/') || linkUrl.startsWith('#'));
@@ -210,7 +226,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                             href={href}
                             target={isInternal ? undefined : "_blank"}
                             rel={isInternal ? undefined : "noopener noreferrer"}
-                            className="text-primary hover:underline"
+                            className="text-foreground underline decoration-1 underline-offset-2 hover:decoration-2"
                           >
                             {linkText}
                           </a>
@@ -228,7 +244,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                             href={href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:underline"
+                            className="text-foreground underline decoration-1 underline-offset-2 hover:decoration-2"
                           >
                             {url}
                           </a>
@@ -240,7 +256,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                     return parts.length === 1 ? parts[0] : parts;
                   };
 
-                  // Check headings from most specific (####) to least specific (#)
                   if (trimmed.startsWith("#### ")) {
                     return (
                       <h4 key={index} className="text-lg font-semibold mt-4 mb-2">
@@ -293,7 +308,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               </div>
 
               {/* Tags */}
-              <div className="mt-12 pt-8 border-t border-border">
+              <div className="mt-10 pt-6 border-t border-border">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground mr-1">Tags</span>
                   {post.tags.map((tag) => (
@@ -307,6 +322,71 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
+
+            {/* RIGHT COLUMN: Sidebar (desktop only) */}
+            <aside className="hidden lg:block lg:col-span-4">
+              <div className="lg:sticky lg:top-28 space-y-8">
+
+                <AdPlaceholder id="501" format="rectangle" />
+
+                {/* Trending Stories */}
+                {sidebarStories.length > 0 && (
+                  <div>
+                    <div className="border-b-2 border-foreground pb-2 mb-4">
+                      <h3 className="text-[11px] font-bold uppercase tracking-editorial">Trending Stories</h3>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {sidebarStories.map((story) => (
+                        <Link key={story.slug} href={`/blog/${story.slug}`} className="group block py-3 first:pt-0">
+                          <span className="text-[10px] font-bold uppercase tracking-editorial text-destructive">{story.category}</span>
+                          <h4 className="font-semibold text-sm leading-snug mt-0.5 group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
+                            {story.title}
+                          </h4>
+                          <span className="text-[10px] text-muted-foreground mt-1 block">
+                            {story.readingTime} min read
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Categories */}
+                <div>
+                  <div className="border-b-2 border-foreground pb-2 mb-4">
+                    <h3 className="text-[11px] font-bold uppercase tracking-editorial">Categories</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat}
+                        href={`/blog/category/${cat.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="px-3 py-1.5 border border-border text-xs font-medium hover:bg-foreground hover:text-background transition-colors"
+                      >
+                        {cat}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <AdPlaceholder id="502" format="rectangle" />
+
+                {/* Ask AI CTA */}
+                <div className="border border-border p-5 text-center">
+                  <h3 className="font-display text-lg font-bold mb-2">Ask our AI</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Get context and analysis on any trending topic instantly.
+                  </p>
+                  <Link
+                    href="/#search"
+                    className="inline-flex items-center px-5 py-2.5 bg-foreground text-background text-xs font-bold uppercase tracking-editorial hover:opacity-80 transition-opacity"
+                  >
+                    Ask AI
+                  </Link>
+                </div>
+              </div>
+            </aside>
+
           </div>
         </div>
       </article>
