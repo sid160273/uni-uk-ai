@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     siteName: "uni-uk.ai",
     images: [{ url: "/logo.png", width: 512, height: 512, alt: "uni-uk.ai Crypto News" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Crypto News & Market Analysis | uni-uk.ai",
+    description: "AI-powered cryptocurrency news and market analysis. Bitcoin, Ethereum, Solana and more — updated every hour.",
+    images: ["/logo.png"],
+  },
 };
 
 export default async function CryptoNewsPage() {

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "Trending News Today | What's Trending Right Now | uni-uk.ai",
     template: "%s | uni-uk.ai",
   },
-  description: "Discover what's trending right now with AI-powered stories updated every 30 minutes. Breaking news, trending topics, sports, politics, entertainment and tech.",
+  description: "Discover what's trending right now with AI-powered stories updated every 10 minutes. Breaking news, trending topics, sports, politics, entertainment and tech.",
   keywords: ["trending news", "what's trending", "trending topics", "trending stories today", "current events", "breaking news", "news today", "AI news", "trending now", "what's happening today"],
   authors: [{ name: "uni-uk.ai" }],
   creator: "uni-uk.ai",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
-    description: "AI-powered trending news platform. Discover what everyone is searching for with clear, insightful stories updated every 30 minutes.",
+    description: "AI-powered trending news platform. Discover what everyone is searching for with clear, insightful stories updated every 10 minutes.",
     type: "website",
     locale: "en_GB",
     url: "https://uni-uk.ai",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
-    description: "AI-powered trending news. Discover what everyone is searching for, updated every 30 minutes.",
+    description: "AI-powered trending news. Discover what everyone is searching for, updated every 10 minutes.",
     images: ["/logo.png"],
     creator: "@uniukai",
   },
@@ -93,6 +93,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* RSS Feed Discovery */}
+        <link rel="alternate" type="application/rss+xml" title="uni-uk.ai Blog Feed" href="/blog/rss.xml" />
+
         {/* Ezoic GateKeeper Consent Management */}
         <Script
           src="https://cmp.gatekeeperconsent.com/min.js"

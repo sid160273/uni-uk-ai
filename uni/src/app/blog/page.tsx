@@ -8,14 +8,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Trending Stories Today | What's Trending Now | Breaking News",
   description:
-    "Read the latest trending stories and breaking news. AI-powered coverage of what everyone is searching for — sports, politics, entertainment, tech. Updated every 30 minutes.",
+    "Read the latest trending stories and breaking news. AI-powered coverage of what everyone is searching for — sports, politics, entertainment, tech. Updated every 10 minutes.",
   keywords: ["trending stories today", "what's trending", "trending news", "breaking news", "trending topics", "news today", "latest stories"],
   alternates: {
     canonical: "/blog",
   },
   openGraph: {
     title: "Trending Stories Today | What's Trending Now | uni-uk.ai",
-    description: "AI-powered trending stories on the topics everyone is searching for. Sports, politics, entertainment, tech and more — updated every 30 minutes.",
+    description: "AI-powered trending stories on the topics everyone is searching for. Sports, politics, entertainment, tech and more — updated every 10 minutes.",
     type: "website",
     url: "https://uni-uk.ai/blog",
     siteName: "uni-uk.ai",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Trending Stories Today | What's Trending Now",
-    description: "AI-powered trending stories updated every 30 minutes. Sports, politics, entertainment, tech and more.",
+    description: "AI-powered trending stories updated every 10 minutes. Sports, politics, entertainment, tech and more.",
     images: ["/logo.png"],
   },
 };
@@ -61,7 +61,7 @@ export default async function BlogIndexPage() {
               Trending Stories
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              AI-powered stories on the topics everyone is searching for right now — updated every 30 minutes.
+              AI-powered stories on the topics everyone is searching for right now — updated every 10 minutes.
             </p>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { getAllUniversities } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
@@ -40,6 +41,10 @@ export default function UniversitiesIndexPage() {
 
     return (
         <div className="min-h-screen bg-background">
+            <BreadcrumbSchema items={[
+                { name: "Home", url: "https://uni-uk.ai" },
+                { name: "Universities", url: "https://uni-uk.ai/universities" },
+            ]} />
             <MainNavigation />
 
             {/* Hero Section */}

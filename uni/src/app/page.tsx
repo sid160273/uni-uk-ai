@@ -3,10 +3,34 @@ import { MainNavigation } from "@/components/MainNavigation";
 import { TrendingTicker } from "@/components/TrendingTicker";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
 import { TrendChart } from "@/components/TrendChart";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+  description: "Discover what's trending right now with AI-powered stories updated every 10 minutes. Breaking news, trending topics, sports, politics, entertainment and tech — ask our AI anything.",
+  keywords: ["trending news", "what's trending", "trending topics today", "breaking news", "AI news", "trending stories", "current events", "what's happening today"],
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+    description: "AI-powered trending news updated every 10 minutes. Discover what everyone is searching for with clear, insightful stories.",
+    type: "website",
+    url: "https://uni-uk.ai",
+    siteName: "uni-uk.ai",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "uni-uk.ai - Trending News" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trending News Today | uni-uk.ai",
+    description: "AI-powered trending news updated every 10 minutes. Ask our AI anything about what's trending.",
+    images: ["/logo.png"],
+    creator: "@uniukai",
+  },
+};
 
 const CATEGORY_EMOJI: Record<string, string> = {
   'Sports': '⚽',
@@ -49,6 +73,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      <BreadcrumbSchema items={[{ name: "Home", url: "https://uni-uk.ai" }]} />
       <MainNavigation />
 
       {/* Breaking News Ticker */}
