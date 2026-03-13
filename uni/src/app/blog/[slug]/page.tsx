@@ -165,23 +165,23 @@ export default async function BlogPostPage({ params }: PageProps) {
                   </Link>
                 </div>
 
-                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-5 leading-[1.1]">
+                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-5 leading-[1.08]">
                   {post.title}
                 </h1>
 
-                <p className="text-lg text-muted-foreground mb-5 leading-relaxed">{post.excerpt}</p>
+                <p className="font-body-serif text-lg text-muted-foreground mb-5 leading-relaxed">{post.excerpt}</p>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-b border-border py-3">
-                  <span className="font-semibold text-foreground">{post.author}</span>
+                <div className="flex flex-wrap items-center gap-4 border-t border-b border-border py-3">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-foreground">{post.author}</span>
                   <span className="text-border">|</span>
-                  <span>{formattedDate}</span>
+                  <span className="text-xs text-muted-foreground">{formattedDate}</span>
                   <span className="text-border">|</span>
-                  <span>{post.readingTime} min read</span>
+                  <span className="text-xs text-muted-foreground">{post.readingTime} min read</span>
                 </div>
               </header>
 
               {/* Article Content */}
-              <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display">
+              <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display font-body-serif">
                 {post.content.split("\n").map((paragraph, index) => {
                   const trimmed = paragraph.trim();
                   if (!trimmed) return null;
@@ -258,49 +258,49 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                   if (trimmed.startsWith("#### ")) {
                     return (
-                      <h4 key={index} className="text-lg font-semibold mt-4 mb-2">
+                      <h4 key={index} className="font-display text-lg font-bold mt-5 mb-2">
                         {parseInlineMarkdown(trimmed.slice(5))}
                       </h4>
                     );
                   }
                   if (trimmed.startsWith("### ")) {
                     return (
-                      <h3 key={index} className="text-xl font-semibold mt-6 mb-3">
+                      <h3 key={index} className="font-display text-xl font-bold mt-7 mb-3">
                         {parseInlineMarkdown(trimmed.slice(4))}
                       </h3>
                     );
                   }
                   if (trimmed.startsWith("## ")) {
                     return (
-                      <h2 key={index} className="text-2xl font-bold mt-8 mb-4">
+                      <h2 key={index} className="font-display text-2xl font-extrabold mt-9 mb-4">
                         {parseInlineMarkdown(trimmed.slice(3))}
                       </h2>
                     );
                   }
                   if (trimmed.startsWith("# ")) {
                     return (
-                      <h1 key={index} className="text-3xl font-bold mt-8 mb-4">
+                      <h1 key={index} className="font-display text-3xl font-black mt-9 mb-4">
                         {parseInlineMarkdown(trimmed.slice(2))}
                       </h1>
                     );
                   }
                   if (trimmed.startsWith("- ")) {
                     return (
-                      <li key={index} className="ml-4 text-muted-foreground">
+                      <li key={index} className="ml-4 text-foreground/70 leading-[1.8]">
                         {parseInlineMarkdown(trimmed.slice(2))}
                       </li>
                     );
                   }
                   if (/^\d+\./.test(trimmed)) {
                     return (
-                      <li key={index} className="ml-4 text-muted-foreground list-decimal">
+                      <li key={index} className="ml-4 text-foreground/70 leading-[1.8] list-decimal">
                         {parseInlineMarkdown(trimmed.replace(/^\d+\.\s*/, ""))}
                       </li>
                     );
                   }
 
                   return (
-                    <p key={index} className="text-muted-foreground leading-relaxed my-4">
+                    <p key={index} className="text-foreground/70 leading-[1.8] my-4 text-[17px]">
                       {parseInlineMarkdown(trimmed)}
                     </p>
                   );

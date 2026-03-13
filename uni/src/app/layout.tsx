@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Source_Serif_4 } from "next/font/google";
 import Script from "next/script";
 import { OrganizationSchema, WebSiteSchema } from "@/components/StructuredData";
 import { AdScripts } from "@/components/AdScripts";
@@ -19,6 +19,12 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -118,7 +124,7 @@ export default function RootLayout({
 
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${sourceSerif.variable} antialiased`}
       >
         <OrganizationSchema />
         <WebSiteSchema />

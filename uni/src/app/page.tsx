@@ -74,10 +74,10 @@ export default async function Home() {
             </span>
             Live — Updated every 10 minutes
           </div>
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4">
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-4">
             Learn What&apos;s Happening
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-body-serif text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             AI-powered stories on what everyone is searching for. Ask our assistant anything or browse the latest trends.
           </p>
         </div>
@@ -155,10 +155,10 @@ export default async function Home() {
                       {topStories[0].readingTime} min read
                     </span>
                   </div>
-                  <h3 className="font-display text-2xl md:text-4xl font-bold leading-tight mb-3 group-hover:underline decoration-2 underline-offset-4">
+                  <h3 className="font-display text-2xl md:text-4xl font-black leading-[1.1] mb-3 group-hover:underline decoration-2 underline-offset-4">
                     {topStories[0].title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed line-clamp-2">{topStories[0].excerpt}</p>
+                  <p className="font-body-serif text-muted-foreground leading-relaxed line-clamp-2">{topStories[0].excerpt}</p>
                 </Link>
 
                 {/* #2 and #3 Stories */}
@@ -175,10 +175,10 @@ export default async function Home() {
                       <span className="text-[11px] font-bold uppercase tracking-editorial text-destructive">
                         {story.category}
                       </span>
-                      <h3 className="font-display text-lg md:text-xl font-bold mt-1 mb-2 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
+                      <h3 className="font-display text-lg md:text-xl font-extrabold mt-1 mb-2 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
                         {story.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{story.excerpt}</p>
+                      <p className="font-body-serif text-sm text-muted-foreground line-clamp-2">{story.excerpt}</p>
                     </Link>
                   ))}
                 </div>
@@ -203,10 +203,10 @@ export default async function Home() {
                         <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">
                           {story.category}
                         </span>
-                        <h3 className="font-display text-base md:text-lg font-bold mt-0.5 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
+                        <h3 className="font-display text-base md:text-lg font-extrabold mt-0.5 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
                           {story.title}
                         </h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1 hidden md:block">{story.excerpt}</p>
+                        <p className="font-body-serif text-xs text-muted-foreground mt-1 line-clamp-1 hidden md:block">{story.excerpt}</p>
                       </div>
                     </Link>
                   ))}
@@ -267,11 +267,11 @@ export default async function Home() {
                   {trendingStories.slice(0, 5).map((story) => (
                     <Link key={story.slug} href={`/blog/${story.slug}`} className="group block py-3">
                       <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">{story.category}</span>
-                      <h4 className="font-semibold text-sm leading-snug mt-0.5 group-hover:underline line-clamp-2">
+                      <h4 className="font-display font-bold text-sm leading-snug mt-0.5 group-hover:underline line-clamp-2">
                         {story.title}
                       </h4>
-                      <span className="text-[11px] text-muted-foreground mt-1 block">
-                        By uni-uk.ai Newsroom
+                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-1 block">
+                        uni-uk.ai Newsroom
                       </span>
                     </Link>
                   ))}

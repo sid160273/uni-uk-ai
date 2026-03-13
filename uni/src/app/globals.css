@@ -58,6 +58,7 @@
   --radius: 0.25rem;
 
   --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
+  --font-body-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
 }
 
 .dark {
@@ -146,6 +147,10 @@
 
   .tracking-editorial {
     letter-spacing: 0.08em;
+  }
+
+  .font-body-serif {
+    font-family: var(--font-body-serif);
   }
 }
 

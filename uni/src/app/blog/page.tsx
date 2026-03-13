@@ -46,10 +46,10 @@ export default async function BlogIndexPage() {
       {/* Hero */}
       <section className="py-12 border-b border-border">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-black tracking-tight mb-4">
             Trending Stories
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-body-serif text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             AI-powered stories on the topics everyone is searching for right now.
           </p>
         </div>
@@ -88,10 +88,10 @@ export default async function BlogIndexPage() {
       {/* CTA */}
       <section className="py-12 border-t border-border">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
+          <h2 className="font-display text-2xl md:text-3xl font-black mb-4">
             Want to know more about what&apos;s trending?
           </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+          <p className="font-body-serif text-muted-foreground mb-6 max-w-xl mx-auto">
             Ask our AI assistant about any trending topic — get context, background, and analysis instantly.
           </p>
           <Link
