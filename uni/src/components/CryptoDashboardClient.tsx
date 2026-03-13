@@ -326,7 +326,7 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
 
           {/* LEFT: Market Table */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4">
             <div>
               <div className="flex items-center justify-between mb-4 border-b-2 border-foreground pb-2">
                 <h2 className="text-[11px] font-bold uppercase tracking-editorial">Market Overview</h2>
