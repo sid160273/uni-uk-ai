@@ -173,8 +173,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                       const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
                       // Check for bold text **text**
                       const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-                      // Check for plain URLs (www. or https:// or http://) - exclude trailing punctuation
-                      const urlMatch = remaining.match(/(https?:\/\/[^\s\)\]\,]+|www\.[^\s\)\]\,]+)/);
+                      // Check for plain URLs: http(s)://, www., or bare domains (e.g. discoveruni.gov.uk, lnat.ac.uk)
+                      const urlMatch = remaining.match(/(https?:\/\/[^\s\)\]\,]+|www\.[^\s\)\]\,]+|[a-z0-9][-a-z0-9]*\.(com|co\.uk|org|org\.uk|net|edu|gov|gov\.uk|ac\.uk|io|ai|nhs\.uk|me|info)(\/[^\s\)\]\,]*)?)/);
 
                       // Find the earliest match
                       const matches = [
@@ -200,7 +200,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                       if (earliest.type === 'link') {
                         const [fullMatch, linkText, linkUrl] = earliest.match;
                         // Detect external domains that might be missing protocol
-                        const looksExternal = /^(www\.|[a-z0-9-]+\.(com|co\.uk|org|net|edu|gov|io|ai|bbc|news))/.test(linkUrl);
+                        const looksExternal = /^(www\.|[a-z0-9-]+\.(com|co\.uk|org|org\.uk|net|edu|gov|gov\.uk|ac\.uk|io|ai|nhs\.uk|me|info|bbc|news))/.test(linkUrl);
                         const isExternal = linkUrl.startsWith('http') || looksExternal;
                         const isInternal = !isExternal && (linkUrl.startsWith('/') || linkUrl.startsWith('#'));
                         const href = linkUrl.startsWith('http') ? linkUrl : isInternal ? linkUrl : `https://${linkUrl.replace(/^\/+/, '')}`;
