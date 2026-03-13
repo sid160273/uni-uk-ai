@@ -31,14 +31,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${categoryName} Trending Stories Today | What's Trending in ${categoryName}`,
-    description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news. Discover what everyone is searching for right now with AI-powered insights, updated every 30 minutes.`,
+    description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news. Discover what everyone is searching for right now with AI-powered insights, updated every 10 minutes.`,
     keywords: [`${categoryName.toLowerCase()} news`, "trending stories today", "what's trending", `trending ${categoryName.toLowerCase()}`, "breaking news", "news today"],
     alternates: {
       canonical: `/blog/category/${category}`,
     },
     openGraph: {
       title: `${categoryName} Trending Stories Today | uni-uk.ai`,
-      description: `Latest trending ${categoryName.toLowerCase()} stories — what everyone is searching for right now. AI-powered insights updated every 30 minutes.`,
+      description: `Latest trending ${categoryName.toLowerCase()} stories — what everyone is searching for right now. AI-powered insights updated every 10 minutes.`,
       type: "website",
       url: `https://uni-uk.ai/blog/category/${category}`,
       siteName: "uni-uk.ai",
@@ -54,17 +54,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: "summary_large_image",
       title: `${categoryName} Trending Stories Today | uni-uk.ai`,
-      description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news, updated every 30 minutes.`,
+      description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news, updated every 10 minutes.`,
       images: ["/logo.png"],
     },
   };
-}
-
-export async function generateStaticParams() {
-  const categories = await getAllCategoriesCombined();
-  return categories.map((category) => ({
-    category: nameToSlug(category),
-  }));
 }
 
 export default async function CategoryPage({ params }: PageProps) {
