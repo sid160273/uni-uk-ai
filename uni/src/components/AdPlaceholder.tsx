@@ -13,18 +13,10 @@ export function AdPlaceholder({ id, className = "", format = "horizontal" }: AdP
   const [hasAd, setHasAd] = useState(false);
 
   useEffect(() => {
-    // Try to trigger Ezoic ad display
-    if (typeof window !== "undefined" && (window as any).ezstandalone) {
-      (window as any).ezstandalone.cmd.push(function () {
-        (window as any).ezstandalone.showAds();
-      });
-    }
-
     // Check if ad actually loaded after a delay
     const timer = setTimeout(() => {
       if (adRef.current) {
         const children = adRef.current.children;
-        // If Ezoic injected content, it will have child elements
         if (children.length > 0) {
           setHasAd(true);
         }
@@ -43,7 +35,7 @@ export function AdPlaceholder({ id, className = "", format = "horizontal" }: AdP
       )}
       <div
         ref={adRef}
-        id={`ezoic-pub-ad-placeholder-${id}`}
+        id={`ad-placeholder-${id}`}
         className="w-full flex items-center justify-center"
       />
     </div>

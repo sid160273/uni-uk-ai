@@ -338,16 +338,12 @@ export default function PrivacyPage() {
                         </div>
                     </section>
 
-                    {/* Ezoic Privacy Policy Embed */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">15. Advertising & Third-Party Services</h2>
                         <p className="text-muted-foreground leading-relaxed mb-4">
-                            We use Ezoic and other third-party advertising services to display ads on our website.
+                            We use Google AdSense and other third-party advertising services to display ads on our website.
                             These services may use cookies and similar technologies to collect information about your browsing activity.
                         </p>
-                        <div className="bg-card border rounded-lg p-6">
-                            <span id="ezoic-privacy-policy-embed"></span>
-                        </div>
                     </section>
 
                     {/* Summary */}

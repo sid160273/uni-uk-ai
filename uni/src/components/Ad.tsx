@@ -2,18 +2,17 @@
 
 import { AdSense } from "./AdSense";
 import { MediaNetAd } from "./MediaNetAd";
-import { EzoicAd } from "./EzoicAd";
 
 /**
  * Unified Ad Component
  *
  * Switches between ad networks based on AD_NETWORK environment variable.
- * Set AD_NETWORK in .env.local to: "adsense" | "medianet" | "ezoic"
+ * Set AD_NETWORK in .env.local to: "adsense" | "medianet"
  *
  * Default: adsense
  */
 
-type AdNetwork = "adsense" | "medianet" | "ezoic";
+type AdNetwork = "adsense" | "medianet";
 
 interface AdProps {
   // AdSense props
@@ -22,9 +21,6 @@ interface AdProps {
 
   // Media.net props - maps to standard IAB sizes
   size?: "leaderboard" | "rectangle" | "skyscraper" | "mobile" | "large-rectangle";
-
-  // Ezoic props
-  placementId?: number;
 
   // Common props
   className?: string;
@@ -49,20 +45,10 @@ const defaultAdSlots: Record<string, string> = {
   "large-rectangle": "5811947452",
 };
 
-// Default Ezoic placement IDs
-const defaultEzoicPlacements: Record<string, number> = {
-  leaderboard: 101,
-  rectangle: 102,
-  skyscraper: 103,
-  mobile: 104,
-  "large-rectangle": 105,
-};
-
 export function Ad({
   adSlot,
   adFormat = "auto",
   size = "rectangle",
-  placementId,
   className = "",
   style = { display: "block" },
 }: AdProps) {
@@ -76,13 +62,6 @@ export function Ad({
         <MediaNetAd
           size={sizeMap[size] || "300x250"}
           className={className}
-        />
-      );
-
-    case "ezoic":
-      return (
-        <EzoicAd
-          placementId={placementId || defaultEzoicPlacements[size] || 101}
         />
       );
 

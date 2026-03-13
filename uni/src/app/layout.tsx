@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import Script from "next/script";
-import { EzoicRouteHandler } from "@/components/EzoicRouteHandler";
 import { OrganizationSchema, WebSiteSchema } from "@/components/StructuredData";
 import { AdScripts } from "@/components/AdScripts";
 import "./globals.css";
@@ -102,31 +101,6 @@ export default function RootLayout({
         {/* RSS Feed Discovery */}
         <link rel="alternate" type="application/rss+xml" title="uni-uk.ai Blog Feed" href="/blog/rss.xml" />
 
-        {/* Ezoic GateKeeper Consent Management */}
-        <Script
-          src="https://cmp.gatekeeperconsent.com/min.js"
-          strategy="beforeInteractive"
-          data-cfasync="false"
-        />
-        <Script
-          src="https://the.gatekeeperconsent.com/cmp.min.js"
-          strategy="beforeInteractive"
-          data-cfasync="false"
-        />
-
-        {/* Ezoic Header Script */}
-        <Script
-          async
-          src="//www.ezojs.com/ezoic/sa.min.js"
-          strategy="beforeInteractive"
-        />
-        <Script id="ezoic-standalone" strategy="beforeInteractive">
-          {`
-            window.ezstandalone = window.ezstandalone || {};
-            ezstandalone.cmd = ezstandalone.cmd || [];
-          `}
-        </Script>
-
         {/* Google Analytics */}
         <Script
           async
@@ -148,7 +122,6 @@ export default function RootLayout({
       >
         <OrganizationSchema />
         <WebSiteSchema />
-        <EzoicRouteHandler />
         <AdScripts />
         {children}
       </body>

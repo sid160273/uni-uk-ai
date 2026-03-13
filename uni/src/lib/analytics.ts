@@ -48,21 +48,6 @@ export const trackAdImpression = (adSlot?: string, adUnit?: string) => {
   }
 };
 
-// Track Ezoic ad loaded
-export const trackEzoicAdLoaded = (placementId: number) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    console.log('📊 Tracking Ezoic ad loaded:', placementId);
-
-    window.gtag('event', 'ezoic_ad_loaded', {
-      event_category: 'advertisement',
-      event_label: `placement_${placementId}`,
-      value: 0.1,
-    });
-
-    console.log('✅ Ezoic ad loaded event sent to GA4');
-  }
-};
-
 // Track AdSense ad loaded
 export const trackAdSenseLoaded = (adSlot: string) => {
   if (typeof window !== 'undefined' && window.gtag) {

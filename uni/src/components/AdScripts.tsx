@@ -11,7 +11,6 @@ import Script from "next/script";
  * Options:
  * - "adsense" (default): Google AdSense
  * - "medianet": Media.net (Yahoo/Bing)
- * - "ezoic": Ezoic (already loaded separately via Ezoic scripts)
  */
 
 export function AdScripts() {
@@ -56,7 +55,5 @@ export function AdScripts() {
     );
   }
 
-  // For Ezoic, scripts are loaded separately in layout.tsx
-  // Return null as Ezoic has its own script management
   return null;
 }
