@@ -530,11 +530,9 @@ function RegionSelector({
 }
 
 export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
-  // Data source: "stories" = blog posts (default), "live" = Google Trends API
-  const [dataSource, setDataSource] = useState<"stories" | "live">("stories");
   const [selectedGeo, setSelectedGeo] = useState(defaultGeo || "GB");
   const [liveTopics, setLiveTopics] = useState<TrendTopic[]>([]);
-  const [isLoadingLive, setIsLoadingLive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [activeLines, setActiveLines] = useState<Set<string>>(new Set());
@@ -544,12 +542,10 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
   const [isAnimated, setIsAnimated] = useState(false);
   const [tick, setTick] = useState(() => Math.floor(Date.now() / 60000));
 
-  // Fetch live trends when switching to live mode or changing country
+  // Fetch live trends on mount and when country changes
   useEffect(() => {
-    if (dataSource !== "live") return;
-
     let cancelled = false;
-    setIsLoadingLive(true);
+    setIsLoading(true);
     setFetchError(null);
 
     fetch(`/api/trends?geo=${selectedGeo}&limit=10`)
@@ -560,19 +556,19 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
       .then((data) => {
         if (cancelled) return;
         setLiveTopics(data.topics || []);
-        setIsLoadingLive(false);
+        setIsLoading(false);
       })
       .catch((err) => {
         if (cancelled) return;
         console.error("Failed to fetch live trends:", err);
         setFetchError("Failed to load trends");
-        setIsLoadingLive(false);
+        setIsLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [dataSource, selectedGeo]);
+  }, [selectedGeo]);
 
   // Auto-refresh every 60 seconds
   useEffect(() => {
@@ -582,9 +578,9 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Build display items based on data source
+  // Build display items — live trends first, fall back to stories
   const displayTopics = useMemo(() => {
-    if (dataSource === "live" && liveTopics.length > 0) {
+    if (liveTopics.length > 0) {
       return liveTopics.slice(0, 5).map((t) => ({
         title: t.title,
         slug: generateSlug(t.title),
@@ -596,7 +592,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
       slug: s.slug,
       trafficVolume: undefined as string | undefined,
     }));
-  }, [dataSource, liveTopics, stories]);
+  }, [liveTopics, stories]);
 
   // Reset active lines when topics change
   useEffect(() => {
@@ -641,7 +637,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
     );
   }, []);
 
-  if (displayTopics.length === 0 && !isLoadingLive) return null;
+  if (displayTopics.length === 0 && !isLoading) return null;
 
   const selectedTopicData = selectedStory
     ? displayTopics.find((t) => t.slug === selectedStory)
@@ -662,8 +658,6 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
         )
       : 0;
 
-  const currentRegion = REGIONS.find((r) => r.code === selectedGeo);
-
   return (
     <div
       className={`border border-border bg-background transition-all duration-700 ${
@@ -680,50 +674,17 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
           </span>
-          {dataSource === "live" && currentRegion && (
-            <span className="text-[10px] text-muted-foreground uppercase tracking-editorial">
-              {currentRegion.flag} {currentRegion.label}
-            </span>
-          )}
         </div>
-        <div className="flex items-center gap-2">
-          {/* Data source toggle */}
-          <div className="flex border border-border">
-            <button
-              onClick={() => setDataSource("stories")}
-              className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-editorial transition-colors ${
-                dataSource === "stories"
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Stories
-            </button>
-            <button
-              onClick={() => setDataSource("live")}
-              className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-editorial transition-colors ${
-                dataSource === "live"
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Live Trends
-            </button>
-          </div>
-          {/* Country selector (only when in live mode) */}
-          {dataSource === "live" && (
-            <RegionSelector
-              selectedGeo={selectedGeo}
-              onChange={setSelectedGeo}
-              isLoading={isLoadingLive}
-            />
-          )}
-        </div>
+        <RegionSelector
+          selectedGeo={selectedGeo}
+          onChange={setSelectedGeo}
+          isLoading={isLoading}
+        />
       </div>
 
       {/* Legend / Topic selector */}
       <div className="flex flex-wrap gap-1 px-4 md:px-6 py-3 border-b border-border">
-        {isLoadingLive && displayTopics.length === 0 ? (
+        {isLoading && displayTopics.length === 0 ? (
           <div className="flex items-center gap-2 py-2">
             <span className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
             <span className="text-[11px] text-muted-foreground uppercase tracking-editorial">
@@ -892,7 +853,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
             currentValue={selectedCurrentValue}
             changePercent={changePercent}
             onClose={() => setSelectedStory(null)}
-            isLiveTrend={dataSource === "live"}
+            isLiveTrend={liveTopics.length > 0}
           />
         </div>
       )}
@@ -900,9 +861,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
       {/* Footer */}
       <div className="flex items-center justify-between px-4 md:px-6 py-3 border-t border-border">
         <p className="text-[10px] text-muted-foreground uppercase tracking-editorial">
-          {dataSource === "live"
-            ? "Live Google Trends - Click topics to highlight"
-            : "Click stories to highlight - Hover for details"}
+          Live Google Trends — Click topics to highlight
         </p>
         <Link
           href="/blog"
