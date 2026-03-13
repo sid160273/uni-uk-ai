@@ -138,16 +138,21 @@ SEO REQUIREMENTS:
 - Use related keywords and phrases in headings
 - Write a compelling meta excerpt that drives clicks
 
-LINK REQUIREMENTS:
+LINK REQUIREMENTS (CRITICAL — you MUST use proper markdown link syntax for EVERY link):
 1. HOMEPAGE CHAT LINK - Include ONE link to our AI assistant:
-   [Ask our AI about this topic](/#search) or [chat with us about this](/#search)
+   [Ask our AI about this topic](/#search) or [Chat with us about this](/#search)
 
 2. TRENDING PAGE LINK - Include ONE link:
-   [See all trending stories](/blog) or [what else is trending](/blog)
+   [See all trending stories](/blog) or [What else is trending](/blog)
 
-3. EXTERNAL LINKS - Include 2-3 links to authoritative sources:
-   - Link to relevant news sources covering this story
-   - Use full URLs with https://
+3. EXTERNAL SOURCE LINKS - Include 2-3 links to REAL, authoritative sources:
+   - MUST use markdown link syntax: [Source Name](https://www.example.com/article-url)
+   - MUST use full, real URLs starting with https://
+   - Link to major news outlets: BBC, Reuters, Guardian, Sky News, CNN, etc.
+   - NEVER write "check out Source Name" or "visit Source Name" without a proper markdown link
+   - NEVER use placeholder or made-up URLs — only link to real, well-known domains
+   - Example: [Read more on BBC News](https://www.bbc.co.uk/news) or [Guardian report](https://www.theguardian.com)
+   - If unsure of exact article URL, link to the source homepage instead of guessing
 
 OUTPUT FORMAT:
 You must respond with ONLY a valid JSON object (no markdown code blocks, no explanation):
