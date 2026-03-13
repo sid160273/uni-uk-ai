@@ -6,6 +6,7 @@ import { TrendChart } from "@/components/TrendChart";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
+import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -39,6 +40,10 @@ const CATEGORIES = [
 ];
 
 export default async function Home() {
+  // Auto-detect user's country from Vercel's geo headers
+  const headersList = await headers();
+  const detectedCountry = headersList.get('x-vercel-ip-country') || 'GB';
+
   let trendingStories: any[] = [];
   try {
     const allPosts = await getAllBlogPostsCombined();
@@ -87,12 +92,15 @@ export default async function Home() {
       {/* Interactive Trend Chart */}
       {trendingStories.length > 0 && (
         <section className="container mx-auto px-4 py-8">
-          <TrendChart stories={trendingStories.map(s => ({
-            title: s.title,
-            slug: s.slug,
-            category: s.category,
-            publishedAt: s.publishedAt,
-          }))} />
+          <TrendChart
+            stories={trendingStories.map(s => ({
+              title: s.title,
+              slug: s.slug,
+              category: s.category,
+              publishedAt: s.publishedAt,
+            }))}
+            defaultGeo={detectedCountry}
+          />
         </section>
       )}
 

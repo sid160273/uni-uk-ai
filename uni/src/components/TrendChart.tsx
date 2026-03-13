@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import {
   LineChart,
@@ -11,8 +11,40 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  ReferenceDot,
 } from "recharts";
+
+// Region options available in the selector
+const REGIONS = [
+  { code: "GB", label: "UK", flag: "🇬🇧" },
+  { code: "US", label: "USA", flag: "🇺🇸" },
+  { code: "AU", label: "Australia", flag: "🇦🇺" },
+  { code: "CA", label: "Canada", flag: "🇨🇦" },
+  { code: "IN", label: "India", flag: "🇮🇳" },
+  { code: "DE", label: "Germany", flag: "🇩🇪" },
+  { code: "FR", label: "France", flag: "🇫🇷" },
+  { code: "JP", label: "Japan", flag: "🇯🇵" },
+  { code: "BR", label: "Brazil", flag: "🇧🇷" },
+  { code: "ZA", label: "S. Africa", flag: "🇿🇦" },
+  { code: "NG", label: "Nigeria", flag: "🇳🇬" },
+  { code: "KE", label: "Kenya", flag: "🇰🇪" },
+  { code: "AE", label: "UAE", flag: "🇦🇪" },
+  { code: "SG", label: "Singapore", flag: "🇸🇬" },
+  { code: "NZ", label: "New Zealand", flag: "🇳🇿" },
+  { code: "IE", label: "Ireland", flag: "🇮🇪" },
+  { code: "IT", label: "Italy", flag: "🇮🇹" },
+  { code: "ES", label: "Spain", flag: "🇪🇸" },
+  { code: "MX", label: "Mexico", flag: "🇲🇽" },
+  { code: "AR", label: "Argentina", flag: "🇦🇷" },
+];
+
+interface TrendTopic {
+  title: string;
+  trafficVolume?: string;
+  pictureUrl?: string;
+  region: string;
+  regionLabel: string;
+  relatedHeadlines: string[];
+}
 
 interface TrendStory {
   title: string;
@@ -23,6 +55,7 @@ interface TrendStory {
 
 interface TrendChartProps {
   stories: TrendStory[];
+  defaultGeo?: string; // Auto-detected country code
 }
 
 interface TimelineEvent {
@@ -54,7 +87,6 @@ const EVENT_LABELS: Record<string, string> = {
   surge: "SURGE",
 };
 
-// Simple hash to create a stable but unique seed from a string
 function hashSeed(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -64,14 +96,25 @@ function hashSeed(str: string): number {
   return Math.abs(hash);
 }
 
-function generateTrendData(stories: TrendStory[], tick: number) {
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .substring(0, 60)
+    .replace(/-$/, "");
+}
+
+function generateTrendData(
+  topics: { title: string; slug: string }[],
+  tick: number
+) {
   const now = new Date();
-  // Use the current hour as part of the seed so data shifts hourly
   const hourSeed = now.getHours() + now.getDate() * 24;
-  const points = 48; // 48 points = 24 hours at 30-min intervals
+  const points = 48;
   const data = [];
 
-  // Current position in the day (0-1) so the "now" line moves
   const dayProgress = (now.getHours() * 60 + now.getMinutes()) / (24 * 60);
 
   for (let i = 0; i < points; i++) {
@@ -84,15 +127,15 @@ function generateTrendData(stories: TrendStory[], tick: number) {
 
     const point: Record<string, any> = { time: label, _index: i };
 
-    stories.forEach((story, rank) => {
-      const seed = hashSeed(story.slug) + hourSeed;
+    topics.forEach((topic, rank) => {
+      const seed = hashSeed(topic.slug) + hourSeed;
       const t = i / (points - 1);
 
-      // Each story gets a unique peak position and shape based on its hash
-      const peakOffset = ((seed % 40) - 20) / 100; // -0.2 to +0.2
-      const peakPosition = rank === 0
-        ? Math.min(0.95, 0.7 + dayProgress * 0.25)
-        : 0.35 + rank * 0.07 + peakOffset;
+      const peakOffset = ((seed % 40) - 20) / 100;
+      const peakPosition =
+        rank === 0
+          ? Math.min(0.95, 0.7 + dayProgress * 0.25)
+          : 0.35 + rank * 0.07 + peakOffset;
       const spread = 0.12 + (seed % 15) / 100 + rank * 0.02;
 
       const gaussian = Math.exp(
@@ -101,7 +144,6 @@ function generateTrendData(stories: TrendStory[], tick: number) {
 
       const baseInterest = Math.max(10, 95 - rank * 14);
 
-      // Time-varying noise that shifts with the minute to create movement
       const noiseSeed = seed + tick;
       const noise =
         Math.sin(i * (rank + 1) * 1.7 + noiseSeed * 0.1) * 4 +
@@ -110,27 +152,31 @@ function generateTrendData(stories: TrendStory[], tick: number) {
 
       let value;
       if (rank === 0) {
-        // #1: Strong climb with dramatic spike near current time
         const distFromNow = Math.abs(t - dayProgress);
         const spike = distFromNow < 0.15 ? (1 - distFromNow / 0.15) * 25 : 0;
-        value = 25 + (baseInterest - 25) * (0.2 + 0.8 * Math.pow(t, 0.6)) + spike + noise;
+        value =
+          25 +
+          (baseInterest - 25) * (0.2 + 0.8 * Math.pow(t, 0.6)) +
+          spike +
+          noise;
       } else if (rank === 1) {
-        // #2: Had a breakout moment, sustaining high
         const breakoutCenter = 0.3 + (seed % 20) / 100;
-        const breakout = t > breakoutCenter && t < breakoutCenter + 0.2
-          ? Math.sin((t - breakoutCenter) / 0.2 * Math.PI) * 20
-          : 0;
+        const breakout =
+          t > breakoutCenter && t < breakoutCenter + 0.2
+            ? Math.sin(((t - breakoutCenter) / 0.2) * Math.PI) * 20
+            : 0;
         value = baseInterest * (0.35 + 0.65 * gaussian) + breakout + noise;
       } else if (rank <= 3) {
         value = baseInterest * (0.3 + 0.7 * gaussian) + noise;
       } else {
-        // Lower ranked: more volatile, different patterns per story
-        const volatility = Math.sin(i * 0.8 + seed * 0.3) * 8 +
+        const volatility =
+          Math.sin(i * 0.8 + seed * 0.3) * 8 +
           Math.cos(i * 0.5 + seed * 0.2) * 5;
-        value = baseInterest * (0.25 + 0.75 * gaussian) + noise + volatility;
+        value =
+          baseInterest * (0.25 + 0.75 * gaussian) + noise + volatility;
       }
 
-      point[story.slug] = Math.max(3, Math.min(100, Math.round(value)));
+      point[topic.slug] = Math.max(3, Math.min(100, Math.round(value)));
     });
 
     data.push(point);
@@ -141,17 +187,16 @@ function generateTrendData(stories: TrendStory[], tick: number) {
 
 function detectEvents(
   data: Record<string, any>[],
-  stories: TrendStory[]
+  topics: { title: string; slug: string }[]
 ): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
-  stories.forEach((story, rank) => {
-    const values = data.map((d) => d[story.slug] as number);
+  topics.forEach((topic, rank) => {
+    const values = data.map((d) => d[topic.slug] as number);
     const color = LINE_COLORS[rank % LINE_COLORS.length];
     let maxVal = 0;
     let maxIdx = 0;
 
-    // Find peak
     values.forEach((v, i) => {
       if (v > maxVal) {
         maxVal = v;
@@ -159,19 +204,20 @@ function detectEvents(
       }
     });
 
-    // Add peak event
     if (maxIdx > 2 && maxIdx < values.length - 1) {
       events.push({
         index: maxIdx,
         time: data[maxIdx].time,
-        label: story.title.length > 30 ? story.title.slice(0, 28) + "..." : story.title,
-        storySlug: story.slug,
+        label:
+          topic.title.length > 30
+            ? topic.title.slice(0, 28) + "..."
+            : topic.title,
+        storySlug: topic.slug,
         type: "peak",
         color,
       });
     }
 
-    // Detect biggest spike (largest increase over 3 intervals)
     let maxIncrease = 0;
     let spikeIdx = 0;
     for (let i = 3; i < values.length; i++) {
@@ -186,15 +232,17 @@ function detectEvents(
       events.push({
         index: spikeIdx,
         time: data[spikeIdx].time,
-        label: story.title.length > 30 ? story.title.slice(0, 28) + "..." : story.title,
-        storySlug: story.slug,
+        label:
+          topic.title.length > 30
+            ? topic.title.slice(0, 28) + "..."
+            : topic.title,
+        storySlug: topic.slug,
         type: rank === 0 ? "surge" : "breakout",
         color,
       });
     }
   });
 
-  // Deduplicate events that are too close together (within 3 intervals)
   events.sort((a, b) => a.index - b.index);
   const filtered: TimelineEvent[] = [];
   for (const event of events) {
@@ -206,7 +254,7 @@ function detectEvents(
     }
   }
 
-  return filtered.slice(0, 6); // Max 6 events on timeline
+  return filtered.slice(0, 6);
 }
 
 function CustomTooltip({ active, payload, label, events }: any) {
@@ -216,7 +264,6 @@ function CustomTooltip({ active, payload, label, events }: any) {
     .filter((p: any) => p.value !== undefined)
     .sort((a: any, b: any) => b.value - a.value);
 
-  // Find events at this time point
   const currentIndex = payload[0]?.payload?._index;
   const matchingEvents = (events || []).filter(
     (e: TimelineEvent) => Math.abs(e.index - currentIndex) < 2
@@ -247,14 +294,12 @@ function CustomTooltip({ active, payload, label, events }: any) {
             <span className="text-[11px] font-medium line-clamp-1 flex-1 text-foreground">
               {entry.name}
             </span>
-            <div className="flex items-center gap-1">
-              <span
-                className="text-[11px] font-bold tabular-nums"
-                style={{ color: entry.color }}
-              >
-                {entry.value}
-              </span>
-            </div>
+            <span
+              className="text-[11px] font-bold tabular-nums"
+              style={{ color: entry.color }}
+            >
+              {entry.value}
+            </span>
           </div>
         ))}
       </div>
@@ -262,70 +307,6 @@ function CustomTooltip({ active, payload, label, events }: any) {
   );
 }
 
-function EventMarker({ cx, cy, event, isHovered, onHover, onLeave }: any) {
-  if (!cx || !cy) return null;
-
-  return (
-    <g
-      onMouseEnter={() => onHover(event)}
-      onMouseLeave={onLeave}
-      style={{ cursor: "pointer" }}
-    >
-      {/* Pulse ring */}
-      <circle cx={cx} cy={cy} r={isHovered ? 16 : 12} fill={event.color} opacity={0.1}>
-        <animate
-          attributeName="r"
-          from={isHovered ? 16 : 12}
-          to={isHovered ? 24 : 18}
-          dur="1.5s"
-          repeatCount="indefinite"
-        />
-        <animate
-          attributeName="opacity"
-          from="0.15"
-          to="0"
-          dur="1.5s"
-          repeatCount="indefinite"
-        />
-      </circle>
-      {/* Inner dot */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={isHovered ? 6 : 4}
-        fill={event.color}
-        stroke="#fff"
-        strokeWidth={2}
-      />
-      {/* Label flag */}
-      {isHovered && (
-        <g>
-          <rect
-            x={cx - 50}
-            y={cy - 36}
-            width={100}
-            height={22}
-            fill={event.color}
-            rx={0}
-          />
-          <text
-            x={cx}
-            y={cy - 22}
-            textAnchor="middle"
-            fill="white"
-            fontSize={9}
-            fontWeight="bold"
-            style={{ textTransform: "uppercase", letterSpacing: "0.05em" }}
-          >
-            {EVENT_LABELS[event.type]}
-          </text>
-        </g>
-      )}
-    </g>
-  );
-}
-
-// Timeline bar below the chart
 function EventTimeline({
   events,
   hoveredEvent,
@@ -343,13 +324,10 @@ function EventTimeline({
 }) {
   return (
     <div className="relative mt-2 h-12 border-t border-border">
-      {/* Timeline track */}
       <div className="absolute inset-x-0 top-5 h-px bg-border" />
-
       {events.map((event, i) => {
         const leftPercent = (event.index / (totalPoints - 1)) * 100;
         const isHovered = hoveredEvent?.index === event.index;
-
         return (
           <button
             key={`${event.storySlug}-${event.type}-${i}`}
@@ -359,12 +337,13 @@ function EventTimeline({
             onMouseLeave={onLeave}
             onClick={() => onEventClick(event)}
           >
-            {/* Vertical tick */}
             <div
               className="w-px h-3 mx-auto transition-all"
-              style={{ backgroundColor: event.color, opacity: isHovered ? 1 : 0.5 }}
+              style={{
+                backgroundColor: event.color,
+                opacity: isHovered ? 1 : 0.5,
+              }}
             />
-            {/* Dot */}
             <div
               className="w-3 h-3 mx-auto border-2 border-white transition-transform"
               style={{
@@ -372,7 +351,6 @@ function EventTimeline({
                 transform: isHovered ? "scale(1.5)" : "scale(1)",
               }}
             />
-            {/* Label */}
             <div
               className={`absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap transition-opacity ${
                 isHovered ? "opacity-100" : "opacity-0"
@@ -392,39 +370,54 @@ function EventTimeline({
   );
 }
 
-// Story detail card that appears on hover/click
 function StorySpotlight({
-  story,
+  topic,
   color,
   currentValue,
   changePercent,
   onClose,
+  isLiveTrend,
 }: {
-  story: TrendStory;
+  topic: { title: string; slug: string };
   color: string;
   currentValue: number;
   changePercent: number;
   onClose: () => void;
+  isLiveTrend: boolean;
 }) {
   return (
     <div className="border border-border p-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-3 h-3 shrink-0" style={{ backgroundColor: color }} />
-            <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">
-              {story.category}
-            </span>
+            <div
+              className="w-3 h-3 shrink-0"
+              style={{ backgroundColor: color }}
+            />
+            {isLiveTrend && (
+              <span className="text-[10px] font-bold uppercase tracking-editorial text-destructive">
+                Live Trend
+              </span>
+            )}
           </div>
-          <Link
-            href={`/blog/${story.slug}`}
-            className="font-display text-base font-bold hover:underline decoration-1 underline-offset-2 line-clamp-2 block"
-          >
-            {story.title}
-          </Link>
+          {isLiveTrend ? (
+            <span className="font-display text-base font-bold line-clamp-2 block">
+              {topic.title}
+            </span>
+          ) : (
+            <Link
+              href={`/blog/${topic.slug}`}
+              className="font-display text-base font-bold hover:underline decoration-1 underline-offset-2 line-clamp-2 block"
+            >
+              {topic.title}
+            </Link>
+          )}
         </div>
         <div className="text-right shrink-0">
-          <div className="text-2xl font-bold tabular-nums" style={{ color }}>
+          <div
+            className="text-2xl font-bold tabular-nums"
+            style={{ color }}
+          >
             {currentValue}
           </div>
           <div
@@ -441,13 +434,15 @@ function StorySpotlight({
         </div>
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <Link
-          href={`/blog/${story.slug}`}
-          className="text-[10px] font-bold uppercase tracking-editorial hover:underline"
-          style={{ color }}
-        >
-          Read full story
-        </Link>
+        {!isLiveTrend && (
+          <Link
+            href={`/blog/${topic.slug}`}
+            className="text-[10px] font-bold uppercase tracking-editorial hover:underline"
+            style={{ color }}
+          >
+            Read full story
+          </Link>
+        )}
         <button
           onClick={onClose}
           className="text-[10px] text-muted-foreground hover:text-foreground uppercase tracking-editorial"
@@ -459,18 +454,127 @@ function StorySpotlight({
   );
 }
 
-export function TrendChart({ stories }: TrendChartProps) {
-  const displayStories = stories.slice(0, 5);
-  const [activeLines, setActiveLines] = useState<Set<string>>(
-    () => new Set(displayStories.map((s) => s.slug))
+// Country selector dropdown
+function RegionSelector({
+  selectedGeo,
+  onChange,
+  isLoading,
+}: {
+  selectedGeo: string;
+  onChange: (geo: string) => void;
+  isLoading: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selected = REGIONS.find((r) => r.code === selectedGeo) || REGIONS[0];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 border border-border text-[10px] font-bold uppercase tracking-editorial hover:bg-muted transition-colors"
+      >
+        <span>{selected.flag}</span>
+        <span>{selected.label}</span>
+        <svg
+          className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        {isLoading && (
+          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+        )}
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border shadow-lg max-h-64 overflow-y-auto min-w-[160px]">
+            {REGIONS.map((region) => (
+              <button
+                key={region.code}
+                onClick={() => {
+                  onChange(region.code);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-[11px] font-medium hover:bg-muted transition-colors text-left ${
+                  region.code === selectedGeo
+                    ? "bg-muted font-bold"
+                    : ""
+                }`}
+              >
+                <span>{region.flag}</span>
+                <span>{region.label}</span>
+                {region.code === selectedGeo && (
+                  <svg className="w-3 h-3 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
+}
+
+export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
+  // Data source: "stories" = blog posts (default), "live" = Google Trends API
+  const [dataSource, setDataSource] = useState<"stories" | "live">("stories");
+  const [selectedGeo, setSelectedGeo] = useState(defaultGeo || "GB");
+  const [liveTopics, setLiveTopics] = useState<TrendTopic[]>([]);
+  const [isLoadingLive, setIsLoadingLive] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [activeLines, setActiveLines] = useState<Set<string>>(new Set());
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<TimelineEvent | null>(null);
   const [isAnimated, setIsAnimated] = useState(false);
   const [tick, setTick] = useState(() => Math.floor(Date.now() / 60000));
 
-  // Auto-refresh data every 60 seconds for live feel
+  // Fetch live trends when switching to live mode or changing country
+  useEffect(() => {
+    if (dataSource !== "live") return;
+
+    let cancelled = false;
+    setIsLoadingLive(true);
+    setFetchError(null);
+
+    fetch(`/api/trends?geo=${selectedGeo}&limit=10`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setLiveTopics(data.topics || []);
+        setIsLoadingLive(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to fetch live trends:", err);
+        setFetchError("Failed to load trends");
+        setIsLoadingLive(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dataSource, selectedGeo]);
+
+  // Auto-refresh every 60 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setTick(Math.floor(Date.now() / 60000));
@@ -478,21 +582,42 @@ export function TrendChart({ stories }: TrendChartProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const slugKey = displayStories.map((s) => s.slug).join(",");
+  // Build display items based on data source
+  const displayTopics = useMemo(() => {
+    if (dataSource === "live" && liveTopics.length > 0) {
+      return liveTopics.slice(0, 5).map((t) => ({
+        title: t.title,
+        slug: generateSlug(t.title),
+        trafficVolume: t.trafficVolume,
+      }));
+    }
+    return stories.slice(0, 5).map((s) => ({
+      title: s.title,
+      slug: s.slug,
+      trafficVolume: undefined as string | undefined,
+    }));
+  }, [dataSource, liveTopics, stories]);
+
+  // Reset active lines when topics change
+  useEffect(() => {
+    setActiveLines(new Set(displayTopics.map((t) => t.slug)));
+    setSelectedStory(null);
+  }, [displayTopics]);
+
+  const slugKey = displayTopics.map((t) => t.slug).join(",");
 
   const data = useMemo(
-    () => generateTrendData(displayStories, tick),
+    () => generateTrendData(displayTopics, tick),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [slugKey, tick]
   );
 
   const events = useMemo(
-    () => detectEvents(data, displayStories),
+    () => detectEvents(data, displayTopics),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data, slugKey]
   );
 
-  // Trigger entrance animation
   useEffect(() => {
     const timer = setTimeout(() => setIsAnimated(true), 100);
     return () => clearTimeout(timer);
@@ -516,13 +641,13 @@ export function TrendChart({ stories }: TrendChartProps) {
     );
   }, []);
 
-  if (displayStories.length === 0) return null;
+  if (displayTopics.length === 0 && !isLoadingLive) return null;
 
-  const selectedStoryData = selectedStory
-    ? displayStories.find((s) => s.slug === selectedStory)
+  const selectedTopicData = selectedStory
+    ? displayTopics.find((t) => t.slug === selectedStory)
     : null;
-  const selectedStoryIndex = selectedStoryData
-    ? displayStories.indexOf(selectedStoryData)
+  const selectedTopicIndex = selectedTopicData
+    ? displayTopics.indexOf(selectedTopicData)
     : -1;
   const selectedCurrentValue = selectedStory
     ? (data[data.length - 1]?.[selectedStory] as number) || 0
@@ -532,8 +657,12 @@ export function TrendChart({ stories }: TrendChartProps) {
     : 0;
   const changePercent =
     selectedPrevValue > 0
-      ? Math.round(((selectedCurrentValue - selectedPrevValue) / selectedPrevValue) * 100)
+      ? Math.round(
+          ((selectedCurrentValue - selectedPrevValue) / selectedPrevValue) * 100
+        )
       : 0;
+
+  const currentRegion = REGIONS.find((r) => r.code === selectedGeo);
 
   return (
     <div
@@ -544,66 +673,116 @@ export function TrendChart({ stories }: TrendChartProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border">
         <div className="flex items-center gap-3">
-          <h3 className="text-[11px] font-bold uppercase tracking-editorial">Trending Now</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-editorial">
+            Trending Now
+          </h3>
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
           </span>
+          {dataSource === "live" && currentRegion && (
+            <span className="text-[10px] text-muted-foreground uppercase tracking-editorial">
+              {currentRegion.flag} {currentRegion.label}
+            </span>
+          )}
         </div>
-        <span className="text-[10px] text-muted-foreground uppercase tracking-editorial">
-          Live - 10 min intervals
-        </span>
+        <div className="flex items-center gap-2">
+          {/* Data source toggle */}
+          <div className="flex border border-border">
+            <button
+              onClick={() => setDataSource("stories")}
+              className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-editorial transition-colors ${
+                dataSource === "stories"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Stories
+            </button>
+            <button
+              onClick={() => setDataSource("live")}
+              className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-editorial transition-colors ${
+                dataSource === "live"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Live Trends
+            </button>
+          </div>
+          {/* Country selector (only when in live mode) */}
+          {dataSource === "live" && (
+            <RegionSelector
+              selectedGeo={selectedGeo}
+              onChange={setSelectedGeo}
+              isLoading={isLoadingLive}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Legend / Story selector */}
+      {/* Legend / Topic selector */}
       <div className="flex flex-wrap gap-1 px-4 md:px-6 py-3 border-b border-border">
-        {displayStories.map((story, i) => {
-          const color = LINE_COLORS[i % LINE_COLORS.length];
-          const isActive = activeLines.has(story.slug);
-          const isHovered = hoveredStory === story.slug;
-          const currentVal = data[data.length - 1]?.[story.slug] || 0;
+        {isLoadingLive && displayTopics.length === 0 ? (
+          <div className="flex items-center gap-2 py-2">
+            <span className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+            <span className="text-[11px] text-muted-foreground uppercase tracking-editorial">
+              Loading trends...
+            </span>
+          </div>
+        ) : fetchError ? (
+          <div className="text-[11px] text-destructive uppercase tracking-editorial py-2">
+            {fetchError}
+          </div>
+        ) : (
+          displayTopics.map((topic, i) => {
+            const color = LINE_COLORS[i % LINE_COLORS.length];
+            const isActive = activeLines.has(topic.slug);
+            const isHovered = hoveredStory === topic.slug;
+            const currentVal = data[data.length - 1]?.[topic.slug] || 0;
 
-          return (
-            <button
-              key={story.slug}
-              onClick={() => {
-                toggleLine(story.slug);
-                setSelectedStory(story.slug);
-              }}
-              onMouseEnter={() => setHoveredStory(story.slug)}
-              onMouseLeave={() => setHoveredStory(null)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-editorial border transition-all cursor-pointer ${
-                isActive
-                  ? "opacity-100"
-                  : "opacity-30 hover:opacity-50"
-              } ${isHovered || selectedStory === story.slug ? "shadow-sm" : ""}`}
-              style={{
-                borderColor: isActive ? color : "#e5e5e5",
-                backgroundColor:
-                  isHovered || selectedStory === story.slug
-                    ? `${color}10`
-                    : "transparent",
-                color: isActive ? color : "#999",
-              }}
-            >
-              <span
-                className="w-2 h-2 shrink-0"
-                style={{ backgroundColor: isActive ? color : "#ccc" }}
-              />
-              <span className="line-clamp-1 max-w-[100px] md:max-w-[140px]">
-                {story.title.length > 20
-                  ? story.title.slice(0, 18) + "..."
-                  : story.title}
-              </span>
-              <span
-                className="font-bold tabular-nums"
-                style={{ color: isActive ? color : "#999" }}
+            return (
+              <button
+                key={topic.slug}
+                onClick={() => {
+                  toggleLine(topic.slug);
+                  setSelectedStory(topic.slug);
+                }}
+                onMouseEnter={() => setHoveredStory(topic.slug)}
+                onMouseLeave={() => setHoveredStory(null)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-editorial border transition-all cursor-pointer ${
+                  isActive ? "opacity-100" : "opacity-30 hover:opacity-50"
+                } ${
+                  isHovered || selectedStory === topic.slug ? "shadow-sm" : ""
+                }`}
+                style={{
+                  borderColor: isActive ? color : "#e5e5e5",
+                  backgroundColor:
+                    isHovered || selectedStory === topic.slug
+                      ? `${color}10`
+                      : "transparent",
+                  color: isActive ? color : "#999",
+                }}
               >
-                {currentVal}
-              </span>
-            </button>
-          );
-        })}
+                <span
+                  className="w-2 h-2 shrink-0"
+                  style={{ backgroundColor: isActive ? color : "#ccc" }}
+                />
+                <span className="line-clamp-1 max-w-[100px] md:max-w-[140px]">
+                  {topic.title.length > 20
+                    ? topic.title.slice(0, 18) + "..."
+                    : topic.title}
+                </span>
+                <span
+                  className="font-bold tabular-nums"
+                  style={{ color: isActive ? color : "#999" }}
+                >
+                  {currentVal}
+                </span>
+              </button>
+            );
+          })
+        )}
       </div>
 
       {/* Chart */}
@@ -637,35 +816,33 @@ export function TrendChart({ stories }: TrendChartProps) {
                 cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
               />
 
-              {/* Event reference lines */}
               {events.map((event, i) => (
                 <ReferenceLine
                   key={`ref-${i}`}
                   x={data[event.index]?.time}
                   stroke={event.color}
                   strokeDasharray="3 3"
-                  strokeOpacity={hoveredEvent?.index === event.index ? 0.6 : 0.15}
+                  strokeOpacity={
+                    hoveredEvent?.index === event.index ? 0.6 : 0.15
+                  }
                 />
               ))}
 
-              {/* Story lines */}
-              {displayStories.map((story, i) => {
+              {displayTopics.map((topic, i) => {
                 const color = LINE_COLORS[i % LINE_COLORS.length];
-                const isActive = activeLines.has(story.slug);
+                const isActive = activeLines.has(topic.slug);
                 const isHighlighted =
-                  hoveredStory === story.slug ||
-                  selectedStory === story.slug;
+                  hoveredStory === topic.slug ||
+                  selectedStory === topic.slug;
 
                 return (
                   <Line
-                    key={story.slug}
+                    key={topic.slug}
                     type="monotone"
-                    dataKey={story.slug}
-                    name={story.title}
+                    dataKey={topic.slug}
+                    name={topic.title}
                     stroke={color}
-                    strokeWidth={
-                      isHighlighted ? 4 : isActive ? 2.5 : 0
-                    }
+                    strokeWidth={isHighlighted ? 4 : isActive ? 2.5 : 0}
                     dot={false}
                     activeDot={
                       isActive
@@ -680,7 +857,7 @@ export function TrendChart({ stories }: TrendChartProps) {
                     opacity={
                       !isActive
                         ? 0
-                        : hoveredStory && hoveredStory !== story.slug
+                        : hoveredStory && hoveredStory !== topic.slug
                         ? 0.25
                         : 1
                     }
@@ -706,15 +883,16 @@ export function TrendChart({ stories }: TrendChartProps) {
         />
       </div>
 
-      {/* Story Spotlight (when a story or event is selected) */}
-      {selectedStoryData && (
+      {/* Story Spotlight */}
+      {selectedTopicData && (
         <div className="px-4 md:px-6 pb-4">
           <StorySpotlight
-            story={selectedStoryData}
-            color={LINE_COLORS[selectedStoryIndex % LINE_COLORS.length]}
+            topic={selectedTopicData}
+            color={LINE_COLORS[selectedTopicIndex % LINE_COLORS.length]}
             currentValue={selectedCurrentValue}
             changePercent={changePercent}
             onClose={() => setSelectedStory(null)}
+            isLiveTrend={dataSource === "live"}
           />
         </div>
       )}
@@ -722,7 +900,9 @@ export function TrendChart({ stories }: TrendChartProps) {
       {/* Footer */}
       <div className="flex items-center justify-between px-4 md:px-6 py-3 border-t border-border">
         <p className="text-[10px] text-muted-foreground uppercase tracking-editorial">
-          Click stories to highlight - Hover for details - Click timeline events to explore
+          {dataSource === "live"
+            ? "Live Google Trends - Click topics to highlight"
+            : "Click stories to highlight - Hover for details"}
         </p>
         <Link
           href="/blog"
