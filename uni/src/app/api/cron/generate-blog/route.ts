@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { google } from 'googleapis';
 import { Resend } from 'resend';
-import { fetchAllNews } from '@/lib/news-sources';
+import { fetchMultiRegionNews } from '@/lib/news-sources';
 import {
   generateBlogPost,
   validateBlogPost,
@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Step 1: Fetch top 10 trending topics from Google Trends
-    console.log('Fetching trending topics from Google Trends...');
-    const trendingTopics = await fetchAllNews();
+    // Step 1: Fetch trending topics from Google Trends (multiple countries)
+    console.log('Fetching trending topics from Google Trends (multi-region)...');
+    const trendingTopics = await fetchMultiRegionNews();
 
     if (trendingTopics.length === 0) {
       return NextResponse.json({

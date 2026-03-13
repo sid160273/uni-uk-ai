@@ -168,6 +168,7 @@ You must respond with ONLY a valid JSON object (no markdown code blocks, no expl
 
 TRENDING TOPIC: ${newsItem.title}
 SEARCH VOLUME: ${newsItem.trafficVolume || 'High'}
+TRENDING IN: ${(newsItem as any).regionLabel || 'UK'}
 RELATED HEADLINES:
 ${relatedContext || newsItem.description}
 

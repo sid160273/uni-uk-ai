@@ -1,6 +1,7 @@
 /**
  * Trending Sources Module
- * Fetches and parses Google Trends RSS feed for real-time trending topics
+ * Fetches and parses Google Trends RSS feeds for real-time trending topics
+ * across multiple countries
  */
 
 export interface NewsItem {
@@ -12,14 +13,23 @@ export interface NewsItem {
   trafficVolume?: string;
   pictureUrl?: string;
   newsItems?: { title: string; url: string; source: string }[];
+  region?: string;      // Country code (GB, US, etc.)
+  regionLabel?: string; // Human-readable (UK, USA, etc.)
 }
 
-const TRENDS_RSS_URL = 'https://trends.google.com/trending/rss?geo=GB';
+// Countries to fetch trends from — ordered by priority
+const TREND_REGIONS = [
+  { geo: 'GB', label: 'UK', limit: 10 },
+  { geo: 'US', label: 'USA', limit: 8 },
+  { geo: 'AU', label: 'Australia', limit: 5 },
+  { geo: 'CA', label: 'Canada', limit: 5 },
+  { geo: 'IN', label: 'India', limit: 5 },
+] as const;
 
 /**
  * Parses Google Trends RSS feed into trending items
  */
-function parseTrendsRSS(xmlText: string): NewsItem[] {
+function parseTrendsRSS(xmlText: string, region: string, regionLabel: string): NewsItem[] {
   const items: NewsItem[] = [];
 
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -61,12 +71,14 @@ function parseTrendsRSS(xmlText: string): NewsItem[] {
       items.push({
         title,
         description: description.substring(0, 500),
-        link: linkMatch ? linkMatch[1].trim() : `https://trends.google.com/trends/explore?q=${encodeURIComponent(title)}&geo=GB`,
+        link: linkMatch ? linkMatch[1].trim() : `https://trends.google.com/trends/explore?q=${encodeURIComponent(title)}&geo=${region}`,
         pubDate: pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString(),
         source: 'Google Trends',
         trafficVolume: trafficMatch ? trafficMatch[1].trim() : undefined,
         pictureUrl: pictureMatch ? pictureMatch[1].trim() : undefined,
         newsItems: relatedNews.length > 0 ? relatedNews : undefined,
+        region,
+        regionLabel,
       });
     }
   }
@@ -75,11 +87,12 @@ function parseTrendsRSS(xmlText: string): NewsItem[] {
 }
 
 /**
- * Fetches top trending topics from Google Trends
+ * Fetches trending topics from a single country
  */
-export async function fetchAllNews(): Promise<NewsItem[]> {
+async function fetchTrendsForRegion(geo: string, regionLabel: string, limit: number): Promise<NewsItem[]> {
   try {
-    const response = await fetch(TRENDS_RSS_URL, {
+    const url = `https://trends.google.com/trending/rss?geo=${geo}`;
+    const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; uni-uk.ai/1.0)',
       },
@@ -87,19 +100,84 @@ export async function fetchAllNews(): Promise<NewsItem[]> {
     });
 
     if (!response.ok) {
-      console.warn(`Failed to fetch Google Trends: ${response.status}`);
+      console.warn(`Failed to fetch Google Trends for ${geo}: ${response.status}`);
       return [];
     }
 
     const xmlText = await response.text();
-    const items = parseTrendsRSS(xmlText);
-
-    // Return top 10 trending topics
-    return items.slice(0, 10);
+    const items = parseTrendsRSS(xmlText, geo, regionLabel);
+    return items.slice(0, limit);
   } catch (error) {
-    console.error('Error fetching Google Trends:', error);
+    console.error(`Error fetching Google Trends for ${geo}:`, error);
     return [];
   }
+}
+
+/**
+ * Deduplicates topics across countries
+ * If the same topic trends in multiple countries, keeps the first occurrence
+ * and merges the region info
+ */
+function deduplicateTopics(allItems: NewsItem[]): NewsItem[] {
+  const seen = new Map<string, NewsItem>();
+
+  for (const item of allItems) {
+    const key = item.title.toLowerCase().trim();
+
+    if (seen.has(key)) {
+      // Same topic in another country — append region to existing
+      const existing = seen.get(key)!;
+      if (existing.regionLabel && item.regionLabel && !existing.regionLabel.includes(item.regionLabel)) {
+        existing.regionLabel = `${existing.regionLabel}, ${item.regionLabel}`;
+      }
+      // Keep the higher traffic volume
+      if (item.trafficVolume && existing.trafficVolume) {
+        const itemTraffic = parseInt(item.trafficVolume.replace(/[^0-9]/g, '')) || 0;
+        const existingTraffic = parseInt(existing.trafficVolume.replace(/[^0-9]/g, '')) || 0;
+        if (itemTraffic > existingTraffic) {
+          existing.trafficVolume = item.trafficVolume;
+        }
+      }
+    } else {
+      seen.set(key, { ...item });
+    }
+  }
+
+  return Array.from(seen.values());
+}
+
+/**
+ * Fetches top trending topics from Google Trends (UK only — for homepage display)
+ */
+export async function fetchAllNews(): Promise<NewsItem[]> {
+  return fetchTrendsForRegion('GB', 'UK', 10);
+}
+
+/**
+ * Fetches trending topics from ALL configured countries
+ * Used by the blog generation cron for broader coverage
+ */
+export async function fetchMultiRegionNews(): Promise<NewsItem[]> {
+  // Fetch all regions in parallel
+  const results = await Promise.allSettled(
+    TREND_REGIONS.map(r => fetchTrendsForRegion(r.geo, r.label, r.limit))
+  );
+
+  const allItems: NewsItem[] = [];
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      console.log(`${TREND_REGIONS[i].label}: ${result.value.length} topics`);
+      allItems.push(...result.value);
+    } else {
+      console.error(`Failed to fetch ${TREND_REGIONS[i].label}:`, result.reason);
+    }
+  });
+
+  // Deduplicate cross-country overlaps
+  const unique = deduplicateTopics(allItems);
+  console.log(`Total unique topics across all regions: ${unique.length}`);
+
+  return unique;
 }
 
 /**
@@ -107,7 +185,7 @@ export async function fetchAllNews(): Promise<NewsItem[]> {
  */
 export function formatNewsForPrompt(items: NewsItem[]): string {
   return items.map((item, index) =>
-    `${index + 1}. "${item.title}" (${item.trafficVolume || 'trending'})
+    `${index + 1}. "${item.title}" (${item.trafficVolume || 'trending'}${item.regionLabel ? ` — ${item.regionLabel}` : ''})
    Related: ${item.newsItems?.map(n => n.title).join('; ') || item.description}
    Link: ${item.link}
    Date: ${item.pubDate}`
