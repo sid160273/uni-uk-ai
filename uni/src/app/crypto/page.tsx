@@ -101,22 +101,17 @@ export default async function CryptoDashboard() {
       )}
 
       {/* Hero */}
-      <section className="relative py-8 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-100 via-background to-background dark:from-yellow-900/20 pointer-events-none" />
-        <div className="container relative mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-yellow-50 border border-yellow-200 rounded-full text-sm font-medium text-yellow-700 mb-4">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500" />
+      <section className="py-6 border-b border-border">
+        <div className="container mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 border border-border text-xs font-semibold uppercase tracking-editorial text-muted-foreground mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
             </span>
             Updated every hour
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
-            Crypto Intelligence{" "}
-            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-              Dashboard
-            </span>
-            {" "}🪙
+          <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-3">
+            Crypto Dashboard
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Pick a coin, watch the chart, get AI insights — all in one place
@@ -133,25 +128,28 @@ export default async function CryptoDashboard() {
 
       {/* Disclaimer */}
       <section className="container mx-auto px-4 py-4">
-        <div className="bg-muted/50 border rounded-lg p-4 text-xs text-muted-foreground text-center">
-          <strong>Disclaimer:</strong> uni-uk.ai provides information and analysis only, not financial advice.
+        <div className="border border-border p-4 text-xs text-muted-foreground text-center">
+          <strong className="text-foreground">Disclaimer:</strong> uni-uk.ai provides information and analysis only, not financial advice.
           Cryptocurrency investments are volatile and carry risk. Always do your own research before making investment decisions.
           Data provided by CoinGecko.
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-10 bg-muted/50">
+      <footer className="border-t border-border py-10">
         <div className="container mx-auto px-4 text-center space-y-4">
+          <div className="font-display text-xl font-bold">
+            uni-uk<span className="text-destructive">.ai</span>
+          </div>
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">Trending News</Link>
-            <Link href="/crypto" className="hover:text-foreground transition-colors font-medium text-foreground">Crypto</Link>
+            <Link href="/blog" className="hover:text-foreground transition-colors">Stories</Link>
             <Link href="/crypto/news" className="hover:text-foreground transition-colors">Crypto News</Link>
+            <Link href="/universities" className="hover:text-foreground transition-colors">Universities</Link>
             <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
           </div>
-          <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} uni-uk.ai &bull; Powered by AI 🤖 &bull; Crypto data updated hourly
+          <p className="text-muted-foreground text-xs">
+            &copy; {new Date().getFullYear()} uni-uk.ai. Crypto data updated hourly. Not financial advice.
           </p>
         </div>
       </footer>

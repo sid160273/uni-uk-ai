@@ -79,12 +79,12 @@ const PLACEHOLDERS = [
 ];
 
 const QUICK_TOPICS = [
-  { label: "🪙 Bitcoin", query: "What's happening with Bitcoin right now?" },
-  { label: "💎 Ethereum", query: "Give me the latest on Ethereum" },
-  { label: "📊 Market", query: "How's the crypto market looking today?" },
-  { label: "🔥 Hot Coins", query: "Which coins are trending right now?" },
-  { label: "🚀 Movers", query: "What are the biggest movers today?" },
-  { label: "💡 DeFi", query: "What's happening in DeFi?" },
+  { label: "Bitcoin", query: "What's happening with Bitcoin right now?" },
+  { label: "Ethereum", query: "Give me the latest on Ethereum" },
+  { label: "Market", query: "How's the crypto market looking today?" },
+  { label: "Trending", query: "Which coins are trending right now?" },
+  { label: "Movers", query: "What are the biggest movers today?" },
+  { label: "DeFi", query: "What's happening in DeFi?" },
 ];
 
 // ── Main Component ──────────────────────────────────
@@ -143,7 +143,6 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
     const direction = change >= 0 ? "up" : "down";
     sendMessage(`Tell me about ${coin.name} (${coin.symbol.toUpperCase()}). It's currently at ${formatPrice(coin.current_price)}, ${direction} ${Math.abs(change).toFixed(2)}% today. What's driving this and what should I know?`);
 
-    // On mobile: scroll to chart so they see the full flow (chart → chat below it)
     if (window.innerWidth < 1024) {
       setTimeout(() => {
         document.getElementById("chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -156,34 +155,34 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
     sendMessage(query);
   };
 
-  // ── Chat Panel (rendered once, used in layout) ──
+  // ── Chat Panel ──
   const chatPanel = (
     <div id="chat">
-      <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <h2 className="text-xl font-bold">🤖 Crypto AI</h2>
-        {selectedCoin ? (
-          <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5">
-            <img src={selectedCoin.image} alt="" className="w-4 h-4 rounded-full" />
-            Analysing {selectedCoin.name}
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground">• Pick a coin to get started</span>
-        )}
+      <div className="border-b-2 border-foreground pb-2 mb-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-editorial">Crypto AI</h2>
+          {selectedCoin && (
+            <span className="text-[10px] text-muted-foreground uppercase tracking-editorial flex items-center gap-1.5">
+              <img src={selectedCoin.image} alt="" className="w-3.5 h-3.5 rounded-full" />
+              Analysing {selectedCoin.name}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="bg-card border rounded-xl overflow-hidden">
+      <div className="border border-border overflow-hidden">
         {messages.length > 0 && (
           <div className="max-h-[350px] lg:max-h-[400px] overflow-y-auto p-4 space-y-3">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+                <div className={`max-w-[85%] px-4 py-2.5 text-sm ${
                   msg.role === "user"
-                    ? "bg-gradient-to-r from-yellow-600 to-orange-600 text-white"
+                    ? "bg-foreground text-background"
                     : "bg-muted"
                 }`}>
                   {msg.role === "assistant" ? (
                     <div
-                      className="prose prose-sm dark:prose-invert max-w-none [&_a]:text-yellow-600 [&_a]:underline"
+                      className="prose prose-sm dark:prose-invert max-w-none [&_a]:underline"
                       dangerouslySetInnerHTML={{
                         __html: msg.content
                           .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -199,12 +198,12 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-muted rounded-2xl px-4 py-3 text-sm">
+                <div className="bg-muted px-4 py-3 text-sm">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 rounded-full bg-yellow-500 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-yellow-500 animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-yellow-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <span className="w-1.5 h-1.5 bg-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 bg-foreground animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 bg-foreground animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                     <span className="text-xs text-muted-foreground">Analysing {selectedCoin?.name || "market"}...</span>
                   </div>
@@ -224,7 +223,7 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                   const matched = coins.find(c => c.id === coin.id);
                   if (matched) handleCoinSelect(matched);
                 }}
-                className="shrink-0 bg-muted rounded-lg px-3 py-2 text-xs flex items-center gap-2 hover:bg-muted/80 cursor-pointer transition-colors"
+                className="shrink-0 border border-border px-3 py-2 text-xs flex items-center gap-2 hover:bg-muted cursor-pointer transition-colors"
               >
                 <img src={coin.image} alt={coin.name} className="w-4 h-4 rounded-full" />
                 <span className="font-bold">{coin.symbol}</span>
@@ -239,25 +238,16 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
 
         {messages.length === 0 && (
           <div className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <span className="text-2xl">🪙</span>
-                <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500" />
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Crypto AI Assistant</p>
-                <p className="text-xs text-muted-foreground">Click a coin in the table — I&apos;ll explain it instantly</p>
-              </div>
+            <div>
+              <p className="text-sm font-semibold">Crypto AI Assistant</p>
+              <p className="text-xs text-muted-foreground">Click a coin in the table — instant analysis</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {QUICK_TOPICS.map((topic) => (
                 <button
                   key={topic.label}
                   onClick={() => sendMessage(topic.query)}
-                  className="px-3 py-1.5 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-full text-xs font-medium text-yellow-800 hover:shadow-md transition-all hover:scale-105 cursor-pointer"
+                  className="px-3 py-1.5 border border-border text-[10px] font-semibold uppercase tracking-editorial hover:bg-muted transition-all cursor-pointer"
                 >
                   {topic.label}
                 </button>
@@ -266,19 +256,19 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="border-t p-3 flex gap-2">
+        <form onSubmit={handleSubmit} className="border-t border-border p-3 flex gap-2">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={PLACEHOLDERS[placeholderIndex]}
-            className="flex-1 bg-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all placeholder:text-muted-foreground"
+            className="flex-1 bg-muted px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-foreground transition-all placeholder:text-muted-foreground"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={isLoading || !query.trim()}
-            className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="bg-foreground text-background px-4 py-2.5 text-xs font-bold uppercase tracking-editorial hover:opacity-80 transition-opacity disabled:opacity-50"
           >
             {isLoading ? "..." : "Ask"}
           </button>
@@ -289,33 +279,25 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
 
   return (
     <>
-      {/* ═══ HOW IT WORKS — 3-step guide ═══ */}
-      <section className="container mx-auto px-4 pb-4">
-        <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-yellow-50 dark:from-yellow-950/20 dark:via-orange-950/20 dark:to-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 md:p-5">
-          <div className="grid grid-cols-3 gap-3 md:gap-6">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-yellow-500 text-white font-bold text-lg md:text-xl mb-2">1</div>
-              <p className="text-xs md:text-sm font-bold">Pick a Coin</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Tap any coin below</p>
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section className="container mx-auto px-4 py-4">
+        <div className="border border-border p-4">
+          <div className="grid grid-cols-3 gap-3 md:gap-6 text-center">
+            <div>
+              <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-foreground font-bold text-sm mb-1">1</div>
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-editorial">Pick a Coin</p>
+              <p className="text-[9px] md:text-[10px] text-muted-foreground mt-0.5">Tap any coin below</p>
             </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-500 text-white font-bold text-lg md:text-xl mb-2">2</div>
-              <p className="text-xs md:text-sm font-bold">See the Chart</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Price graph updates</p>
+            <div>
+              <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-foreground font-bold text-sm mb-1">2</div>
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-editorial">See the Chart</p>
+              <p className="text-[9px] md:text-[10px] text-muted-foreground mt-0.5">Price graph updates</p>
             </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-500 text-white font-bold text-lg md:text-xl mb-2">3</div>
-              <p className="text-xs md:text-sm font-bold">AI Explains</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Instant analysis</p>
+            <div>
+              <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-foreground font-bold text-sm mb-1">3</div>
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-editorial">AI Explains</p>
+              <p className="text-[9px] md:text-[10px] text-muted-foreground mt-0.5">Instant analysis</p>
             </div>
-          </div>
-          <div className="hidden md:flex justify-center items-center gap-1 mt-3 text-muted-foreground text-xs">
-            <span>📊 Table</span>
-            <span className="text-yellow-500">→</span>
-            <span>📈 Chart</span>
-            <span className="text-orange-500">→</span>
-            <span>🤖 AI Chat</span>
-            <span className="text-muted-foreground/50 ml-2">— everything is connected</span>
           </div>
         </div>
       </section>
@@ -334,43 +316,43 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
         )}
       </section>
 
-      {/* ═══ MOBILE: Chat right after chart (hidden on desktop) ═══ */}
-      <section className="container mx-auto px-4 pb-6 lg:hidden">
+      {/* ═══ MOBILE: Chat right after chart ═══ */}
+      <section className="container mx-auto px-4 pb-4 lg:hidden">
         {chatPanel}
       </section>
 
       {/* ═══ MAIN LAYOUT ═══ */}
-      <div className="container mx-auto px-4 py-4 lg:py-8">
+      <div className="container mx-auto px-4 py-4 lg:py-6">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
 
           {/* LEFT: Market Table */}
           <div className="lg:col-span-7 space-y-6">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">📊 Market Overview</h2>
+              <div className="flex items-center justify-between mb-4 border-b-2 border-foreground pb-2">
+                <h2 className="text-[11px] font-bold uppercase tracking-editorial">Market Overview</h2>
                 <div className="flex items-center gap-2">
                   {selectedCoin && (
-                    <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 px-2 py-0.5 rounded-full font-medium hidden md:inline-flex items-center gap-1">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-editorial hidden md:inline-flex items-center gap-1">
                       <img src={selectedCoin.image} alt="" className="w-3.5 h-3.5 rounded-full" />
                       {selectedCoin.symbol.toUpperCase()}
                     </span>
                   )}
-                  <span className="text-[10px] md:text-xs text-muted-foreground">👆 Tap a coin • GBP</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-editorial">Tap a coin - GBP</span>
                 </div>
               </div>
 
-              <div className="bg-card border rounded-xl overflow-hidden">
+              <div className="border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b bg-muted/50 text-xs text-muted-foreground">
-                        <th className="text-left p-3 font-medium">#</th>
-                        <th className="text-left p-3 font-medium">Coin</th>
-                        <th className="text-right p-3 font-medium">Price</th>
-                        <th className="text-right p-3 font-medium">24h</th>
-                        <th className="text-right p-3 font-medium hidden md:table-cell">7d</th>
-                        <th className="text-right p-3 font-medium hidden lg:table-cell">Market Cap</th>
-                        <th className="text-right p-3 font-medium hidden md:table-cell">7d Chart</th>
+                      <tr className="border-b bg-muted/50 text-[10px] text-muted-foreground uppercase tracking-editorial">
+                        <th className="text-left p-3 font-semibold">#</th>
+                        <th className="text-left p-3 font-semibold">Coin</th>
+                        <th className="text-right p-3 font-semibold">Price</th>
+                        <th className="text-right p-3 font-semibold">24h</th>
+                        <th className="text-right p-3 font-semibold hidden md:table-cell">7d</th>
+                        <th className="text-right p-3 font-semibold hidden lg:table-cell">Mkt Cap</th>
+                        <th className="text-right p-3 font-semibold hidden md:table-cell">7d</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -384,33 +366,32 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                             onClick={() => handleCoinSelect(coin)}
                             className={`border-b last:border-0 cursor-pointer transition-all ${
                               isSelected
-                                ? "bg-yellow-50 dark:bg-yellow-950/30 border-l-4 border-l-yellow-500"
-                                : "hover:bg-muted/30 border-l-4 border-l-transparent"
+                                ? "bg-muted border-l-2 border-l-foreground"
+                                : "hover:bg-muted/30 border-l-2 border-l-transparent"
                             }`}
                           >
-                            <td className="p-3 text-muted-foreground font-medium">
-                              {isSelected && <span className="mr-1">▶</span>}
+                            <td className="p-3 text-muted-foreground text-xs font-medium">
                               {i + 1}
                             </td>
                             <td className="p-3">
                               <div className="flex items-center gap-2">
-                                <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" />
+                                <img src={coin.image} alt={coin.name} className="w-5 h-5 rounded-full" />
                                 <div>
-                                  <span className={`font-bold ${isSelected ? "text-yellow-700 dark:text-yellow-400" : ""}`}>
+                                  <span className={`font-bold text-sm ${isSelected ? "text-foreground" : ""}`}>
                                     {coin.name}
                                   </span>
-                                  <span className="text-xs text-muted-foreground ml-1.5">{coin.symbol.toUpperCase()}</span>
+                                  <span className="text-[10px] text-muted-foreground ml-1.5 uppercase">{coin.symbol}</span>
                                 </div>
                               </div>
                             </td>
-                            <td className="p-3 text-right font-mono font-medium">{formatPrice(coin.current_price)}</td>
-                            <td className={`p-3 text-right font-medium ${change24h >= 0 ? "text-green-600" : "text-red-600"}`}>
-                              {change24h >= 0 ? "▲" : "▼"} {Math.abs(change24h).toFixed(2)}%
+                            <td className="p-3 text-right font-mono font-medium text-sm">{formatPrice(coin.current_price)}</td>
+                            <td className={`p-3 text-right text-xs font-semibold ${change24h >= 0 ? "text-green-600" : "text-red-600"}`}>
+                              {change24h >= 0 ? "+" : ""}{change24h.toFixed(2)}%
                             </td>
-                            <td className={`p-3 text-right font-medium hidden md:table-cell ${change7d >= 0 ? "text-green-600" : "text-red-600"}`}>
-                              {change7d >= 0 ? "▲" : "▼"} {Math.abs(change7d).toFixed(2)}%
+                            <td className={`p-3 text-right text-xs font-semibold hidden md:table-cell ${change7d >= 0 ? "text-green-600" : "text-red-600"}`}>
+                              {change7d >= 0 ? "+" : ""}{change7d.toFixed(2)}%
                             </td>
-                            <td className="p-3 text-right hidden lg:table-cell text-muted-foreground">
+                            <td className="p-3 text-right hidden lg:table-cell text-xs text-muted-foreground">
                               {formatLargeNumber(coin.market_cap)}
                             </td>
                             <td className="p-3 text-right hidden md:table-cell">
@@ -434,7 +415,9 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
 
             {trendingCoins.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold mb-4">🔥 Trending Coins</h2>
+                <div className="border-b-2 border-foreground pb-2 mb-4">
+                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Trending Coins</h2>
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {trendingCoins.slice(0, 6).map((tc, i) => {
                     const matchedCoin = coins.find(c => c.id === tc.id);
@@ -445,20 +428,20 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                           if (matchedCoin) handleCoinSelect(matchedCoin);
                           else sendMessage(`Tell me about ${tc.name} (${tc.symbol.toUpperCase()}). It's trending right now — what's going on?`);
                         }}
-                        className={`bg-card border rounded-xl p-4 hover:shadow-md transition-all text-left cursor-pointer ${
-                          selectedCoin?.id === tc.id ? "ring-2 ring-yellow-500 bg-yellow-50/50" : ""
+                        className={`border border-border p-3 hover:bg-muted transition-all text-left cursor-pointer ${
+                          selectedCoin?.id === tc.id ? "bg-muted border-foreground" : ""
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <img src={tc.large || tc.thumb} alt={tc.name} className="w-8 h-8 rounded-full" />
+                          <img src={tc.large || tc.thumb} alt={tc.name} className="w-7 h-7 rounded-full" />
                           <div>
-                            <p className="font-bold text-sm">{tc.name}</p>
-                            <p className="text-xs text-muted-foreground">{tc.symbol.toUpperCase()}</p>
+                            <p className="font-bold text-xs">{tc.name}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase">{tc.symbol}</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">Rank #{tc.market_cap_rank || "?"}</span>
-                          <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded-full">🔥 #{i + 1}</span>
+                          <span className="text-[10px] text-muted-foreground">Rank #{tc.market_cap_rank || "?"}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-editorial text-destructive">#{i + 1}</span>
                         </div>
                       </button>
                     );
@@ -471,26 +454,26 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
 
             {recentPosts.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">📰 Crypto News</h2>
-                  <Link href="/crypto/news" className="text-sm text-primary hover:underline font-medium">See all →</Link>
+                <div className="flex items-center justify-between border-b-2 border-foreground pb-2 mb-4">
+                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Crypto News</h2>
+                  <Link href="/crypto/news" className="text-[10px] font-bold uppercase tracking-editorial hover:underline">See all</Link>
                 </div>
-                <div className="space-y-3">
+                <div className="divide-y divide-border">
                   {recentPosts.map((post) => (
                     <Link
                       key={post.slug}
                       href={`/crypto/news#${post.slug}`}
-                      className="group flex gap-4 bg-card border-l-4 border-l-yellow-500 rounded-xl p-4 hover:shadow-md transition-all"
+                      className="group flex gap-4 py-3 first:pt-0"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           {post.coins.slice(0, 3).map((coin) => (
-                            <span key={coin} className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded-full">{coin}</span>
+                            <span key={coin} className="text-[10px] font-bold uppercase tracking-editorial text-destructive">{coin}</span>
                           ))}
                         </div>
-                        <h3 className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-2">{post.title}</h3>
+                        <h3 className="font-semibold text-sm group-hover:underline decoration-1 underline-offset-2 line-clamp-2">{post.title}</h3>
                         <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{post.excerpt}</p>
-                        <span className="text-xs text-primary font-medium mt-1 inline-block">📖 {post.readingTime} min read</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-editorial mt-1 inline-block">{post.readingTime} min read</span>
                       </div>
                     </Link>
                   ))}
@@ -499,7 +482,7 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             )}
           </div>
 
-          {/* RIGHT: Desktop chat + extras (hidden on mobile — chat is above table) */}
+          {/* RIGHT: Desktop chat + extras */}
           <div className="hidden lg:block lg:col-span-5">
             <div className="lg:sticky lg:top-20 space-y-6">
               {chatPanel}
@@ -507,28 +490,30 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
               <AdPlaceholder id="403" format="rectangle" />
 
               {coins.length >= 3 && (
-                <div className="bg-card border rounded-xl p-5">
-                  <h3 className="font-bold mb-3">⚡ Quick Stats</h3>
-                  <div className="space-y-2">
+                <div className="border border-border p-4">
+                  <div className="border-b border-border pb-2 mb-3">
+                    <h3 className="text-[11px] font-bold uppercase tracking-editorial">Quick Stats</h3>
+                  </div>
+                  <div className="divide-y divide-border">
                     {coins.slice(0, 5).map((coin) => {
                       const isSelected = selectedCoin?.id === coin.id;
                       return (
                         <button
                           key={coin.id}
                           onClick={() => handleCoinSelect(coin)}
-                          className={`w-full flex items-center justify-between p-2 rounded-lg transition-all cursor-pointer ${
-                            isSelected ? "bg-yellow-50 dark:bg-yellow-950/30" : "hover:bg-muted/50"
+                          className={`w-full flex items-center justify-between py-2.5 transition-all cursor-pointer ${
+                            isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <img src={coin.image} alt={coin.name} className="w-5 h-5 rounded-full" />
-                            <span className={`text-sm font-medium ${isSelected ? "text-yellow-700 dark:text-yellow-400" : ""}`}>
-                              {coin.symbol.toUpperCase()}
+                            <img src={coin.image} alt={coin.name} className="w-4 h-4 rounded-full" />
+                            <span className="text-xs font-bold uppercase">
+                              {coin.symbol}
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-sm font-mono">{formatPrice(coin.current_price)}</span>
-                            <span className={`text-xs ml-2 ${
+                            <span className="text-xs font-mono">{formatPrice(coin.current_price)}</span>
+                            <span className={`text-[10px] ml-2 font-semibold ${
                               (coin.price_change_percentage_24h || 0) >= 0 ? "text-green-600" : "text-red-600"
                             }`}>
                               {(coin.price_change_percentage_24h || 0) >= 0 ? "+" : ""}
@@ -542,10 +527,10 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                 </div>
               )}
 
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 border rounded-xl p-5 text-center">
-                <p className="text-sm font-medium mb-2">Also on uni-uk.ai</p>
-                <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
-                  🔥 Trending News
+              <div className="border border-border p-4 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground mb-2">Also on uni-uk.ai</p>
+                <Link href="/" className="inline-flex items-center px-4 py-2 bg-foreground text-background text-xs font-bold uppercase tracking-editorial hover:opacity-80 transition-opacity">
+                  Trending News
                 </Link>
               </div>
             </div>
