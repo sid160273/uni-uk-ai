@@ -17,8 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY not configured');
       return NextResponse.json(
-        { error: 'Newsletter service not configured' },
+        { error: 'Newsletter service not configured (key)' },
         { status: 500 }
       );
     }
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (!audienceId) {
       console.error('RESEND_AUDIENCE_ID not configured');
       return NextResponse.json(
-        { error: 'Newsletter service not configured' },
+        { error: 'Newsletter service not configured (audience)' },
         { status: 500 }
       );
     }
