@@ -1,4 +1,4 @@
-import { getBlogPostBySlugCombined, getAllBlogPostsCombined, getRelatedBlogPostsCombined } from "@/lib/blog-data";
+import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BlogCard } from "@/components/BlogCard";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/StructuredData";
@@ -16,7 +16,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPostBySlugCombined(slug);
+  const allPosts = await getAllBlogPostsCombined();
+  const post = allPosts.find(p => p.slug === slug);
 
   if (!post) {
     return {
@@ -62,22 +63,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export async function generateStaticParams() {
-  const posts = await getAllBlogPostsCombined();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
-
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await getBlogPostBySlugCombined(slug);
+
+  // Fetch all posts once, then find the matching post and related posts from the same data
+  const allPosts = await getAllBlogPostsCombined();
+  const post = allPosts.find(p => p.slug === slug);
 
   if (!post) {
+    console.error(`[blog/${slug}] Post not found. Total posts available: ${allPosts.length}. Slugs sample: ${allPosts.slice(0, 5).map(p => p.slug).join(', ')}`);
     notFound();
   }
 
-  const relatedPosts = await getRelatedBlogPostsCombined(slug, 3);
+  // Get related posts from the already-fetched data
+  const relatedPosts = allPosts
+    .filter(p => p.slug !== slug)
+    .map(p => {
+      let score = 0;
+      if (p.category === post.category) score += 3;
+      score += p.tags.filter(t => post.tags.includes(t)).length;
+      return { post: p, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(s => s.post);
 
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -196,10 +205,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                       if (earliest.type === 'link') {
                         const [fullMatch, linkText, linkUrl] = earliest.match;
-                        // Handle internal links (start with /), external links (start with http), and others
-                        const isInternal = linkUrl.startsWith('/') || linkUrl.startsWith('#');
-                        const isExternal = linkUrl.startsWith('http');
-                        const href = isInternal || isExternal ? linkUrl : `https://${linkUrl}`;
+                        // Detect external domains that might be missing protocol
+                        const looksExternal = /^(www\.|[a-z0-9-]+\.(com|co\.uk|org|net|edu|gov|io|ai|bbc|news))/.test(linkUrl);
+                        const isExternal = linkUrl.startsWith('http') || looksExternal;
+                        const isInternal = !isExternal && (linkUrl.startsWith('/') || linkUrl.startsWith('#'));
+                        const href = linkUrl.startsWith('http') ? linkUrl : isInternal ? linkUrl : `https://${linkUrl.replace(/^\/+/, '')}`;
                         parts.push(
                           <a
                             key={key++}
