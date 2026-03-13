@@ -4,7 +4,7 @@ import { BlogCard } from "@/components/BlogCard";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Clock, Calendar, ArrowLeft, Tag } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 // Force dynamic rendering to always show fresh content
@@ -116,44 +116,38 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       {/* Article Header */}
       <article>
-        <header className="py-12 bg-gradient-to-br from-primary/5 via-background to-violet-50/30 dark:from-primary/5 dark:via-background dark:to-violet-950/30">
+        <header className="py-10 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Blog
+                <ArrowLeft className="w-3 h-3" />
+                All Stories
               </Link>
 
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
+              <div className="mb-4">
+                <Link
+                  href={`/blog/category/${post.category.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="text-[11px] font-bold uppercase tracking-editorial text-destructive hover:underline"
+                >
                   {post.category}
-                </span>
+                </Link>
               </div>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight">
                 {post.title}
               </h1>
 
-              <p className="text-xl text-muted-foreground mb-6">{post.excerpt}</p>
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">{post.excerpt}</p>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-xs font-medium">UK</span>
-                  </div>
-                  <span>{post.author}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>{formattedDate}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{post.readingTime} min read</span>
-                </div>
+              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border pt-4">
+                <span className="font-semibold text-foreground">{post.author}</span>
+                <span className="text-border">|</span>
+                <span>{formattedDate}</span>
+                <span className="text-border">|</span>
+                <span>{post.readingTime} min read</span>
               </div>
             </div>
           </div>
@@ -163,7 +157,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         <div className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <div className="prose prose-lg dark:prose-invert max-w-none">
+              <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display">
                 {post.content.split("\n").map((paragraph, index) => {
                   const trimmed = paragraph.trim();
                   if (!trimmed) return null;
@@ -299,13 +293,13 @@ export default async function BlogPostPage({ params }: PageProps) {
               </div>
 
               {/* Tags */}
-              <div className="mt-12 pt-8 border-t">
+              <div className="mt-12 pt-8 border-t border-border">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Tag className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground mr-1">Tags</span>
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-muted text-muted-foreground text-sm rounded-full"
+                      className="px-2.5 py-1 border border-border text-xs font-medium text-muted-foreground"
                     >
                       {tag}
                     </span>
@@ -319,11 +313,13 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <section className="py-12 bg-muted/30">
+        <section className="py-12 border-t border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-2xl font-bold mb-8">Related Articles</h2>
-              <div className="grid gap-6 md:grid-cols-3">
+              <div className="border-b-2 border-foreground pb-2 mb-8">
+                <h2 className="text-[11px] font-bold uppercase tracking-editorial">Related Stories</h2>
+              </div>
+              <div className="grid gap-8 md:grid-cols-3">
                 {relatedPosts.map((relatedPost) => (
                   <BlogCard key={relatedPost.slug} post={relatedPost} />
                 ))}
@@ -334,9 +330,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       )}
 
       {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
+      <section className="py-12 border-t border-border">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
             Want to know more about what&apos;s trending?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
@@ -345,13 +341,13 @@ export default async function BlogPostPage({ params }: PageProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+              className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
             >
               Ask Our AI
             </Link>
             <Link
               href="/blog"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-background border rounded-lg font-medium hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border border-border font-semibold text-sm uppercase tracking-editorial hover:bg-muted transition-colors"
             >
               See All Trending Stories
             </Link>
@@ -360,23 +356,19 @@ export default async function BlogPostPage({ params }: PageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-12 bg-muted/50">
+      <footer className="border-t border-border py-10">
         <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/#about" className="hover:text-foreground transition-colors">
-              About
-            </Link>
-            <Link href="/universities" className="hover:text-foreground transition-colors">
-              Universities
-            </Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">
-              Blog
-            </Link>
+          <div className="font-display text-xl font-bold">
+            uni-uk<span className="text-destructive">.ai</span>
           </div>
-          <p className="text-muted-foreground text-sm">
+          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/#about" className="hover:text-foreground transition-colors">About</Link>
+            <Link href="/universities" className="hover:text-foreground transition-colors">Universities</Link>
+            <Link href="/blog" className="hover:text-foreground transition-colors">Stories</Link>
+            <Link href="/crypto" className="hover:text-foreground transition-colors">Crypto</Link>
+          </div>
+          <p className="text-muted-foreground text-xs">
             &copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.
           </p>
         </div>

@@ -2,20 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Clock, Calendar } from "lucide-react";
 import { BlogPost } from "@/data/blog-posts";
-
-interface BlogCardProps {
-  post: BlogPost;
-  featured?: boolean;
-}
 
 function PostImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const [error, setError] = useState(false);
 
   if (!src || !src.startsWith("http") || error) {
     return (
-      <div className={`bg-gradient-to-br from-primary/20 to-violet-600/20 ${className || ""}`} />
+      <div className={`bg-muted ${className || ""}`} />
     );
   }
 
@@ -30,48 +24,32 @@ function PostImage({ src, alt, className }: { src: string; alt: string; classNam
   );
 }
 
-export function BlogCard({ post, featured = false }: BlogCardProps) {
+export function BlogCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-GB", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 
   if (featured) {
     return (
-      <Link
-        href={`/blog/${post.slug}`}
-        className="group block bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all"
-      >
-        <div className="grid md:grid-cols-2 gap-0">
-          <div className="relative h-64 md:h-full min-h-[250px] overflow-hidden">
-            <PostImage
-              src={post.imageUrl}
-              alt={post.title}
-              className="absolute inset-0 w-full h-full"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-violet-600/20 opacity-30" />
+      <Link href={`/blog/${post.slug}`} className="group block border-b border-border pb-8">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="relative aspect-video overflow-hidden">
+            <PostImage src={post.imageUrl} alt={post.title} className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500" />
           </div>
-          <div className="p-6 flex flex-col justify-center">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                {post.category}
-              </span>
-              <span className="text-xs text-muted-foreground">Featured</span>
-            </div>
-            <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+          <div className="flex flex-col justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-editorial text-destructive mb-2">
+              {post.category}
+            </span>
+            <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4 line-clamp-2">
               {post.title}
             </h2>
             <p className="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                <span>{formattedDate}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{post.readingTime} min read</span>
-              </div>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span>{formattedDate}</span>
+              <span>&middot;</span>
+              <span>{post.readingTime} min read</span>
             </div>
           </div>
         </div>
@@ -80,38 +58,21 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
   }
 
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="group block bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all"
-    >
-      <div className="relative h-48 overflow-hidden">
-        <PostImage
-          src={post.imageUrl}
-          alt={post.title}
-          className="absolute inset-0 w-full h-full"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-violet-600/10 opacity-30" />
-        <div className="absolute top-3 left-3">
-          <span className="px-3 py-1 bg-background/90 backdrop-blur-sm text-xs font-medium rounded-full">
-            {post.category}
-          </span>
-        </div>
+    <Link href={`/blog/${post.slug}`} className="group block">
+      <div className="relative aspect-video overflow-hidden mb-3">
+        <PostImage src={post.imageUrl} alt={post.title} className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500" />
       </div>
-      <div className="p-5">
-        <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
-          {post.title}
-        </h3>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{post.excerpt}</p>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{formattedDate}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{post.readingTime} min</span>
-          </div>
-        </div>
+      <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">
+        {post.category}
+      </span>
+      <h3 className="font-display text-lg font-bold mt-1 mb-2 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
+        {post.title}
+      </h3>
+      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{post.excerpt}</p>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span>{formattedDate}</span>
+        <span>&middot;</span>
+        <span>{post.readingTime} min</span>
       </div>
     </Link>
   );
@@ -138,7 +99,7 @@ export function BlogCardList({ posts, showFeatured = true }: BlogCardListProps) 
       {showFeatured && featuredPost && (
         <BlogCard post={featuredPost} featured />
       )}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {(showFeatured ? otherPosts : posts).map((post) => (
           <BlogCard key={post.slug} post={post} />
         ))}
