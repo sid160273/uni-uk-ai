@@ -2,6 +2,7 @@ import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BlogCard } from "@/components/BlogCard";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -370,6 +371,9 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </div>
 
                 <AdPlaceholder id="502" format="rectangle" />
+
+                {/* Newsletter Signup */}
+                <NewsletterSignup />
 
                 {/* Ask AI CTA */}
                 <div className="border border-border p-5 text-center">

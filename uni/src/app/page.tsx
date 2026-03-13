@@ -3,6 +3,7 @@ import { MainNavigation } from "@/components/MainNavigation";
 import { TrendingTicker } from "@/components/TrendingTicker";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
 import { TrendChart } from "@/components/TrendChart";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
 import Link from "next/link";
@@ -295,6 +296,9 @@ export default async function Home() {
                   ))}
                 </div>
               </div>
+
+              {/* Newsletter Signup */}
+              <NewsletterSignup />
             </div>
           </div>
         </div>

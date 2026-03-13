@@ -2,6 +2,7 @@ import { getAllBlogPostsCombined, getAllCategoriesCombined } from "@/lib/blog-da
 import { BlogCardList } from "@/components/BlogCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BreadcrumbSchema } from "@/components/StructuredData";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -82,6 +83,19 @@ export default async function BlogIndexPage() {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <BlogCardList posts={posts} showFeatured={true} />
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-12 border-t border-border">
+        <div className="container mx-auto px-4 max-w-xl">
+          <div className="text-center mb-6">
+            <h2 className="font-display text-2xl md:text-3xl font-black mb-2">Daily Digest</h2>
+            <p className="font-body-serif text-muted-foreground">
+              The top trending stories, delivered to your inbox every morning.
+            </p>
+          </div>
+          <NewsletterSignup variant="inline" />
         </div>
       </section>
 
