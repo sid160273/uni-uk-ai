@@ -451,40 +451,11 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
             )}
 
             <AdPlaceholder id="402" format="horizontal" />
-
-            {recentPosts.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between border-b-2 border-foreground pb-2 mb-4">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Crypto News</h2>
-                  <Link href="/crypto/news" className="text-[10px] font-bold uppercase tracking-editorial hover:underline">See all</Link>
-                </div>
-                <div className="divide-y divide-border">
-                  {recentPosts.map((post) => (
-                    <Link
-                      key={post.slug}
-                      href={`/crypto/news#${post.slug}`}
-                      className="group flex gap-4 py-3 first:pt-0"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {post.coins.slice(0, 3).map((coin) => (
-                            <span key={coin} className="text-[10px] font-bold uppercase tracking-editorial text-destructive">{coin}</span>
-                          ))}
-                        </div>
-                        <h3 className="font-semibold text-sm group-hover:underline decoration-1 underline-offset-2 line-clamp-2">{post.title}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{post.excerpt}</p>
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-editorial mt-1 inline-block">{post.readingTime} min read</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* RIGHT: Desktop chat + extras */}
           <div className="hidden lg:block lg:col-span-5">
-            <div className="lg:sticky lg:top-20 space-y-6">
+            <div className="space-y-6">
               {chatPanel}
 
               <AdPlaceholder id="403" format="rectangle" />
@@ -533,6 +504,35 @@ export function CryptoDashboardClient({ coins, trendingCoins, recentPosts }: Cry
                   Trending News
                 </Link>
               </div>
+
+              {recentPosts.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between border-b-2 border-foreground pb-2 mb-4">
+                    <h2 className="text-[11px] font-bold uppercase tracking-editorial">Crypto News</h2>
+                    <Link href="/crypto/news" className="text-[10px] font-bold uppercase tracking-editorial hover:underline">See all</Link>
+                  </div>
+                  <div className="divide-y divide-border">
+                    {recentPosts.map((post) => (
+                      <Link
+                        key={post.slug}
+                        href={`/crypto/news#${post.slug}`}
+                        className="group flex gap-4 py-3 first:pt-0"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            {post.coins.slice(0, 3).map((coin) => (
+                              <span key={coin} className="text-[10px] font-bold uppercase tracking-editorial text-destructive">{coin}</span>
+                            ))}
+                          </div>
+                          <h3 className="font-semibold text-sm group-hover:underline decoration-1 underline-offset-2 line-clamp-2">{post.title}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{post.excerpt}</p>
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-editorial mt-1 inline-block">{post.readingTime} min read</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
