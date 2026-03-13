@@ -54,10 +54,25 @@ const EVENT_LABELS: Record<string, string> = {
   surge: "SURGE",
 };
 
-function generateTrendData(stories: TrendStory[]) {
+// Simple hash to create a stable but unique seed from a string
+function hashSeed(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function generateTrendData(stories: TrendStory[], tick: number) {
   const now = new Date();
+  // Use the current hour as part of the seed so data shifts hourly
+  const hourSeed = now.getHours() + now.getDate() * 24;
   const points = 48; // 48 points = 24 hours at 30-min intervals
   const data = [];
+
+  // Current position in the day (0-1) so the "now" line moves
+  const dayProgress = (now.getHours() * 60 + now.getMinutes()) / (24 * 60);
 
   for (let i = 0; i < points; i++) {
     const time = new Date(now.getTime() - (points - 1 - i) * 30 * 60 * 1000);
@@ -70,34 +85,48 @@ function generateTrendData(stories: TrendStory[]) {
     const point: Record<string, any> = { time: label, _index: i };
 
     stories.forEach((story, rank) => {
+      const seed = hashSeed(story.slug) + hourSeed;
       const t = i / (points - 1);
-      const peakPosition = rank === 0 ? 0.9 : 0.4 + rank * 0.08;
-      const spread = 0.15 + rank * 0.03;
+
+      // Each story gets a unique peak position and shape based on its hash
+      const peakOffset = ((seed % 40) - 20) / 100; // -0.2 to +0.2
+      const peakPosition = rank === 0
+        ? Math.min(0.95, 0.7 + dayProgress * 0.25)
+        : 0.35 + rank * 0.07 + peakOffset;
+      const spread = 0.12 + (seed % 15) / 100 + rank * 0.02;
 
       const gaussian = Math.exp(
         -Math.pow(t - peakPosition, 2) / (2 * spread * spread)
       );
 
       const baseInterest = Math.max(10, 95 - rank * 14);
+
+      // Time-varying noise that shifts with the minute to create movement
+      const noiseSeed = seed + tick;
       const noise =
-        Math.sin(i * (rank + 1) * 1.7) * 4 +
-        Math.cos(i * (rank + 2) * 0.9) * 3 +
-        Math.sin(i * 0.3 + rank) * 2;
+        Math.sin(i * (rank + 1) * 1.7 + noiseSeed * 0.1) * 4 +
+        Math.cos(i * (rank + 2) * 0.9 + noiseSeed * 0.07) * 3 +
+        Math.sin(i * 0.3 + rank + noiseSeed * 0.05) * 2;
 
       let value;
       if (rank === 0) {
-        // #1: Strong climb with dramatic spike near the end
-        const spike = t > 0.75 ? Math.pow((t - 0.75) / 0.25, 2) * 25 : 0;
+        // #1: Strong climb with dramatic spike near current time
+        const distFromNow = Math.abs(t - dayProgress);
+        const spike = distFromNow < 0.15 ? (1 - distFromNow / 0.15) * 25 : 0;
         value = 25 + (baseInterest - 25) * (0.2 + 0.8 * Math.pow(t, 0.6)) + spike + noise;
       } else if (rank === 1) {
         // #2: Had a breakout moment, sustaining high
-        const breakout = t > 0.3 && t < 0.5 ? Math.sin((t - 0.3) / 0.2 * Math.PI) * 20 : 0;
+        const breakoutCenter = 0.3 + (seed % 20) / 100;
+        const breakout = t > breakoutCenter && t < breakoutCenter + 0.2
+          ? Math.sin((t - breakoutCenter) / 0.2 * Math.PI) * 20
+          : 0;
         value = baseInterest * (0.35 + 0.65 * gaussian) + breakout + noise;
       } else if (rank <= 3) {
         value = baseInterest * (0.3 + 0.7 * gaussian) + noise;
       } else {
-        // Lower ranked: more volatile
-        const volatility = Math.sin(i * 0.8 + rank * 2) * 8;
+        // Lower ranked: more volatile, different patterns per story
+        const volatility = Math.sin(i * 0.8 + seed * 0.3) * 8 +
+          Math.cos(i * 0.5 + seed * 0.2) * 5;
         value = baseInterest * (0.25 + 0.75 * gaussian) + noise + volatility;
       }
 
@@ -439,17 +468,28 @@ export function TrendChart({ stories }: TrendChartProps) {
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<TimelineEvent | null>(null);
   const [isAnimated, setIsAnimated] = useState(false);
+  const [tick, setTick] = useState(() => Math.floor(Date.now() / 60000));
+
+  // Auto-refresh data every 60 seconds for live feel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(Math.floor(Date.now() / 60000));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const slugKey = displayStories.map((s) => s.slug).join(",");
 
   const data = useMemo(
-    () => generateTrendData(displayStories),
+    () => generateTrendData(displayStories, tick),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [displayStories.map((s) => s.slug).join(",")]
+    [slugKey, tick]
   );
 
   const events = useMemo(
     () => detectEvents(data, displayStories),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, displayStories.map((s) => s.slug).join(",")]
+    [data, slugKey]
   );
 
   // Trigger entrance animation
