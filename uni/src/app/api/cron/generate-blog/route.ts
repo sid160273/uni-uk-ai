@@ -70,15 +70,21 @@ export async function GET(request: NextRequest) {
     const newTopics = [];
     for (const topic of trendingTopics) {
       const topicLower = topic.title.toLowerCase();
-      const topicWords = topicLower.split(/\s+/).filter(w => w.length > 3);
+      // Keep words with 2+ characters to catch short but meaningful terms like "UFC", "NBA", "EV"
+      const topicWords = topicLower.split(/\s+/).filter(w => w.length > 1);
 
       // Check if any existing post title contains the main keywords of this topic
       const alreadyCovered = existingPosts.some(post => {
         const postTitle = post.title.toLowerCase();
         const postSlug = post.slug.toLowerCase();
+        const combined = `${postTitle} ${postSlug}`;
+
         // Match if most keywords from the trending topic appear in an existing post
-        const matchCount = topicWords.filter(word => postTitle.includes(word) || postSlug.includes(word)).length;
-        return matchCount >= Math.max(1, topicWords.length * 0.6);
+        const matchCount = topicWords.filter(word => combined.includes(word)).length;
+        const threshold = topicWords.length <= 2
+          ? topicWords.length  // Short topics: ALL words must match
+          : Math.ceil(topicWords.length * 0.5); // Longer topics: 50% match
+        return matchCount >= threshold;
       });
 
       if (!alreadyCovered) {
