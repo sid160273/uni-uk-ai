@@ -370,21 +370,62 @@ function EventTimeline({
   );
 }
 
+/**
+ * Finds the best matching blog post for a live trend topic.
+ * Matches by checking if the trend's keywords appear in blog post titles.
+ */
+function findMatchingStory(
+  trendTitle: string,
+  stories: TrendStory[]
+): TrendStory | null {
+  const trendWords = trendTitle
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 1);
+
+  if (trendWords.length === 0) return null;
+
+  let bestMatch: TrendStory | null = null;
+  let bestScore = 0;
+
+  for (const story of stories) {
+    const storyTitle = story.title.toLowerCase();
+    const matchCount = trendWords.filter((word) =>
+      storyTitle.includes(word)
+    ).length;
+    const score = matchCount / trendWords.length;
+
+    // Require at least 50% of words to match (all for short topics)
+    const threshold = trendWords.length <= 2 ? 1 : 0.5;
+    if (score >= threshold && matchCount > bestScore) {
+      bestScore = matchCount;
+      bestMatch = story;
+    }
+  }
+
+  return bestMatch;
+}
+
 function StorySpotlight({
   topic,
   color,
   currentValue,
   changePercent,
   onClose,
-  isLiveTrend,
+  matchedStory,
 }: {
   topic: { title: string; slug: string };
   color: string;
   currentValue: number;
   changePercent: number;
   onClose: () => void;
-  isLiveTrend: boolean;
+  matchedStory: TrendStory | null;
 }) {
+  // Link destination: matched blog post or AI chat with topic
+  const linkHref = matchedStory
+    ? `/blog/${matchedStory.slug}`
+    : `/#search`;
+
   return (
     <div className="border border-border p-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="flex items-start justify-between gap-4">
@@ -394,24 +435,16 @@ function StorySpotlight({
               className="w-3 h-3 shrink-0"
               style={{ backgroundColor: color }}
             />
-            {isLiveTrend && (
-              <span className="text-[10px] font-bold uppercase tracking-editorial text-destructive">
-                Live Trend
-              </span>
-            )}
-          </div>
-          {isLiveTrend ? (
-            <span className="font-display text-base font-bold line-clamp-2 block">
-              {topic.title}
+            <span className="text-[10px] font-bold uppercase tracking-editorial text-destructive">
+              {matchedStory ? matchedStory.category : "Live Trend"}
             </span>
-          ) : (
-            <Link
-              href={`/blog/${topic.slug}`}
-              className="font-display text-base font-bold hover:underline decoration-1 underline-offset-2 line-clamp-2 block"
-            >
-              {topic.title}
-            </Link>
-          )}
+          </div>
+          <Link
+            href={linkHref}
+            className="font-display text-base font-bold hover:underline decoration-1 underline-offset-2 line-clamp-2 block"
+          >
+            {matchedStory ? matchedStory.title : topic.title}
+          </Link>
         </div>
         <div className="text-right shrink-0">
           <div
@@ -434,15 +467,13 @@ function StorySpotlight({
         </div>
       </div>
       <div className="mt-3 flex items-center gap-3">
-        {!isLiveTrend && (
-          <Link
-            href={`/blog/${topic.slug}`}
-            className="text-[10px] font-bold uppercase tracking-editorial hover:underline"
-            style={{ color }}
-          >
-            Read full story
-          </Link>
-        )}
+        <Link
+          href={linkHref}
+          className="text-[10px] font-bold uppercase tracking-editorial hover:underline"
+          style={{ color }}
+        >
+          {matchedStory ? "Read full story" : "Ask AI about this"}
+        </Link>
         <button
           onClick={onClose}
           className="text-[10px] text-muted-foreground hover:text-foreground uppercase tracking-editorial"
@@ -853,7 +884,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
             currentValue={selectedCurrentValue}
             changePercent={changePercent}
             onClose={() => setSelectedStory(null)}
-            isLiveTrend={liveTopics.length > 0}
+            matchedStory={findMatchingStory(selectedTopicData.title, stories)}
           />
         </div>
       )}
