@@ -71,11 +71,48 @@ export async function GET(request: NextRequest) {
       .map(k => `${pctEnc(k)}="${pctEnc(oauthParams[k])}"`)
       .join(', ');
 
-  // Make the actual request
-  let rawBody = '';
-  let statusCode = 0;
-  let responseHeaders: Record<string, string> = {};
+  // --- Test 1: Try GET /2/users/me first (simpler, just validates credentials) ---
+  const meUrl = 'https://api.twitter.com/2/users/me';
+  const meOauthParams: Record<string, string> = {
+    oauth_consumer_key: consumerKey,
+    oauth_nonce: crypto.randomBytes(16).toString('hex'),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: Math.floor(Date.now() / 1000).toString(),
+    oauth_token: accessToken,
+    oauth_version: '1.0',
+  };
 
+  const meSortedParams = Object.keys(meOauthParams)
+    .sort()
+    .map(k => `${pctEnc(k)}=${pctEnc(meOauthParams[k])}`)
+    .join('&');
+  const meBaseString = ['GET', pctEnc(meUrl), pctEnc(meSortedParams)].join('&');
+  const meSignature = crypto.createHmac('sha1', signingKey).update(meBaseString).digest('base64');
+  meOauthParams['oauth_signature'] = meSignature;
+
+  const meAuthHeader =
+    'OAuth ' +
+    Object.keys(meOauthParams)
+      .sort()
+      .map(k => `${pctEnc(k)}="${pctEnc(meOauthParams[k])}"`)
+      .join(', ');
+
+  let meStatus = 0;
+  let meBody = '';
+  try {
+    const meRes = await fetch(meUrl, {
+      method: 'GET',
+      headers: { Authorization: meAuthHeader },
+    });
+    meStatus = meRes.status;
+    meBody = await meRes.text();
+  } catch (err: any) {
+    meBody = `Fetch error: ${err.message}`;
+  }
+
+  // --- Test 2: Try POST /2/tweets ---
+  let tweetStatus = 0;
+  let tweetBody = '';
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -85,25 +122,21 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({ text: tweetText }),
     });
-
-    statusCode = res.status;
-    res.headers.forEach((v, k) => { responseHeaders[k] = v; });
-    rawBody = await res.text();
+    tweetStatus = res.status;
+    tweetBody = await res.text();
   } catch (err: any) {
-    rawBody = `Fetch error: ${err.message}`;
+    tweetBody = `Fetch error: ${err.message}`;
   }
 
   return NextResponse.json({
     envCheck,
-    oauthDebug: {
-      timestamp: oauthParams['oauth_timestamp'],
-      nonce: oauthParams['oauth_nonce'],
-      baseStringPreview: baseString.slice(0, 200) + '...',
+    test1_users_me: {
+      status: meStatus,
+      body: meBody,
     },
-    twitterResponse: {
-      status: statusCode,
-      body: rawBody,
-      headers: responseHeaders,
+    test2_post_tweet: {
+      status: tweetStatus,
+      body: tweetBody,
     },
   });
 }
