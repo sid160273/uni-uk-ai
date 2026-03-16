@@ -12,34 +12,46 @@ const STOP_WORDS = new Set([
   'explained', 'happening', 'everyone', 'talking', 'here', 'heres',
   'whats', 'going', 'on', 'all', 'we', 'in', 'of', 'at', 'by', 'from',
   'up', 'out', 'into', 'over', 'just', 'more', 'than', 'been', 'being',
+  'story', 'update', 'breaking', 'game', 'match', 'between',
 ]);
 
 /**
- * Extract significant keywords from a blog post title.
- * Strips common SEO filler words to get the core topic.
+ * Extract significant keywords from text (title + slug combined).
+ * Strips SEO filler and stop words to get the core topic.
  */
-function extractCoreKeywords(title: string): string[] {
-  return title
+function extractCoreKeywords(text: string): string[] {
+  return text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .split(/\s+/)
-    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
 }
 
 /**
- * Measures topic similarity between two post titles.
- * Returns a value between 0 (no overlap) and 1 (identical topics).
+ * Measures topic similarity between two posts.
+ * Combines title + slug for comparison to catch cases where titles differ
+ * but slugs reveal the same underlying topic.
  */
-function titleSimilarity(titleA: string, titleB: string): number {
-  const wordsA = extractCoreKeywords(titleA);
-  const wordsB = extractCoreKeywords(titleB);
+function postSimilarity(
+  titleA: string,
+  slugA: string,
+  titleB: string,
+  slugB: string
+): number {
+  // Combine title + slug for richer keyword extraction
+  const textA = `${titleA} ${slugA.replace(/-/g, ' ')}`;
+  const textB = `${titleB} ${slugB.replace(/-/g, ' ')}`;
+
+  const wordsA = extractCoreKeywords(textA);
+  const wordsB = extractCoreKeywords(textB);
 
   if (wordsA.length === 0 || wordsB.length === 0) return 0;
 
   const setA = new Set(wordsA);
   const setB = new Set(wordsB);
 
-  const overlap = wordsA.filter((w) => setB.has(w)).length;
+  // Count unique overlapping keywords
+  const overlap = [...setA].filter((w) => setB.has(w)).length;
   const minLen = Math.min(setA.size, setB.size);
 
   return overlap / minLen;
@@ -48,15 +60,15 @@ function titleSimilarity(titleA: string, titleB: string): number {
 /**
  * Deduplicates blog posts for display.
  * Groups posts by topic similarity and keeps only the most recent
- * from each group.
+ * from each group. Uses both title and slug for matching.
  *
  * @param posts - Already sorted by date (newest first)
- * @param threshold - Similarity threshold (0.6 = 60% keyword overlap)
+ * @param threshold - Similarity threshold (0.5 = 50% keyword overlap)
  * @returns Deduplicated posts, maintaining sort order
  */
 export function deduplicatePosts<
   T extends { title: string; publishedAt: string; slug: string }
->(posts: T[], threshold: number = 0.6): T[] {
+>(posts: T[], threshold: number = 0.5): T[] {
   const kept: T[] = [];
   const seenSlugs = new Set<string>();
 
@@ -66,7 +78,9 @@ export function deduplicatePosts<
 
     // Check if this post's topic is too similar to one we've already kept
     const isDuplicate = kept.some(
-      (existing) => titleSimilarity(existing.title, post.title) >= threshold
+      (existing) =>
+        postSimilarity(existing.title, existing.slug, post.title, post.slug) >=
+        threshold
     );
 
     if (!isDuplicate) {
