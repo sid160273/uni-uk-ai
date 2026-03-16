@@ -7,6 +7,7 @@ interface TrendItem {
   region: string;
   regionLabel: string;
   relatedHeadlines: string[];
+  pubDate: string;
 }
 
 // Supported countries
@@ -44,6 +45,7 @@ function parseTrendsRSS(xmlText: string, region: string, regionLabel: string): T
     const titleMatch = itemXml.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/);
     const trafficMatch = itemXml.match(/<ht:approx_traffic>(.*?)<\/ht:approx_traffic>/);
     const pictureMatch = itemXml.match(/<ht:picture>(.*?)<\/ht:picture>/);
+    const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/);
 
     // Extract related headlines
     const newsItemRegex = /<ht:news_item_title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/ht:news_item_title>/g;
@@ -61,6 +63,7 @@ function parseTrendsRSS(xmlText: string, region: string, regionLabel: string): T
         region,
         regionLabel,
         relatedHeadlines: headlines,
+        pubDate: pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString(),
       });
     }
   }
@@ -91,7 +94,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; uni-uk.ai/1.0)',
       },
-      next: { revalidate: 300 }, // Cache for 5 minutes
+      next: { revalidate: 120 }, // Cache for 2 minutes
     });
 
     if (!response.ok) {
@@ -111,7 +114,7 @@ export async function GET(request: NextRequest) {
       fetchedAt: new Date().toISOString(),
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
       },
     });
   } catch (error: any) {

@@ -106,15 +106,20 @@ function selectImage(category: string): string {
 }
 
 /**
- * Generates a trending story using OpenAI
+ * Generates a trending story using OpenAI.
+ * When quickTake is true, generates a shorter ~300-word article
+ * for maximum speed on fast-breaking topics.
  */
 export async function generateBlogPost(
   newsItem: NewsItem,
-  openaiClient: OpenAI
+  openaiClient: OpenAI,
+  quickTake: boolean = false
 ): Promise<GeneratedBlogPost | null> {
   const relatedContext = newsItem.newsItems
     ? newsItem.newsItems.map(n => `- ${n.title} (${n.source})`).join('\n')
     : '';
+
+  const wordTarget = quickTake ? '250-350 words' : '600-1000 words';
 
   const systemPrompt = `You are a world-class journalist writing for uni-uk.ai, a fast-moving news platform that helps people understand what's trending RIGHT NOW.
 
@@ -126,7 +131,7 @@ BRAND VOICE:
 
 WRITING GUIDELINES:
 - Write in British English
-- Target 600-1000 words — punchy, not padded
+- Target ${wordTarget} — punchy, not padded${quickTake ? '\n- This is a QUICK TAKE — speed matters. Focus on the key facts, skip the deep background. Hit: What happened, Why it matters, What\'s next.' : ''}
 - Use an engaging, journalistic tone — hook them in the first line
 - The trending keyword MUST appear naturally in the very first sentence
 - Structure with clear H2 (##) and H3 (###) headings
@@ -213,7 +218,7 @@ Remember: Output ONLY the JSON object, no other text.`;
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.7,
-      max_tokens: 2500,
+      max_tokens: quickTake ? 1200 : 2500,
     });
 
     const responseText = completion.choices[0]?.message?.content;

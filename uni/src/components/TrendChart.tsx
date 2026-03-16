@@ -44,6 +44,7 @@ interface TrendTopic {
   region: string;
   regionLabel: string;
   relatedHeadlines: string[];
+  pubDate?: string;
 }
 
 interface TrendStory {
@@ -601,13 +602,31 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
     };
   }, [selectedGeo]);
 
-  // Auto-refresh every 60 seconds
+  // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setTick(Math.floor(Date.now() / 60000));
-    }, 60000);
+      setTick(Math.floor(Date.now() / 30000));
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Velocity badge based on pubDate
+  function getVelocity(pubDate?: string): {
+    label: string;
+    color: string;
+    arrow: string;
+  } | null {
+    if (!pubDate) return null;
+    const ageHours =
+      (Date.now() - new Date(pubDate).getTime()) / (1000 * 60 * 60);
+    if (ageHours < 1)
+      return { label: "NEW", color: "#dc2626", arrow: "\u2B06" }; // ⬆
+    if (ageHours < 4)
+      return { label: "RISING", color: "#ea580c", arrow: "\u2197" }; // ↗
+    if (ageHours < 12)
+      return { label: "", color: "", arrow: "\u2192" }; // →
+    return null;
+  }
 
   // Build display items — live trends first, fall back to stories
   const displayTopics = useMemo(() => {
@@ -616,12 +635,14 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
         title: t.title,
         slug: generateSlug(t.title),
         trafficVolume: t.trafficVolume,
+        pubDate: t.pubDate,
       }));
     }
     return stories.slice(0, 5).map((s) => ({
       title: s.title,
       slug: s.slug,
       trafficVolume: undefined as string | undefined,
+      pubDate: undefined as string | undefined,
     }));
   }, [liveTopics, stories]);
 
@@ -732,6 +753,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
             const isActive = activeLines.has(topic.slug);
             const isHovered = hoveredStory === topic.slug;
             const currentVal = data[data.length - 1]?.[topic.slug] || 0;
+            const velocity = getVelocity(topic.pubDate);
 
             return (
               <button
@@ -760,11 +782,22 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
                   className="w-2 h-2 shrink-0"
                   style={{ backgroundColor: isActive ? color : "#ccc" }}
                 />
+                {velocity?.label && (
+                  <span
+                    className="text-[8px] font-bold px-1 py-px text-white shrink-0"
+                    style={{ backgroundColor: velocity.color }}
+                  >
+                    {velocity.label}
+                  </span>
+                )}
                 <span className="line-clamp-1 max-w-[100px] md:max-w-[140px]">
                   {topic.title.length > 20
                     ? topic.title.slice(0, 18) + "..."
                     : topic.title}
                 </span>
+                {velocity?.arrow && (
+                  <span className="text-[10px] shrink-0">{velocity.arrow}</span>
+                )}
                 <span
                   className="font-bold tabular-nums"
                   style={{ color: isActive ? color : "#999" }}
@@ -892,7 +925,7 @@ export function TrendChart({ stories, defaultGeo }: TrendChartProps) {
       {/* Footer */}
       <div className="flex items-center justify-between px-4 md:px-6 py-3 border-t border-border">
         <p className="text-[10px] text-muted-foreground uppercase tracking-editorial">
-          Live Google Trends — Click topics to highlight
+          Live Trends — Refreshes every 30s
         </p>
         <Link
           href="/blog"

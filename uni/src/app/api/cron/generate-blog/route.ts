@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { google } from 'googleapis';
 import { Resend } from 'resend';
-import { fetchMultiRegionNews } from '@/lib/news-sources';
 import {
   generateBlogPost,
   validateBlogPost,
@@ -12,6 +11,7 @@ import { slugExists, getAllBlogPostsCombined } from '@/lib/blog-data';
 import { notifyNewBlogPost } from '@/lib/google-indexing';
 import { postTweet } from '@/lib/twitter';
 import { formatStoryTweet } from '@/lib/tweet-formatter';
+import { fetchAggregatedTrends, ScoredTrend } from '@/lib/trend-aggregator';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
@@ -47,9 +47,9 @@ export async function GET(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Step 1: Fetch trending topics from Google Trends (multiple countries)
-    console.log('Fetching trending topics from Google Trends (multi-region)...');
-    const trendingTopics = await fetchMultiRegionNews();
+    // Step 1: Fetch trending topics from all sources (Google Trends + Reddit)
+    console.log('Fetching trending topics from aggregated sources...');
+    const trendingTopics = await fetchAggregatedTrends();
 
     if (trendingTopics.length === 0) {
       return NextResponse.json({
@@ -59,7 +59,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`Found ${trendingTopics.length} trending topics`);
+    const crossValidated = trendingTopics.filter(t => t.sourceCount > 1).length;
+    console.log(`Found ${trendingTopics.length} trending topics (${crossValidated} cross-validated)`);
 
     // Step 2: Filter out topics we already have stories for
     // Check by matching the trending topic keyword against existing story titles/slugs
@@ -126,10 +127,18 @@ export async function GET(request: NextRequest) {
 
     console.log(`${newTopics.length} new topics to generate stories for`);
 
-    // Step 3: Generate stories for new topics (max 5 per cycle — Vercel Pro 60s timeout is plenty for parallel OpenAI calls)
-    const topicsToProcess = newTopics.slice(0, 5);
+    // Step 3: Generate stories for new topics (max 7 per cycle)
+    // Use quick-take mode for breaking/rising topics (speed > depth)
+    const topicsToProcess = newTopics.slice(0, 7);
     const results = await Promise.allSettled(
-      topicsToProcess.map(topic => generateBlogPost(topic, openai))
+      topicsToProcess.map(topic => {
+        const scored = topic as ScoredTrend;
+        const useQuickTake = scored.velocity === 'breaking' || scored.velocity === 'rising';
+        if (useQuickTake) {
+          console.log(`[Quick Take] "${topic.title}" — velocity: ${scored.velocity}, sources: ${scored.sources?.join(', ') || 'unknown'}`);
+        }
+        return generateBlogPost(topic, openai, useQuickTake);
+      })
     );
 
     const generatedStories: GeneratedBlogPost[] = [];
