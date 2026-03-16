@@ -9,6 +9,7 @@ import {
   GeneratedBlogPost,
 } from '@/lib/blog-generator';
 import { slugExists, getAllBlogPostsCombined } from '@/lib/blog-data';
+import { notifyNewBlogPost } from '@/lib/google-indexing';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
@@ -67,30 +68,48 @@ export async function GET(request: NextRequest) {
       console.error('Error fetching existing posts:', error);
     }
 
+    // Only deduplicate against posts from the last 48 hours — a topic can re-trend and deserve a new story
+    const DEDUP_WINDOW_MS = 48 * 60 * 60 * 1000; // 48 hours
+    const now = Date.now();
+    const recentPosts = existingPosts.filter(post => {
+      const postTime = new Date(post.publishedAt).getTime();
+      return now - postTime < DEDUP_WINDOW_MS;
+    });
+
+    console.log(`Dedup window: checking against ${recentPosts.length} posts from last 48h (of ${existingPosts.length} total)`);
+
     const newTopics = [];
     for (const topic of trendingTopics) {
       const topicLower = topic.title.toLowerCase();
       // Keep words with 2+ characters to catch short but meaningful terms like "UFC", "NBA", "EV"
       const topicWords = topicLower.split(/\s+/).filter(w => w.length > 1);
 
-      // Check if any existing post title contains the main keywords of this topic
-      const alreadyCovered = existingPosts.some(post => {
+      // Check if any RECENT post title contains the main keywords of this topic
+      const alreadyCovered = recentPosts.some(post => {
         const postTitle = post.title.toLowerCase();
         const postSlug = post.slug.toLowerCase();
         const combined = `${postTitle} ${postSlug}`;
 
-        // Match if most keywords from the trending topic appear in an existing post
         const matchCount = topicWords.filter(word => combined.includes(word)).length;
-        const threshold = topicWords.length <= 2
-          ? topicWords.length  // Short topics: ALL words must match
-          : Math.ceil(topicWords.length * 0.5); // Longer topics: 50% match
-        return matchCount >= threshold;
+
+        if (topicWords.length <= 2) {
+          // Short topics: ALL words must match AND title lengths must be similar (within 2x)
+          // Prevents "Trump" matching "Trump Trade War Analysis"
+          const topicLen = topicWords.join(' ').length;
+          const postTitleLen = postTitle.length;
+          const lengthRatio = Math.max(topicLen, postTitleLen) / Math.max(1, Math.min(topicLen, postTitleLen));
+          return matchCount >= topicWords.length && lengthRatio <= 2;
+        } else {
+          // Longer topics: 70% of words must match (raised from 50%)
+          const threshold = Math.ceil(topicWords.length * 0.7);
+          return matchCount >= threshold;
+        }
       });
 
       if (!alreadyCovered) {
         newTopics.push(topic);
       } else {
-        console.log(`Skipping "${topic.title}" — already covered`);
+        console.log(`Skipping "${topic.title}" — already covered in last 48h`);
       }
     }
 
@@ -105,8 +124,8 @@ export async function GET(request: NextRequest) {
 
     console.log(`${newTopics.length} new topics to generate stories for`);
 
-    // Step 3: Generate stories for new topics (max 3 per cycle to stay within timeout)
-    const topicsToProcess = newTopics.slice(0, 3);
+    // Step 3: Generate stories for new topics (max 5 per cycle — Vercel Pro 60s timeout is plenty for parallel OpenAI calls)
+    const topicsToProcess = newTopics.slice(0, 5);
     const results = await Promise.allSettled(
       topicsToProcess.map(topic => generateBlogPost(topic, openai))
     );
@@ -141,6 +160,16 @@ export async function GET(request: NextRequest) {
       if (saved) {
         savedCount++;
         console.log(`Saved story: "${story.title}"`);
+
+        // Ping Google Indexing API so the new post gets indexed quickly
+        try {
+          const indexingResults = await notifyNewBlogPost(story.slug);
+          const successCount = indexingResults.filter(r => r.success).length;
+          console.log(`[Indexing] Submitted ${successCount}/${indexingResults.length} URLs for "${story.slug}"`);
+        } catch (indexError: any) {
+          // Never let indexing failures break the cron
+          console.error(`[Indexing] Failed for "${story.slug}":`, indexError.message);
+        }
       }
     }
 

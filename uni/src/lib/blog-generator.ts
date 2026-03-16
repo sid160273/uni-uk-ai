@@ -128,15 +128,30 @@ WRITING GUIDELINES:
 - Write in British English
 - Target 600-1000 words — punchy, not padded
 - Use an engaging, journalistic tone — hook them in the first line
+- The trending keyword MUST appear naturally in the very first sentence
 - Structure with clear H2 (##) and H3 (###) headings
-- Include "Why This Matters" and "What's Next" sections
+- Use QUESTION-BASED H2 headings that target "People Also Ask" snippets. Examples:
+  - "What happened with [topic]?"
+  - "Why is [topic] trending right now?"
+  - "Why does this matter?"
+  - "What are people saying about [topic]?"
+  - "What happens next?"
+- Include a "Why This Matters" and "What's Next" section (these can use the question format above)
 - Cite facts and context where relevant
 
-SEO REQUIREMENTS:
-- Title must be click-worthy and include the trending keyword naturally
+SEO REQUIREMENTS — LONG-TAIL TITLES (CRITICAL):
+- NEVER use just the topic name as the title. "Fernando Alonso" is WRONG. We cannot rank for head terms.
+- Title MUST be in a long-tail question or explainer format (50-80 characters ideal)
+- Rotate between these title patterns — do NOT always use the same one:
+  1. "Why Is [X] Trending Today? Latest News Explained"
+  2. "[X] Explained: What You Need to Know"
+  3. "What Happened With [X]? Here's What We Know"
+  4. "[X]: Why Everyone Is Talking About It Right Now"
+  5. "The [X] Story: What's Going On and Why It Matters"
+- The title must contain the trending keyword AND a long-tail qualifier (why, what, explained, latest, etc.)
 - Include the trending term 3-5 times throughout the article
-- Use related keywords and phrases in headings
-- Write a compelling meta excerpt that drives clicks
+- Use related long-tail keywords and question phrases in H2 headings
+- Write the meta excerpt as a DIRECT ANSWER to the question implied by the title — Google pulls direct answers for featured snippets. Start the excerpt with the key fact, not a vague teaser.
 
 LINK REQUIREMENTS (CRITICAL — you MUST use proper markdown link syntax for EVERY link):
 1. HOMEPAGE CHAT LINK - Include ONE link to our AI assistant:
@@ -157,9 +172,9 @@ LINK REQUIREMENTS (CRITICAL — you MUST use proper markdown link syntax for EVE
 OUTPUT FORMAT:
 You must respond with ONLY a valid JSON object (no markdown code blocks, no explanation):
 {
-  "title": "Engaging, SEO-optimised title (50-70 characters ideal)",
-  "excerpt": "Compelling summary that makes people click (120-160 characters)",
-  "content": "Full markdown content with all links included",
+  "title": "Long-tail SEO title in question/explainer format (50-80 characters)",
+  "excerpt": "Direct answer to the title's question — lead with the key fact (120-160 characters)",
+  "content": "Full markdown content with question-based H2 headings and all links included",
   "category": "One of: Sports, Politics, Entertainment, Technology, Business, Science, Health, World, Culture, Breaking",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }`;
@@ -173,12 +188,20 @@ RELATED HEADLINES:
 ${relatedContext || newsItem.description}
 
 Requirements:
-1. Open with a strong hook — why is everyone searching for this RIGHT NOW?
-2. Provide essential context and background
-3. Include a "Why This Matters" section explaining the wider significance
-4. Include a "What's Next" section with what to watch for
-5. Make it the definitive quick-read on this trending topic
-6. Optimise for search traffic — people are actively looking for this
+1. TITLE FORMAT (CRITICAL): The title MUST be a long-tail question or explainer — NEVER just the topic name.
+   BAD: "Fernando Alonso" or "iPhone 16"
+   GOOD: "Why Is Fernando Alonso Trending? Latest F1 News Explained"
+   GOOD: "iPhone 16 Explained: What's New and Should You Upgrade?"
+   Pick a varied format — rotate between "Why Is...", "[X] Explained:...", "What Happened With...?", etc.
+2. Open with a strong hook that includes the trending keyword in the FIRST sentence
+3. Use 2-3 QUESTION-BASED H2 subheadings that people would actually type into Google:
+   e.g. "## Why is [topic] trending today?", "## What does this mean for...?", "## What happens next?"
+4. Provide essential context and background
+5. Include a "Why does this matter?" section explaining the wider significance
+6. Include a "What happens next?" section with what to watch for
+7. Write the excerpt as a DIRECT ANSWER to the title's question — start with the key fact
+8. Make it the definitive quick-read on this trending topic
+9. Optimise for long-tail search traffic — people are searching questions about this topic
 
 Remember: Output ONLY the JSON object, no other text.`;
 
