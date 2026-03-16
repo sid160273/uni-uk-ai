@@ -154,7 +154,7 @@ function categoryEmoji(category: string): string {
 }
 
 /** Deterministic-ish pick based on slug so the same story always gets the same format */
-function pickFormat(formats: FormatFn[], slug: string): FormatFn {
+function pickFormat<T>(formats: ((s: T) => string)[], slug: string): (s: T) => string {
   let hash = 0;
   for (let i = 0; i < slug.length; i++) {
     hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
@@ -196,6 +196,110 @@ export function formatBreakingTweet(story: StoryInput): string {
     const prefix = '\uD83D\uDD34 ';
     const title = truncateTitle(story.title, 280 - prefix.length - url.length - 2);
     return `${prefix}${title}\n${url}`;
+  }
+  return tweet;
+}
+
+// ---------------------------------------------------------------------------
+// Crypto tweet formats — optimised for CT (Crypto Twitter) engagement
+// ---------------------------------------------------------------------------
+
+interface CryptoStoryInput {
+  title: string;
+  slug: string;
+  coins: string[];   // e.g. ["BTC", "ETH"]
+  tags: string[];
+  priceData?: { symbol: string; price: string; change24h: number }[];
+}
+
+/** Turn coin symbols into cashtags: BTC → $BTC */
+function cashtags(coins: string[], max: number = 3): string {
+  return coins.slice(0, max).map(c => `$${c.toUpperCase()}`).join(' ');
+}
+
+/** Pick crypto-relevant hashtags */
+function cryptoHashtags(tags: string[], coins: string[], max: number = 3): string[] {
+  const base = ['#Crypto'];
+  const coinTags = coins.slice(0, 2).map(c => `#${c.toUpperCase()}`);
+  const topicTags = tags
+    .filter(t => !coins.some(c => c.toLowerCase() === t.toLowerCase()))
+    .slice(0, 2)
+    .map(t => `#${toCamelCaseHashtag(t)}`);
+  const all = [...base, ...coinTags, ...topicTags];
+  const unique = [...new Set(all)];
+  return unique.slice(0, max);
+}
+
+/** Format a price snippet: "$BTC £82,450 (+3.2%)" */
+function priceSnippet(data: { symbol: string; price: string; change24h: number }): string {
+  const dir = data.change24h >= 0 ? '+' : '';
+  return `$${data.symbol.toUpperCase()} ${data.price} (${dir}${data.change24h.toFixed(1)}%)`;
+}
+
+function cryptoUrl(slug: string): string {
+  return `${SITE_URL}/crypto/blog/${slug}`;
+}
+
+const CRYPTO_FORMATS: ((story: CryptoStoryInput) => string)[] = [
+  // Format 1 — Price data lead + question title
+  (story) => {
+    const url = cryptoUrl(story.slug);
+    const prices = (story.priceData || []).slice(0, 2).map(priceSnippet).join('\n');
+    const tags = cryptoHashtags(story.tags, story.coins, 3).join(' ');
+    const priceBlock = prices ? `${prices}\n\n` : '';
+    const overhead = priceBlock.length + 2 + tags.length + 1 + url.length + 1;
+    const title = truncateTitle(story.title, 280 - overhead);
+    return `${priceBlock}${title}\n\n${tags}\n${url}`;
+  },
+
+  // Format 2 — Cashtag lead + chart emoji
+  (story) => {
+    const url = cryptoUrl(story.slug);
+    const cash = cashtags(story.coins, 3);
+    const tags = cryptoHashtags(story.tags, story.coins, 2).join(' ');
+    const prefix = `\uD83D\uDCC9 ${cash}\n\n`;
+    const overhead = prefix.length + 2 + tags.length + 1 + url.length + 1;
+    const title = truncateTitle(story.title, 280 - overhead);
+    return `${prefix}${title}\n\n${tags}\n${url}`;
+  },
+
+  // Format 3 — Engagement hook (question)
+  (story) => {
+    const url = cryptoUrl(story.slug);
+    const cash = cashtags(story.coins, 2);
+    const tags = cryptoHashtags(story.tags, story.coins, 2).join(' ');
+    const hook = story.priceData?.[0]
+      ? `${priceSnippet(story.priceData[0])}\n\nBullish or bearish? \uD83D\uDC47\n\n`
+      : `${cash} \u2014 What do you think? \uD83D\uDC47\n\n`;
+    const overhead = hook.length + 2 + tags.length + 1 + url.length + 1;
+    const title = truncateTitle(story.title, 280 - overhead);
+    return `${hook}${title}\n\n${tags}\n${url}`;
+  },
+
+  // Format 4 — Alert style
+  (story) => {
+    const url = cryptoUrl(story.slug);
+    const cash = cashtags(story.coins, 2);
+    const tags = cryptoHashtags(story.tags, story.coins, 2).join(' ');
+    const prefix = `\uD83D\uDEA8 CRYPTO ALERT: `;
+    const overhead = prefix.length + `\n\n${cash} `.length + 2 + tags.length + 1 + url.length + 1;
+    const title = truncateTitle(story.title, 280 - overhead);
+    return `${prefix}${title}\n\n${cash} ${tags}\n${url}`;
+  },
+];
+
+/**
+ * Format a tweet for a crypto story.
+ * Uses cashtags ($BTC), price data, and engagement hooks for CT audience.
+ */
+export function formatCryptoTweet(story: CryptoStoryInput): string {
+  const formatter = pickFormat(CRYPTO_FORMATS, story.slug);
+  const tweet = formatter(story);
+  if (tweet.length > 280) {
+    const url = cryptoUrl(story.slug);
+    const cash = cashtags(story.coins, 2);
+    const title = truncateTitle(story.title, 280 - cash.length - url.length - 4);
+    return `${cash}\n${title}\n${url}`;
   }
   return tweet;
 }

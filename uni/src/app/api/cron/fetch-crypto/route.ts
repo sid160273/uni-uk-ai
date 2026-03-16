@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { fetchTopCoins, fetchTrendingCoins } from '@/lib/crypto-sources';
+import { fetchTopCoins, fetchTrendingCoins, formatPrice } from '@/lib/crypto-sources';
 import { saveCoinSnapshot, saveCryptoPost, getCryptoPosts, cryptoSlugExists, StoredCoinData } from '@/lib/crypto-data';
-import { generateCryptoStory, validateCryptoPost } from '@/lib/crypto-generator';
+import { generateCryptoStory, detectHotCryptoTopics, validateCryptoPost } from '@/lib/crypto-generator';
+import { postTweet } from '@/lib/twitter';
+import { formatCryptoTweet } from '@/lib/tweet-formatter';
+
+const MAX_STORIES_PER_DAY = 10;
+const MAX_STORIES_PER_CYCLE = 3;
 
 /**
  * Crypto Cron Endpoint
- * Runs every hour to fetch prices and generate crypto stories
+ * Runs every hour to fetch prices, detect hot topics, generate targeted stories, and tweet them.
  */
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -18,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 1: Fetch current market data
-    console.log('Fetching crypto market data...');
+    console.log('[Crypto] Fetching market data...');
     const [topCoins, trendingCoins] = await Promise.all([
       fetchTopCoins(20),
       fetchTrendingCoins(),
@@ -32,9 +37,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`Fetched ${topCoins.length} coins, ${trendingCoins.length} trending`);
+    console.log(`[Crypto] ${topCoins.length} coins, ${trendingCoins.length} trending`);
 
-    // Step 2: Save market data snapshot to Google Sheets
+    // Step 2: Save market data snapshot
     const coinSnapshots: StoredCoinData[] = topCoins.map(coin => ({
       id: coin.id,
       symbol: coin.symbol,
@@ -50,43 +55,87 @@ export async function GET(request: NextRequest) {
     }));
 
     const snapshotSaved = await saveCoinSnapshot(coinSnapshots);
-    console.log(`Market snapshot saved: ${snapshotSaved}`);
+    console.log(`[Crypto] Snapshot saved: ${snapshotSaved}`);
 
-    // Step 3: Generate a crypto story (max 1 per hour)
-    let storySaved = false;
-    let storyTitle = '';
+    // Step 3: Detect hot topics and generate targeted stories
+    const savedStories: { title: string; slug: string; tweeted: boolean; tweetId?: string }[] = [];
 
-    // Only generate if we have an OpenAI key
     if (process.env.OPENAI_API_KEY) {
-      // Check how many stories we've generated today
       const existingPosts = await getCryptoPosts();
       const today = new Date().toISOString().split('T')[0];
       const todayPosts = existingPosts.filter(p => p.publishedAt === today);
+      const remaining = MAX_STORIES_PER_DAY - todayPosts.length;
 
-      // Max 6 stories per day
-      if (todayPosts.length < 6) {
+      if (remaining > 0) {
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-        const story = await generateCryptoStory(topCoins, trendingCoins, openai);
 
-        if (story) {
-          const validation = validateCryptoPost(story);
-          if (!validation.valid) {
-            console.warn('Crypto story validation warnings:', validation.errors);
-          }
+        // Detect what's hot right now
+        const hotTopics = detectHotCryptoTopics(topCoins, trendingCoins);
+        console.log(`[Crypto] Detected ${hotTopics.length} hot topics: ${hotTopics.map(t => t.type).join(', ')}`);
 
-          // Ensure unique slug
-          if (await cryptoSlugExists(story.slug)) {
-            story.slug = `${story.slug}-${Date.now()}`;
-          }
+        // Generate stories for each hot topic (up to cycle + daily limits)
+        const toGenerate = hotTopics.slice(0, Math.min(MAX_STORIES_PER_CYCLE, remaining));
 
-          storySaved = await saveCryptoPost(story);
-          storyTitle = story.title;
-          if (storySaved) {
-            console.log(`Crypto story saved: "${story.title}"`);
+        for (const topic of toGenerate) {
+          try {
+            const story = await generateCryptoStory(topCoins, trendingCoins, openai, topic);
+            if (!story) continue;
+
+            const validation = validateCryptoPost(story);
+            if (!validation.valid) {
+              console.warn(`[Crypto] Validation warnings for "${story.title}":`, validation.errors);
+            }
+
+            // Ensure unique slug
+            if (await cryptoSlugExists(story.slug)) {
+              story.slug = `${story.slug}-${Date.now()}`;
+            }
+
+            const saved = await saveCryptoPost(story);
+            if (!saved) continue;
+
+            console.log(`[Crypto] Saved: "${story.title}" (${topic.type})`);
+
+            // Tweet it with price data for engagement
+            let tweeted = false;
+            let tweetId: string | undefined;
+
+            const priceData = topic.coins
+              .map(sym => {
+                const coin = topCoins.find(c => c.symbol.toUpperCase() === sym);
+                if (!coin) return null;
+                return {
+                  symbol: coin.symbol.toUpperCase(),
+                  price: formatPrice(coin.current_price),
+                  change24h: coin.price_change_percentage_24h,
+                };
+              })
+              .filter((d): d is { symbol: string; price: string; change24h: number } => d !== null);
+
+            const tweetText = formatCryptoTweet({
+              title: story.title,
+              slug: story.slug,
+              coins: story.coins,
+              tags: story.tags,
+              priceData,
+            });
+
+            const tweetResult = await postTweet(tweetText);
+            if (tweetResult.success) {
+              tweeted = true;
+              tweetId = tweetResult.tweetId;
+              console.log(`[Twitter] Crypto tweet sent — ID: ${tweetResult.tweetId}`);
+            } else {
+              console.warn(`[Twitter] Failed for "${story.slug}": ${tweetResult.error}`);
+            }
+
+            savedStories.push({ title: story.title, slug: story.slug, tweeted, tweetId });
+          } catch (err: any) {
+            console.error(`[Crypto] Error generating story for topic "${topic.angle}":`, err.message);
           }
         }
       } else {
-        console.log(`Already generated ${todayPosts.length} stories today, skipping`);
+        console.log(`[Crypto] Already generated ${todayPosts.length} stories today, skipping`);
       }
     }
 
@@ -96,8 +145,8 @@ export async function GET(request: NextRequest) {
       coinsTracked: coinSnapshots.length,
       trendingCoins: trendingCoins.length,
       snapshotSaved,
-      storySaved,
-      storyTitle: storyTitle || undefined,
+      storiesGenerated: savedStories.length,
+      stories: savedStories,
       duration: Date.now() - startTime,
     });
   } catch (error: any) {

@@ -14,6 +14,8 @@ const SUBREDDITS = [
   { name: 'unitedkingdom', limit: 10, region: 'GB', regionLabel: 'UK' },
   { name: 'technology', limit: 8, region: 'GLOBAL', regionLabel: 'Global' },
   { name: 'sports', limit: 8, region: 'GLOBAL', regionLabel: 'Global' },
+  { name: 'CryptoCurrency', limit: 10, region: 'GLOBAL', regionLabel: 'Global' },
+  { name: 'Bitcoin', limit: 8, region: 'GLOBAL', regionLabel: 'Global' },
 ];
 
 interface RedditPost {

@@ -10,7 +10,7 @@ import {
 import { slugExists, getAllBlogPostsCombined } from '@/lib/blog-data';
 import { notifyNewBlogPost } from '@/lib/google-indexing';
 import { postTweet } from '@/lib/twitter';
-import { formatStoryTweet } from '@/lib/tweet-formatter';
+import { formatStoryTweet, formatBreakingTweet } from '@/lib/tweet-formatter';
 import { fetchAggregatedTrends, ScoredTrend } from '@/lib/trend-aggregator';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
@@ -180,17 +180,27 @@ export async function GET(request: NextRequest) {
           console.error(`[Indexing] Failed for "${story.slug}":`, indexError.message);
         }
 
-        // Tweet the new story — failures must never break the cron
+        // Tweet the new story — use breaking format for high-velocity topics
         try {
-          const tweetText = formatStoryTweet({
+          // Find the original scored trend to check velocity
+          const matchedTrend = topicsToProcess.find(t =>
+            story.title.toLowerCase().includes(t.title.toLowerCase().split(' ')[0])
+          ) as ScoredTrend | undefined;
+          const isBreaking = matchedTrend?.velocity === 'breaking' || matchedTrend?.velocity === 'rising';
+
+          const storyInput = {
             title: story.title,
             slug: story.slug,
             category: story.category,
             tags: story.tags,
-          });
+          };
+          const tweetText = isBreaking
+            ? formatBreakingTweet(storyInput)
+            : formatStoryTweet(storyInput);
+
           const tweetResult = await postTweet(tweetText);
           if (tweetResult.success) {
-            console.log(`[Twitter] Tweeted "${story.slug}" — tweet ID: ${tweetResult.tweetId}`);
+            console.log(`[Twitter] ${isBreaking ? 'BREAKING ' : ''}Tweeted "${story.slug}" — ID: ${tweetResult.tweetId}`);
           } else {
             console.warn(`[Twitter] Failed for "${story.slug}": ${tweetResult.error}`);
           }
