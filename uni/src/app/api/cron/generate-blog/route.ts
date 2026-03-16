@@ -96,15 +96,13 @@ export async function GET(request: NextRequest) {
         const matchCount = topicWords.filter(word => combined.includes(word)).length;
 
         if (topicWords.length <= 2) {
-          // Short topics: ALL words must match AND title lengths must be similar (within 2x)
-          // Prevents "Trump" matching "Trump Trade War Analysis"
-          const topicLen = topicWords.join(' ').length;
-          const postTitleLen = postTitle.length;
-          const lengthRatio = Math.max(topicLen, postTitleLen) / Math.max(1, Math.min(topicLen, postTitleLen));
-          return matchCount >= topicWords.length && lengthRatio <= 2;
+          // Short topics (e.g. "Findlay Curtis"): ALL words must appear in the post title/slug.
+          // No length ratio check — our long-tail SEO titles are always much longer than
+          // the 2-word trending topic, so a ratio check causes false negatives.
+          return matchCount >= topicWords.length;
         } else {
-          // Longer topics: 70% of words must match (raised from 50%)
-          const threshold = Math.ceil(topicWords.length * 0.7);
+          // Longer topics: 60% of words must match (lowered from 70% to catch more dupes)
+          const threshold = Math.ceil(topicWords.length * 0.6);
           return matchCount >= threshold;
         }
       });

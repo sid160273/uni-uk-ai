@@ -2,6 +2,7 @@ import { getAllBlogPostsCombined, getAllCategoriesCombined } from "@/lib/blog-da
 import { BlogCardList } from "@/components/BlogCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BreadcrumbSchema } from "@/components/StructuredData";
+import { deduplicatePosts } from "@/lib/dedup-posts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -66,9 +67,11 @@ export default async function CategoryPage({ params }: PageProps) {
 
   // Get all posts and filter by category
   const allPosts = await getAllBlogPostsCombined();
-  const posts = allPosts.filter(
+  const categoryPosts = allPosts.filter(
     (post) => nameToSlug(post.category) === categorySlug
   );
+  // Remove near-duplicate articles covering the same story (keeps most recent)
+  const posts = deduplicatePosts(categoryPosts);
 
   if (posts.length === 0) {
     notFound();

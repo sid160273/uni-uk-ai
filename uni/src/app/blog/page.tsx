@@ -3,6 +3,7 @@ import { BlogCardList } from "@/components/BlogCard";
 import { MainNavigation } from "@/components/MainNavigation";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { deduplicatePosts } from "@/lib/dedup-posts";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -31,7 +32,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function BlogIndexPage() {
-  const posts = await getAllBlogPostsCombined();
+  const allPosts = await getAllBlogPostsCombined();
+  const posts = deduplicatePosts(allPosts);
   const categories = await getAllCategoriesCombined();
 
   const breadcrumbs = [
