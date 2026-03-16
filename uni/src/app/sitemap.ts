@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { getAllUniversities } from '@/lib/data'
 import { getAllBlogPostsCombined, getAllCategoriesCombined } from '@/lib/blog-data'
 import { getCryptoPosts } from '@/lib/crypto-data'
+import { getAllTopics } from '@/lib/topic-utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://uni-uk.ai'
@@ -57,6 +58,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
+  // Get all topics for topic hub pages
+  const topics = await getAllTopics()
+
+  const topicUrls = topics.map((topic) => ({
+    url: `${baseUrl}/topic/${topic}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.5,
+  }))
+
   return [
     {
       url: baseUrl,
@@ -104,6 +115,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...universityUrls,
     ...blogUrls,
     ...categoryUrls,
+    ...topicUrls,
     {
       url: `${baseUrl}/crypto`,
       lastModified: new Date(),

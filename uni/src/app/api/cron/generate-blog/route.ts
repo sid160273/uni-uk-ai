@@ -10,6 +10,8 @@ import {
 } from '@/lib/blog-generator';
 import { slugExists, getAllBlogPostsCombined } from '@/lib/blog-data';
 import { notifyNewBlogPost } from '@/lib/google-indexing';
+import { postTweet } from '@/lib/twitter';
+import { formatStoryTweet } from '@/lib/tweet-formatter';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
@@ -169,6 +171,24 @@ export async function GET(request: NextRequest) {
         } catch (indexError: any) {
           // Never let indexing failures break the cron
           console.error(`[Indexing] Failed for "${story.slug}":`, indexError.message);
+        }
+
+        // Tweet the new story — failures must never break the cron
+        try {
+          const tweetText = formatStoryTweet({
+            title: story.title,
+            slug: story.slug,
+            category: story.category,
+            tags: story.tags,
+          });
+          const tweetResult = await postTweet(tweetText);
+          if (tweetResult.success) {
+            console.log(`[Twitter] Tweeted "${story.slug}" — tweet ID: ${tweetResult.tweetId}`);
+          } else {
+            console.warn(`[Twitter] Failed for "${story.slug}": ${tweetResult.error}`);
+          }
+        } catch (tweetError: any) {
+          console.error(`[Twitter] Unexpected error for "${story.slug}":`, tweetError.message);
         }
       }
     }

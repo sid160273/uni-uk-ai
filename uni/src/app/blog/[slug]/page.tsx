@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const truncatedExcerpt = post.excerpt.length > 160 ? post.excerpt.slice(0, 157) + "..." : post.excerpt;
 
+  // Dynamic OG image via /api/og with title + category
+  const ogImageUrl = `https://uni-uk.ai/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`;
+
   return {
     title: `${post.title} | Trending ${post.category} News`,
     description: truncatedExcerpt,
@@ -47,20 +50,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       modifiedTime: post.updatedAt,
       authors: [post.author],
       tags: post.tags,
-      images: post.imageUrl ? [
+      images: [
         {
-          url: post.imageUrl.startsWith("http") ? post.imageUrl : `https://uni-uk.ai${post.imageUrl}`,
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: post.title,
         },
-      ] : [{ url: "/logo.png", width: 512, height: 512, alt: "uni-uk.ai" }],
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: truncatedExcerpt,
-      images: post.imageUrl ? [post.imageUrl.startsWith("http") ? post.imageUrl : `https://uni-uk.ai${post.imageUrl}`] : ["/logo.png"],
+      images: [ogImageUrl],
     },
   };
 }
@@ -308,17 +311,18 @@ export default async function BlogPostPage({ params }: PageProps) {
                 })}
               </div>
 
-              {/* Tags */}
+              {/* Topics */}
               <div className="mt-10 pt-6 border-t border-border">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground mr-1">Tags</span>
+                  <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground mr-1">Topics</span>
                   {post.tags.map((tag) => (
-                    <span
+                    <Link
                       key={tag}
-                      className="px-2.5 py-1 border border-border text-xs font-medium text-muted-foreground"
+                      href={`/topic/${tag.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`}
+                      className="px-2.5 py-1 border border-border text-xs font-medium text-muted-foreground hover:bg-foreground hover:text-background transition-colors"
                     >
                       {tag}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>
