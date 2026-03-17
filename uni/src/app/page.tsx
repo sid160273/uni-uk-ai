@@ -5,7 +5,7 @@ import { AdPlaceholder } from "@/components/AdPlaceholder";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { getAllBlogPostsCombined } from "@/lib/blog-data";
-import { getSectionTopStories } from "@/lib/section-data";
+import { deduplicatePosts } from "@/lib/dedup-posts";
 import { SECTIONS } from "@/lib/sections";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -53,25 +53,20 @@ export default async function Home() {
   const tickerStories = allStories.slice(0, 10);
   const featuredStory = allStories[0] || null;
 
-  // Fetch top 2 stories per section for the hub cards (in parallel)
+  // Derive section stories from already-fetched posts (no extra API calls)
   const hubSections = SECTIONS.filter(s => HUB_SECTION_SLUGS.includes(s.slug));
   const sectionStoriesMap: Record<string, any[]> = {};
 
-  await Promise.all(
-    hubSections.map(async (section) => {
-      if (section.hasDedicatedDataSource) {
-        // Crypto has its own data source; we won't fetch blog stories for it
-        sectionStoriesMap[section.slug] = [];
-        return;
-      }
-      try {
-        const stories = await getSectionTopStories(section.slug, 2);
-        sectionStoriesMap[section.slug] = stories;
-      } catch {
-        sectionStoriesMap[section.slug] = [];
-      }
-    })
-  );
+  for (const section of hubSections) {
+    if (section.hasDedicatedDataSource) {
+      sectionStoriesMap[section.slug] = [];
+      continue;
+    }
+    const filtered = section.categories.length > 0
+      ? allStories.filter(post => section.categories.includes(post.category))
+      : allStories;
+    sectionStoriesMap[section.slug] = deduplicatePosts(filtered).slice(0, 2);
+  }
 
   return (
     <main className="min-h-screen bg-background">
