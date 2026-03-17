@@ -127,6 +127,12 @@ const TWITTER_TWEETS_ENDPOINT = 'https://api.twitter.com/2/tweets';
  */
 export async function postTweet(text: string): Promise<TweetResult> {
   try {
+    // --- Kill switch: set TWITTER_ENABLED=false to disable tweeting -------
+    if (process.env.TWITTER_ENABLED === 'false') {
+      console.log('[Twitter] Tweeting disabled (TWITTER_ENABLED=false). Skipping.');
+      return { success: false, error: 'Tweeting disabled via TWITTER_ENABLED env var' };
+    }
+
     // --- Validate env vars ------------------------------------------------
     const consumerKey = process.env.TWITTER_API_KEY;
     const consumerSecret = process.env.TWITTER_API_SECRET;
