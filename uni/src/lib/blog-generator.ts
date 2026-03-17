@@ -90,6 +90,52 @@ function generateSlug(title: string): string {
 }
 
 /**
+ * Pick a hero image. Google Trends thumbnails (encrypted-tbn*) are tiny
+ * newspaper logos — always use our curated Unsplash images instead.
+ * Only use source images from domains we know serve real photos.
+ */
+function getHeroImage(sourceUrl: string | undefined, category: string): string {
+  if (!sourceUrl) return selectImage(category);
+
+  // Reject Google's tiny thumbnails (80×80 logos)
+  if (sourceUrl.includes('encrypted-tbn')) return selectImage(category);
+
+  // Reject common logo/favicon patterns
+  const rejectPatterns = [
+    '/favicon', '/logo', '/brand', '/icon',
+    'static/images/logo', 'masthead', 'header-image',
+    'apple-touch-icon', 'og-default', 'placeholder',
+  ];
+  const lower = sourceUrl.toLowerCase();
+  if (rejectPatterns.some(p => lower.includes(p))) return selectImage(category);
+
+  // Only trust known photo CDNs / high-quality sources
+  const trustedDomains = [
+    'images.unsplash.com',
+    'images.pexels.com',
+    'cdn.pixabay.com',
+    'media.gettyimages.com',
+    'ichef.bbci.co.uk',
+    'static.reuters.com',
+    'static01.nyt.com',
+    'i.guim.co.uk',
+    'media.cnn.com',
+    's.yimg.com',
+    'dims.apnews.com',
+  ];
+
+  try {
+    const hostname = new URL(sourceUrl).hostname;
+    if (trustedDomains.some(d => hostname.includes(d))) return sourceUrl;
+  } catch {
+    // invalid URL
+  }
+
+  // Default: use our curated category image
+  return selectImage(category);
+}
+
+/**
  * Calculates reading time based on word count
  */
 function calculateReadingTime(content: string): number {
@@ -238,7 +284,7 @@ Output ONLY the JSON object.`;
       author: 'uni-uk.ai Newsroom',
       publishedAt: now,
       updatedAt: now,
-      imageUrl: newsItem.pictureUrl || selectImage(parsed.category),
+      imageUrl: getHeroImage(newsItem.pictureUrl, parsed.category),
       category: parsed.category || 'Breaking',
       tags: parsed.tags || [],
       readingTime: calculateReadingTime(parsed.content),

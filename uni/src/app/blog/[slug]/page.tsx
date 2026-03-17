@@ -129,7 +129,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <MainNavigation />
 
       {/* Hero Image — full width like Wired */}
-      {post.imageUrl && post.imageUrl.startsWith("http") && (
+      {post.imageUrl && post.imageUrl.startsWith("http") && !post.imageUrl.includes('encrypted-tbn') && (
         <div className="w-full bg-muted">
           <div className="container mx-auto">
             <div className="relative aspect-[21/9] md:aspect-[3/1] overflow-hidden">
