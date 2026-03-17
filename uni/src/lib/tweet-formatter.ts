@@ -303,3 +303,70 @@ export function formatCryptoTweet(story: CryptoStoryInput): string {
   }
   return tweet;
 }
+
+// ---------------------------------------------------------------------------
+// Bluesky formatting (300 grapheme limit)
+// ---------------------------------------------------------------------------
+
+/**
+ * Format a Bluesky post for a blog story.
+ * Returns { text, linkUrl } — linkUrl is used for the embed card.
+ * Bluesky limit: 300 graphemes. URL is in the embed, not the text body.
+ */
+export function formatBlueskyPost(story: StoryInput): { text: string; linkUrl: string } {
+  const linkUrl = blogUrl(story.slug);
+  const hashtags = pickHashtags(story.tags, 2).join(' ');
+  // No URL in text body — it goes in the link card embed
+  const available = 300 - hashtags.length - 2; // 2 for \n\n
+  const title = truncateTitle(story.title, available);
+  return {
+    text: `${title}\n\n${hashtags}`,
+    linkUrl,
+  };
+}
+
+/**
+ * Format a Bluesky post for a crypto story.
+ */
+export function formatBlueskyPostCrypto(story: CryptoStoryInput): { text: string; linkUrl: string } {
+  const linkUrl = cryptoUrl(story.slug);
+  const cash = cashtags(story.coins, 3);
+  const priceLine = story.priceData?.[0] ? `\n${priceSnippet(story.priceData[0])}` : '';
+  const available = 300 - cash.length - priceLine.length - 2;
+  const title = truncateTitle(story.title, available);
+  return {
+    text: `${cash}\n${title}${priceLine}`,
+    linkUrl,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Threads formatting (500 character limit)
+// Threads auto-generates link cards from URLs in text, so include the URL.
+// ---------------------------------------------------------------------------
+
+/**
+ * Format a Threads post for a blog story.
+ * More space (500 chars) = more personality. Include URL for auto-preview.
+ */
+export function formatThreadsPost(story: StoryInput): string {
+  const url = blogUrl(story.slug);
+  const hashtags = pickHashtags(story.tags, 3).join(' ');
+  const overhead = 4 + hashtags.length + 1 + url.length; // \n\n + hashtags + \n + url
+  const title = truncateTitle(story.title, 500 - overhead);
+  return `${title}\n\n${hashtags}\n${url}`;
+}
+
+/**
+ * Format a Threads post for a crypto story.
+ */
+export function formatThreadsPostCrypto(story: CryptoStoryInput): string {
+  const url = cryptoUrl(story.slug);
+  const cash = cashtags(story.coins, 3);
+  const priceLine = (story.priceData || []).slice(0, 2).map(priceSnippet).join('\n');
+  const priceBlock = priceLine ? `${priceLine}\n\n` : '';
+  const hashtags = cryptoHashtags(story.tags, story.coins, 3).join(' ');
+  const overhead = priceBlock.length + 4 + hashtags.length + 1 + url.length;
+  const title = truncateTitle(story.title, 500 - overhead);
+  return `${priceBlock}${title}\n\n${hashtags}\n${url}`;
+}

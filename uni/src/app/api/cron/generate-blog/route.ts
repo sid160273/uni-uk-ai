@@ -10,7 +10,9 @@ import {
 import { slugExists, getAllBlogPostsCombined } from '@/lib/blog-data';
 import { notifyNewBlogPost } from '@/lib/google-indexing';
 import { postTweet } from '@/lib/twitter';
-import { formatStoryTweet, formatBreakingTweet } from '@/lib/tweet-formatter';
+import { postToBluesky } from '@/lib/bluesky';
+import { postToThreads } from '@/lib/threads';
+import { formatStoryTweet, formatBreakingTweet, formatBlueskyPost, formatThreadsPost } from '@/lib/tweet-formatter';
 import { fetchAggregatedTrends, ScoredTrend } from '@/lib/trend-aggregator';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
@@ -206,6 +208,42 @@ export async function GET(request: NextRequest) {
           }
         } catch (tweetError: any) {
           console.error(`[Twitter] Unexpected error for "${story.slug}":`, tweetError.message);
+        }
+
+        // Post to Bluesky with link card
+        try {
+          const bskyData = formatBlueskyPost({
+            title: story.title,
+            slug: story.slug,
+            category: story.category,
+            tags: story.tags,
+          });
+          const bskyResult = await postToBluesky(bskyData.text, bskyData.linkUrl);
+          if (bskyResult.success) {
+            console.log(`[Bluesky] Posted "${story.slug}" — ${bskyResult.uri}`);
+          } else {
+            console.warn(`[Bluesky] Failed for "${story.slug}": ${bskyResult.error}`);
+          }
+        } catch (bskyError: any) {
+          console.error(`[Bluesky] Unexpected error for "${story.slug}":`, bskyError.message);
+        }
+
+        // Post to Threads
+        try {
+          const threadsText = formatThreadsPost({
+            title: story.title,
+            slug: story.slug,
+            category: story.category,
+            tags: story.tags,
+          });
+          const threadsResult = await postToThreads(threadsText);
+          if (threadsResult.success) {
+            console.log(`[Threads] Posted "${story.slug}" — ${threadsResult.postId}`);
+          } else {
+            console.warn(`[Threads] Failed for "${story.slug}": ${threadsResult.error}`);
+          }
+        } catch (threadsError: any) {
+          console.error(`[Threads] Unexpected error for "${story.slug}":`, threadsError.message);
         }
       }
     }

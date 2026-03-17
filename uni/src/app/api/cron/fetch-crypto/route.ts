@@ -4,7 +4,9 @@ import { fetchTopCoins, fetchTrendingCoins, formatPrice } from '@/lib/crypto-sou
 import { saveCoinSnapshot, saveCryptoPost, getCryptoPosts, cryptoSlugExists, StoredCoinData } from '@/lib/crypto-data';
 import { generateCryptoStory, detectHotCryptoTopics, validateCryptoPost } from '@/lib/crypto-generator';
 import { postTweet } from '@/lib/twitter';
-import { formatCryptoTweet } from '@/lib/tweet-formatter';
+import { postToBluesky } from '@/lib/bluesky';
+import { postToThreads } from '@/lib/threads';
+import { formatCryptoTweet, formatBlueskyPostCrypto, formatThreadsPostCrypto } from '@/lib/tweet-formatter';
 
 const MAX_STORIES_PER_DAY = 10;
 const MAX_STORIES_PER_CYCLE = 3;
@@ -127,6 +129,34 @@ export async function GET(request: NextRequest) {
               console.log(`[Twitter] Crypto tweet sent — ID: ${tweetResult.tweetId}`);
             } else {
               console.warn(`[Twitter] Failed for "${story.slug}": ${tweetResult.error}`);
+            }
+
+            // Post to Bluesky with link card
+            try {
+              const cryptoInput = { title: story.title, slug: story.slug, coins: story.coins, tags: story.tags, priceData };
+              const bskyData = formatBlueskyPostCrypto(cryptoInput);
+              const bskyResult = await postToBluesky(bskyData.text, bskyData.linkUrl);
+              if (bskyResult.success) {
+                console.log(`[Bluesky] Crypto post — ${bskyResult.uri}`);
+              } else {
+                console.warn(`[Bluesky] Failed: ${bskyResult.error}`);
+              }
+            } catch (bskyErr: any) {
+              console.error(`[Bluesky] Error:`, bskyErr.message);
+            }
+
+            // Post to Threads
+            try {
+              const cryptoInput = { title: story.title, slug: story.slug, coins: story.coins, tags: story.tags, priceData };
+              const threadsText = formatThreadsPostCrypto(cryptoInput);
+              const threadsResult = await postToThreads(threadsText);
+              if (threadsResult.success) {
+                console.log(`[Threads] Crypto post — ${threadsResult.postId}`);
+              } else {
+                console.warn(`[Threads] Failed: ${threadsResult.error}`);
+              }
+            } catch (threadsErr: any) {
+              console.error(`[Threads] Error:`, threadsErr.message);
             }
 
             savedStories.push({ title: story.title, slug: story.slug, tweeted, tweetId });
