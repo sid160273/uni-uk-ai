@@ -5,12 +5,25 @@ import { useState } from "react";
 interface NewsletterSignupProps {
   variant?: "inline" | "card";
   className?: string;
+  section?: string;
+  title?: string;
+  description?: string;
 }
 
-export function NewsletterSignup({ variant = "card", className = "" }: NewsletterSignupProps) {
+export function NewsletterSignup({
+  variant = "card",
+  className = "",
+  section,
+  title,
+  description,
+}: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+
+  const displayTitle = title || "Daily Digest";
+  const displayDescription =
+    description || "The top trending stories, delivered to your inbox every morning.";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +35,7 @@ export function NewsletterSignup({ variant = "card", className = "" }: Newslette
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, ...(section ? { section } : {}) }),
       });
 
       const data = await res.json();
@@ -77,9 +90,9 @@ export function NewsletterSignup({ variant = "card", className = "" }: Newslette
   // Card variant
   return (
     <div className={`border border-border p-6 ${className}`}>
-      <h3 className="font-display text-xl font-black mb-1">Daily Digest</h3>
+      <h3 className="font-display text-xl font-black mb-1">{displayTitle}</h3>
       <p className="font-body-serif text-sm text-muted-foreground mb-4 leading-relaxed">
-        The top trending stories, delivered to your inbox every morning.
+        {displayDescription}
       </p>
 
       {status === "success" ? (
@@ -104,7 +117,7 @@ export function NewsletterSignup({ variant = "card", className = "" }: Newslette
             disabled={status === "loading"}
             className="w-full py-2.5 bg-foreground text-background text-[11px] font-bold uppercase tracking-editorial hover:opacity-80 transition-opacity disabled:opacity-50"
           >
-            {status === "loading" ? "Subscribing..." : "Get the Daily Digest"}
+            {status === "loading" ? "Subscribing..." : `Get the ${displayTitle}`}
           </button>
           <p className="text-[10px] text-muted-foreground/60 text-center">
             Free. No spam. Unsubscribe anytime.

@@ -3,11 +3,12 @@ import { Resend } from 'resend';
 
 /**
  * POST /api/newsletter/subscribe
- * Adds a contact to the Resend audience for the daily digest
+ * Adds a contact to the Resend audience for the daily digest.
+ * Accepts an optional `section` field to tag the subscriber for segmentation.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, firstName } = await request.json();
+    const { email, firstName, section } = await request.json();
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
@@ -56,6 +57,29 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to subscribe. Please try again.' },
         { status: 500 }
       );
+    }
+
+    // If a section was provided, update the contact with section metadata
+    if (section && data?.id) {
+      try {
+        await resend.contacts.update({
+          id: data.id,
+          audienceId,
+          firstName: firstName || undefined,
+          unsubscribed: false,
+        });
+        // Note: Resend's contact update doesn't natively support arbitrary tags,
+        // so we store section info by appending it to the lastName field as metadata.
+        // When Resend adds tag/metadata support, migrate to that.
+        await resend.contacts.update({
+          id: data.id,
+          audienceId,
+          lastName: `[section:${section}]`,
+        });
+      } catch (tagError) {
+        // Non-critical — the subscription itself succeeded
+        console.error('Failed to tag contact with section:', tagError);
+      }
     }
 
     return NextResponse.json({

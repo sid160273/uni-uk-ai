@@ -49,6 +49,37 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Section hub redirects — old category URLs → new section hubs
+      {
+        source: '/blog/category/sports',
+        destination: '/sport',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/technology',
+        destination: '/tech',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/entertainment',
+        destination: '/entertainment',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/business',
+        destination: '/business',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/culture',
+        destination: '/entertainment',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/science',
+        destination: '/tech',
+        permanent: true,
+      },
       // Common university name variations to proper slugs
       {
         source: '/universities/strathclyde',

@@ -68,6 +68,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
+  // Section hub pages
+  const sectionHubUrls = [
+    { slug: 'sport', priority: 0.95 },
+    { slug: 'tech', priority: 0.95 },
+    { slug: 'entertainment', priority: 0.95 },
+    { slug: 'business', priority: 0.95 },
+  ].map(({ slug, priority }) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'hourly' as const,
+    priority,
+  }))
+
   return [
     {
       url: baseUrl,
@@ -75,6 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 1,
     },
+    ...sectionHubUrls,
     {
       url: `${baseUrl}/universities`,
       lastModified: new Date(),

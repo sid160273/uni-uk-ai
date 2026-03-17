@@ -30,11 +30,11 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   metadataBase: new URL("https://uni-uk.ai"),
   title: {
-    default: "Trending News Today | What's Trending Right Now | uni-uk.ai",
+    default: "Universal News Intelligence | AI-Powered News | uni-uk.ai",
     template: "%s | uni-uk.ai",
   },
-  description: "Discover what's trending right now with AI-powered stories updated every 10 minutes. Breaking news, trending topics, sports, politics, entertainment and tech.",
-  keywords: ["trending news", "what's trending", "trending topics", "trending stories today", "current events", "breaking news", "news today", "AI news", "trending now", "what's happening today"],
+  description: "Universal News Intelligence — AI-powered news across sport, tech, crypto, entertainment, business and trending topics. Updated every 10 minutes.",
+  keywords: ["trending news", "universal news", "AI news", "sport news", "tech news", "crypto news", "entertainment news", "business news", "trending topics", "breaking news"],
   authors: [{ name: "uni-uk.ai" }],
   creator: "uni-uk.ai",
   publisher: "uni-uk.ai",
