@@ -6,12 +6,74 @@
 import OpenAI from 'openai';
 import { NewsItem } from './news-sources';
 
-// Category-based stock images for trending stories
+// Topic-specific images — keywords matched against title for accurate hero images
+const TOPIC_IMAGES: { keywords: string[]; images: string[] }[] = [
+  // Football / Soccer
+  { keywords: ['football', 'premier league', 'fa cup', 'champions league', 'arsenal', 'liverpool', 'manchester united', 'man utd', 'man city', 'chelsea', 'tottenham', 'spurs', 'newcastle', 'everton', 'aston villa', 'west ham', 'wolves', 'crystal palace', 'brighton', 'fulham', 'bournemouth', 'brentford', 'nottingham forest', 'leicester', 'ipswich', 'sheffield united', 'burnley', 'luton', 'efl', 'championship', 'league one', 'league two', 'peterborough', 'rotherham', 'sunderland', 'sacked manager', 'transfer', 'goalkeeper', 'striker', 'midfielder', 'la liga', 'serie a', 'bundesliga', 'ligue 1', 'europa league', 'carabao cup', 'world cup', 'euros', 'real madrid', 'barcelona', 'bayern', 'psg', 'juventus', 'inter milan'],
+    images: [
+      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=630&fit=crop', // football on pitch
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=630&fit=crop', // stadium
+      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&h=630&fit=crop', // football match
+      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&h=630&fit=crop', // football stadium crowd
+    ] },
+  // F1 / Motorsport
+  { keywords: ['f1', 'formula 1', 'formula one', 'grand prix', 'hamilton', 'verstappen', 'leclerc', 'norris', 'red bull racing', 'ferrari f1', 'mclaren', 'mercedes f1', 'motogp', 'nascar'],
+    images: [
+      'https://images.unsplash.com/photo-1504707748692-419802cf939d?w=1200&h=630&fit=crop', // race track
+      'https://images.unsplash.com/photo-1541889413-bc7b3e78c8f6?w=1200&h=630&fit=crop', // racing car
+    ] },
+  // Tennis
+  { keywords: ['tennis', 'wimbledon', 'australian open', 'french open', 'us open tennis', 'djokovic', 'alcaraz', 'sinner', 'nadal', 'federer', 'swiatek', 'gauff'],
+    images: [
+      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&h=630&fit=crop', // tennis court
+      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=1200&h=630&fit=crop', // tennis ball
+    ] },
+  // Boxing / MMA / UFC
+  { keywords: ['boxing', 'ufc', 'mma', 'heavyweight', 'fury', 'usyk', 'joshua', 'tyson', 'mcgregor', 'fight night', 'knockout', 'ring'],
+    images: [
+      'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1200&h=630&fit=crop', // boxing ring
+      'https://images.unsplash.com/photo-1517438322307-e67111335449?w=1200&h=630&fit=crop', // boxing gloves
+    ] },
+  // Cricket
+  { keywords: ['cricket', 'ashes', 'ipl', 'test match', 'odi', 't20', 'wicket', 'batsman', 'bowler'],
+    images: [
+      'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1200&h=630&fit=crop', // cricket
+      'https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=1200&h=630&fit=crop', // cricket stadium
+    ] },
+  // Basketball / NBA
+  { keywords: ['nba', 'basketball', 'lakers', 'celtics', 'warriors', 'lebron', 'curry', 'dunk', 'playoffs nba'],
+    images: [
+      'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200&h=630&fit=crop', // basketball
+      'https://images.unsplash.com/photo-1504450758481-7338bbe75005?w=1200&h=630&fit=crop', // basketball court
+    ] },
+  // Rugby
+  { keywords: ['rugby', 'six nations', 'rugby world cup', 'premiership rugby', 'all blacks', 'springboks', 'try', 'scrum'],
+    images: [
+      'https://images.unsplash.com/photo-1544698422-5290fdef5e64?w=1200&h=630&fit=crop', // rugby ball
+    ] },
+  // Golf
+  { keywords: ['golf', 'pga', 'masters', 'ryder cup', 'open championship', 'mcilroy', 'scheffler', 'woods'],
+    images: [
+      'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=630&fit=crop', // golf course
+    ] },
+  // NFL / American Football
+  { keywords: ['nfl', 'super bowl', 'touchdown', 'quarterback', 'chiefs', 'eagles', 'cowboys', 'patriots', 'mahomes'],
+    images: [
+      'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200&h=630&fit=crop', // american football
+    ] },
+  // Olympics / Athletics
+  { keywords: ['olympics', 'olympic', 'athletics', 'marathon', 'sprint', '100m', 'medal', 'gold medal'],
+    images: [
+      'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1200&h=630&fit=crop', // athletics track
+    ] },
+];
+
+// Category fallback images (used when no topic match)
 const CATEGORY_IMAGES: Record<string, string[]> = {
   'Sports': [
-    'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=630&fit=crop', // football — safe default for UK
+    'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=630&fit=crop', // stadium
+    'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1200&h=630&fit=crop', // athletics
   ],
   'Politics': [
     'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1200&h=630&fit=crop',
@@ -94,11 +156,11 @@ function generateSlug(title: string): string {
  * newspaper logos — always use our curated Unsplash images instead.
  * Only use source images from domains we know serve real photos.
  */
-function getHeroImage(sourceUrl: string | undefined, category: string): string {
-  if (!sourceUrl) return selectImage(category);
+function getHeroImage(sourceUrl: string | undefined, category: string, title: string = ''): string {
+  if (!sourceUrl) return selectImage(category, title);
 
   // Reject Google's tiny thumbnails (80×80 logos)
-  if (sourceUrl.includes('encrypted-tbn')) return selectImage(category);
+  if (sourceUrl.includes('encrypted-tbn')) return selectImage(category, title);
 
   // Reject common logo/favicon patterns
   const rejectPatterns = [
@@ -107,7 +169,7 @@ function getHeroImage(sourceUrl: string | undefined, category: string): string {
     'apple-touch-icon', 'og-default', 'placeholder',
   ];
   const lower = sourceUrl.toLowerCase();
-  if (rejectPatterns.some(p => lower.includes(p))) return selectImage(category);
+  if (rejectPatterns.some(p => lower.includes(p))) return selectImage(category, title);
 
   // Only trust known photo CDNs / high-quality sources
   const trustedDomains = [
@@ -131,8 +193,8 @@ function getHeroImage(sourceUrl: string | undefined, category: string): string {
     // invalid URL
   }
 
-  // Default: use our curated category image
-  return selectImage(category);
+  // Default: use topic-aware category image
+  return selectImage(category, title);
 }
 
 /**
@@ -144,9 +206,20 @@ function calculateReadingTime(content: string): number {
 }
 
 /**
- * Selects an image based on category
+ * Selects an image by matching topic keywords in the title first,
+ * then falling back to category-level images.
  */
-function selectImage(category: string): string {
+function selectImage(category: string, title: string = ''): string {
+  const lower = title.toLowerCase();
+
+  // Try topic-specific match
+  for (const topic of TOPIC_IMAGES) {
+    if (topic.keywords.some(kw => lower.includes(kw))) {
+      return topic.images[Math.floor(Math.random() * topic.images.length)];
+    }
+  }
+
+  // Fallback to category
   const images = CATEGORY_IMAGES[category] || CATEGORY_IMAGES['Breaking'];
   return images[Math.floor(Math.random() * images.length)];
 }
@@ -284,7 +357,7 @@ Output ONLY the JSON object.`;
       author: 'uni-uk.ai Newsroom',
       publishedAt: now,
       updatedAt: now,
-      imageUrl: getHeroImage(newsItem.pictureUrl, parsed.category),
+      imageUrl: getHeroImage(newsItem.pictureUrl, parsed.category, parsed.title),
       category: parsed.category || 'Breaking',
       tags: parsed.tags || [],
       readingTime: calculateReadingTime(parsed.content),
