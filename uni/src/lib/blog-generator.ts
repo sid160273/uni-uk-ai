@@ -11,114 +11,114 @@ const TOPIC_IMAGES: { keywords: string[]; images: string[] }[] = [
   // Football / Soccer
   { keywords: ['football', 'premier league', 'fa cup', 'champions league', 'arsenal', 'liverpool', 'manchester united', 'man utd', 'man city', 'chelsea', 'tottenham', 'spurs', 'newcastle', 'everton', 'aston villa', 'west ham', 'wolves', 'crystal palace', 'brighton', 'fulham', 'bournemouth', 'brentford', 'nottingham forest', 'leicester', 'ipswich', 'sheffield united', 'burnley', 'luton', 'efl', 'championship', 'league one', 'league two', 'peterborough', 'rotherham', 'sunderland', 'sacked manager', 'transfer', 'goalkeeper', 'striker', 'midfielder', 'la liga', 'serie a', 'bundesliga', 'ligue 1', 'europa league', 'carabao cup', 'world cup', 'euros', 'real madrid', 'barcelona', 'bayern', 'psg', 'juventus', 'inter milan'],
     images: [
-      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=630&fit=crop', // football on pitch
-      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=630&fit=crop', // stadium
-      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&h=630&fit=crop', // football match
-      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&h=630&fit=crop', // football stadium crowd
+      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1600&h=900&fit=crop', // football on pitch
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1600&h=900&fit=crop', // stadium
+      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1600&h=900&fit=crop', // football match
+      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1600&h=900&fit=crop', // football stadium crowd
     ] },
   // F1 / Motorsport
   { keywords: ['f1', 'formula 1', 'formula one', 'grand prix', 'hamilton', 'verstappen', 'leclerc', 'norris', 'red bull racing', 'ferrari f1', 'mclaren', 'mercedes f1', 'motogp', 'nascar'],
     images: [
-      'https://images.unsplash.com/photo-1504707748692-419802cf939d?w=1200&h=630&fit=crop', // race track
-      'https://images.unsplash.com/photo-1541889413-bc7b3e78c8f6?w=1200&h=630&fit=crop', // racing car
+      'https://images.unsplash.com/photo-1504707748692-419802cf939d?w=1600&h=900&fit=crop', // race track
+      'https://images.unsplash.com/photo-1541889413-bc7b3e78c8f6?w=1600&h=900&fit=crop', // racing car
     ] },
   // Tennis
   { keywords: ['tennis', 'wimbledon', 'australian open', 'french open', 'us open tennis', 'djokovic', 'alcaraz', 'sinner', 'nadal', 'federer', 'swiatek', 'gauff'],
     images: [
-      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1200&h=630&fit=crop', // tennis court
-      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=1200&h=630&fit=crop', // tennis ball
+      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=1600&h=900&fit=crop', // tennis court
+      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=1600&h=900&fit=crop', // tennis ball
     ] },
   // Boxing / MMA / UFC
   { keywords: ['boxing', 'ufc', 'mma', 'heavyweight', 'fury', 'usyk', 'joshua', 'tyson', 'mcgregor', 'fight night', 'knockout', 'ring'],
     images: [
-      'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1200&h=630&fit=crop', // boxing ring
-      'https://images.unsplash.com/photo-1517438322307-e67111335449?w=1200&h=630&fit=crop', // boxing gloves
+      'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1600&h=900&fit=crop', // boxing ring
+      'https://images.unsplash.com/photo-1517438322307-e67111335449?w=1600&h=900&fit=crop', // boxing gloves
     ] },
   // Cricket
   { keywords: ['cricket', 'ashes', 'ipl', 'test match', 'odi', 't20', 'wicket', 'batsman', 'bowler'],
     images: [
-      'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1200&h=630&fit=crop', // cricket
-      'https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=1200&h=630&fit=crop', // cricket stadium
+      'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1600&h=900&fit=crop', // cricket
+      'https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=1600&h=900&fit=crop', // cricket stadium
     ] },
   // Basketball / NBA
   { keywords: ['nba', 'basketball', 'lakers', 'celtics', 'warriors', 'lebron', 'curry', 'dunk', 'playoffs nba'],
     images: [
-      'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200&h=630&fit=crop', // basketball
-      'https://images.unsplash.com/photo-1504450758481-7338bbe75005?w=1200&h=630&fit=crop', // basketball court
+      'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600&h=900&fit=crop', // basketball
+      'https://images.unsplash.com/photo-1504450758481-7338bbe75005?w=1600&h=900&fit=crop', // basketball court
     ] },
   // Rugby
   { keywords: ['rugby', 'six nations', 'rugby world cup', 'premiership rugby', 'all blacks', 'springboks', 'try', 'scrum'],
     images: [
-      'https://images.unsplash.com/photo-1544698422-5290fdef5e64?w=1200&h=630&fit=crop', // rugby ball
+      'https://images.unsplash.com/photo-1544698422-5290fdef5e64?w=1600&h=900&fit=crop', // rugby ball
     ] },
   // Golf
   { keywords: ['golf', 'pga', 'masters', 'ryder cup', 'open championship', 'mcilroy', 'scheffler', 'woods'],
     images: [
-      'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=630&fit=crop', // golf course
+      'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1600&h=900&fit=crop', // golf course
     ] },
   // NFL / American Football
   { keywords: ['nfl', 'super bowl', 'touchdown', 'quarterback', 'chiefs', 'eagles', 'cowboys', 'patriots', 'mahomes'],
     images: [
-      'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200&h=630&fit=crop', // american football
+      'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1600&h=900&fit=crop', // american football
     ] },
   // Olympics / Athletics
   { keywords: ['olympics', 'olympic', 'athletics', 'marathon', 'sprint', '100m', 'medal', 'gold medal'],
     images: [
-      'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1200&h=630&fit=crop', // athletics track
+      'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1600&h=900&fit=crop', // athletics track
     ] },
 ];
 
 // Category fallback images (used when no topic match)
 const CATEGORY_IMAGES: Record<string, string[]> = {
   'Sports': [
-    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=630&fit=crop', // football — safe default for UK
-    'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=630&fit=crop', // stadium
-    'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1200&h=630&fit=crop', // athletics
+    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1600&h=900&fit=crop', // football — safe default for UK
+    'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1600&h=900&fit=crop', // stadium
+    'https://images.unsplash.com/photo-1461896836934-bd45ba7296f7?w=1600&h=900&fit=crop', // athletics
   ],
   'Politics': [
-    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1575517111478-7f6afd0973db?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1575517111478-7f6afd0973db?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=1600&h=900&fit=crop',
   ],
   'Entertainment': [
-    'https://images.unsplash.com/photo-1603190287605-e6ade32fa852?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1603190287605-e6ade32fa852?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&h=900&fit=crop',
   ],
   'Technology': [
-    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1600&h=900&fit=crop',
   ],
   'Business': [
-    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&h=900&fit=crop',
   ],
   'Science': [
-    'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1600&h=900&fit=crop',
   ],
   'Health': [
-    'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&h=900&fit=crop',
   ],
   'World': [
-    'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&h=900&fit=crop',
   ],
   'Culture': [
-    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1600&h=900&fit=crop',
   ],
   'Breaking': [
-    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1200&h=630&fit=crop',
-    'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200&h=630&fit=crop',
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&h=900&fit=crop',
   ],
 };
 

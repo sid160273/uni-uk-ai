@@ -101,7 +101,7 @@ The UK's strong showing in this ranking is a reminder that British universities 
 
 Browse our full guide to [UK universities](/universities) to find the right international experience for you.`;
 
-  const imageUrl = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=630&fit=crop';
+  const imageUrl = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&h=900&fit=crop';
   const category = 'World';
   const tags = JSON.stringify([
     'university rankings', 'THE rankings', 'international universities',

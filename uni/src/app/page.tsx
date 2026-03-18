@@ -385,8 +385,10 @@ export default async function Home() {
             Universal News Intelligence
           </p>
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
+            <Link href="/editorial-policy" className="hover:text-foreground transition-colors">Editorial Policy</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
             <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-            <Link href="/#about" className="hover:text-foreground transition-colors">About</Link>
             <Link href="/blog" className="hover:text-foreground transition-colors">Stories</Link>
             <Link href="/sport" className="hover:text-foreground transition-colors">Sport</Link>
             <Link href="/tech" className="hover:text-foreground transition-colors">Tech</Link>

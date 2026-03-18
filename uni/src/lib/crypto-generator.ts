@@ -8,12 +8,12 @@ import { CoinData, TrendingCoin, formatPrice } from './crypto-sources';
 import { CryptoPost } from './crypto-data';
 
 const CRYPTO_IMAGES: Record<string, string> = {
-  bitcoin: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=1200&h=630&fit=crop',
-  ethereum: 'https://images.unsplash.com/photo-1622630998477-20aa696ecb05?w=1200&h=630&fit=crop',
-  default: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=630&fit=crop',
-  market: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&h=630&fit=crop',
-  defi: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1200&h=630&fit=crop',
-  nft: 'https://images.unsplash.com/photo-1646463910915-dddbc72b3e87?w=1200&h=630&fit=crop',
+  bitcoin: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=1600&h=900&fit=crop',
+  ethereum: 'https://images.unsplash.com/photo-1622630998477-20aa696ecb05?w=1600&h=900&fit=crop',
+  default: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1600&h=900&fit=crop',
+  market: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1600&h=900&fit=crop',
+  defi: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1600&h=900&fit=crop',
+  nft: 'https://images.unsplash.com/photo-1646463910915-dddbc72b3e87?w=1600&h=900&fit=crop',
 };
 
 function generateSlug(title: string): string {

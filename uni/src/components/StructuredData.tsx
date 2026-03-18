@@ -201,7 +201,7 @@ export function ArticleSchema({
 }: ArticleSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     headline: title,
     description: description,
     url: url,

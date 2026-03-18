@@ -70,7 +70,7 @@ async function fetchBlogPostsFromSheets(): Promise<DynamicBlogPost[]> {
           author: row[4] || 'uni-uk.ai Team',
           publishedAt: row[5] || new Date().toISOString(),
           updatedAt: row[6] || row[5] || new Date().toISOString(),
-          imageUrl: row[7] || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=630&fit=crop',
+          imageUrl: row[7] || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&h=900&fit=crop',
           category: row[8] || 'News',
           tags: parseJsonArray(row[9]),
           readingTime: parseInt(row[10], 10) || 5,
