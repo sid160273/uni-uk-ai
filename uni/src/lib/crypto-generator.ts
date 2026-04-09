@@ -126,8 +126,7 @@ ${isCoinSpecific ? `- Focus ENTIRELY on this specific coin — what's driving th
 
 LINKS:
 1. [Track live prices](/crypto)
-2. [Ask our crypto AI](/crypto#chat)
-3. 1-2 external links to CoinDesk, CoinTelegraph, The Block, etc.
+2. 1-2 external links to CoinDesk, CoinTelegraph, The Block, etc.
 
 OUTPUT FORMAT (JSON only, no markdown blocks):
 {

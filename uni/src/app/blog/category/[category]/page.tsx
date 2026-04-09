@@ -145,25 +145,6 @@ export default async function CategoryPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Want to know more about what&apos;s trending?
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Ask our AI assistant about any trending topic — get context, background, and analysis instantly.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            >
-              Ask Our AI
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="border-t py-12 bg-muted/50">

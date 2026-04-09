@@ -422,10 +422,9 @@ function StorySpotlight({
   onClose: () => void;
   matchedStory: TrendStory | null;
 }) {
-  // Link destination: matched blog post or AI chat with topic
   const linkHref = matchedStory
     ? `/blog/${matchedStory.slug}`
-    : `/#search`;
+    : `/blog`;
 
   return (
     <div className="border border-border p-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -473,7 +472,7 @@ function StorySpotlight({
           className="text-[10px] font-bold uppercase tracking-editorial hover:underline"
           style={{ color }}
         >
-          {matchedStory ? "Read full story" : "Ask AI about this"}
+          {matchedStory ? "Read full story" : "Explore trending"}
         </Link>
         <button
           onClick={onClose}

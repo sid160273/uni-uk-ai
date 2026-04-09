@@ -281,9 +281,8 @@ TITLE RULES:
 - The excerpt should be a DIRECT, factual answer — Google uses this for featured snippets
 
 LINKS:
-1. ONE link to our AI: [Ask our AI about this](/#search)
-2. ONE link to trending: [More trending stories](/blog)
-3. 2-3 external links to REAL sources (BBC, Reuters, Guardian, Sky News, CNN etc.)
+1. ONE link to trending: [More trending stories](/blog)
+2. 2-3 external links to REAL sources (BBC, Reuters, Guardian, Sky News, CNN etc.)
    - Use proper markdown: [BBC News](https://www.bbc.co.uk/news)
    - If unsure of exact URL, link to source homepage
    - NEVER use fake URLs

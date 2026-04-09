@@ -9,10 +9,6 @@
       "schedule": "0 * * * *"
     },
     {
-      "path": "/api/cron/fetch-chat-data",
-      "schedule": "0 0 * * *"
-    },
-    {
       "path": "/api/cron/fetch-ads-data",
       "schedule": "0 */12 * * *"
     },

@@ -192,22 +192,14 @@ export default async function TopicPage({ params }: PageProps) {
             Want to know more about {topicName.toLowerCase()}?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Ask our AI assistant about any trending topic — get context, background, and analysis instantly.
+            Explore all the stories everyone is searching for right now.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            >
-              Ask Our AI
-            </Link>
-            <Link
-              href="/blog"
-              className="inline-flex items-center justify-center px-6 py-3 border border-border font-semibold text-sm uppercase tracking-editorial hover:bg-muted transition-colors"
-            >
-              See All Trending Stories
-            </Link>
-          </div>
+          <Link
+            href="/blog"
+            className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
+          >
+            See All Trending Stories
+          </Link>
         </div>
       </section>
 

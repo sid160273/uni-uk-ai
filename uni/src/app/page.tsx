@@ -1,4 +1,3 @@
-import { SearchBox } from "@/components/SearchBox";
 import { MainNavigation } from "@/components/MainNavigation";
 import { TrendingTicker } from "@/components/TrendingTicker";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
@@ -93,7 +92,7 @@ export default async function Home() {
             Universal News Intelligence
           </p>
           <p className="font-body-serif text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            AI-powered stories on what everyone is searching for. Ask our assistant anything or browse the latest trends.
+            AI-powered stories on what everyone is searching for right now. Browse the latest trends.
           </p>
         </div>
       </section>
@@ -137,17 +136,6 @@ export default async function Home() {
           />
         </section>
       )}
-
-      {/* MOBILE: AI Chat */}
-      <section className="container mx-auto px-4 pb-8 lg:hidden">
-        <div className="space-y-6">
-          <div id="search-mobile">
-            <h2 className="font-display text-2xl font-bold mb-3">Ask AI</h2>
-            <p className="text-sm text-muted-foreground mb-3">Knows all trending topics</p>
-            <SearchBox />
-          </div>
-        </div>
-      </section>
 
       {/* === MAIN CONTENT === */}
       <div className="container mx-auto px-4 py-8">
@@ -272,17 +260,9 @@ export default async function Home() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Chat + Sidebar (Desktop only) */}
+          {/* RIGHT COLUMN: Sidebar (Desktop only) */}
           <div className="hidden lg:block lg:col-span-5">
             <div className="lg:sticky lg:top-28 space-y-8">
-
-              {/* Chat Section */}
-              <div id="search">
-                <div className="border-b-2 border-foreground pb-2 mb-4">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Ask AI</h2>
-                </div>
-                <SearchBox />
-              </div>
 
               <AdPlaceholder id="201" format="rectangle" />
 
@@ -362,7 +342,7 @@ export default async function Home() {
               {[
                 { title: "Every Section", desc: "Sport, tech, crypto, entertainment, business — all in one place, all AI-powered" },
                 { title: "Real-Time", desc: "Updated every 10 minutes so you never miss what's happening right now" },
-                { title: "Ask Anything", desc: "Chat with our AI about any trending topic across any section" },
+                { title: "Multi-Source", desc: "Stories cross-validated across Google Trends, Reddit and 10 UK news outlets" },
                 { title: "Always Free", desc: "Universal access to intelligent news — no paywalls, no sign-up required" },
               ].map((item) => (
                 <div key={item.title} className="bg-background p-6 text-center">

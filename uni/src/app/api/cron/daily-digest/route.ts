@@ -206,8 +206,8 @@ function buildDigestEmail(stories: any[], date: Date): string {
                     <p style="margin:0 0 12px 0;font-size:16px;font-weight:700;color:#ffffff;font-family:Georgia,'Times New Roman',serif;">
                       Want to dig deeper?
                     </p>
-                    <a href="https://uni-uk.ai/#search" style="display:inline-block;padding:12px 28px;background-color:#ffffff;color:#171717;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;text-decoration:none;font-family:monospace;">
-                      Ask Our AI
+                    <a href="https://uni-uk.ai/blog" style="display:inline-block;padding:12px 28px;background-color:#ffffff;color:#171717;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;text-decoration:none;font-family:monospace;">
+                      Read All Stories
                     </a>
                   </td>
                 </tr>

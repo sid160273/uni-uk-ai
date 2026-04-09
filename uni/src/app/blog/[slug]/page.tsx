@@ -379,19 +379,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                 {/* Newsletter Signup */}
                 <NewsletterSignup />
 
-                {/* Ask AI CTA */}
-                <div className="border border-border p-5 text-center">
-                  <h3 className="font-display text-lg font-bold mb-2">Ask our AI</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
-                    Get context and analysis on any trending topic instantly.
-                  </p>
-                  <Link
-                    href="/#search"
-                    className="inline-flex items-center px-5 py-2.5 bg-foreground text-background text-xs font-bold uppercase tracking-editorial hover:opacity-80 transition-opacity"
-                  >
-                    Ask AI
-                  </Link>
-                </div>
               </div>
             </aside>
 
@@ -424,22 +411,14 @@ export default async function BlogPostPage({ params }: PageProps) {
             Want to know more about what&apos;s trending?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Ask our AI assistant about any trending topic, or explore all the stories everyone is searching for right now.
+            Explore all the stories everyone is searching for right now.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/#search"
-              className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
-            >
-              Ask Our AI
-            </Link>
-            <Link
-              href="/blog"
-              className="inline-flex items-center justify-center px-6 py-3 border border-border font-semibold text-sm uppercase tracking-editorial hover:bg-muted transition-colors"
-            >
-              See All Trending Stories
-            </Link>
-          </div>
+          <Link
+            href="/blog"
+            className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
+          >
+            See All Trending Stories
+          </Link>
         </div>
       </section>
 

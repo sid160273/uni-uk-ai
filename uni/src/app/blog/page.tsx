@@ -101,23 +101,6 @@ export default async function BlogIndexPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-12 border-t border-border">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-black mb-4">
-            Want to know more about what&apos;s trending?
-          </h2>
-          <p className="font-body-serif text-muted-foreground mb-6 max-w-xl mx-auto">
-            Ask our AI assistant about any trending topic — get context, background, and analysis instantly.
-          </p>
-          <Link
-            href="/#search"
-            className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
-          >
-            Ask Our AI
-          </Link>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="border-t border-border py-10">

@@ -166,12 +166,6 @@ export default function TopAcademicPage() {
             >
               Browse All Universities
             </Link>
-            <Link
-              href="/#search"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-background border rounded-lg font-medium hover:bg-muted transition-colors"
-            >
-              Use AI Search
-            </Link>
           </div>
         </div>
       </section>

@@ -149,18 +149,12 @@ export default async function CryptoNewsPage() {
             Want deeper crypto analysis?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Ask our crypto AI assistant about any coin, market trend, or investment thesis.
+            Track live prices, charts, and the latest crypto news.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/crypto#chat"
-              className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
-            >
-              Ask Crypto AI
-            </Link>
-            <Link
               href="/crypto"
-              className="inline-flex items-center justify-center px-6 py-3 border border-border font-semibold text-sm uppercase tracking-editorial hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-semibold text-sm uppercase tracking-editorial hover:opacity-80 transition-opacity"
             >
               Live Dashboard
             </Link>

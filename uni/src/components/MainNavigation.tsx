@@ -55,12 +55,6 @@ export function MainNavigation() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <a
-              href="/#search"
-              className="hidden sm:inline-flex bg-foreground text-background px-4 py-2 text-xs font-semibold uppercase tracking-editorial hover:opacity-80 transition-opacity"
-            >
-              Ask AI
-            </a>
             <button
               className="lg:hidden p-2 hover:bg-muted transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -91,15 +85,6 @@ export function MainNavigation() {
                 {section.name}
               </Link>
             ))}
-            <div className="pt-3">
-              <a
-                href="/#search"
-                onClick={() => setMobileOpen(false)}
-                className="block w-full bg-foreground text-background text-center py-2.5 text-sm font-semibold uppercase tracking-editorial"
-              >
-                Ask AI
-              </a>
-            </div>
           </div>
         </div>
       )}
