@@ -1,4 +1,3 @@
-import { SearchBox } from "@/components/SearchBox";
 import { MainNavigation } from "@/components/MainNavigation";
 import { TrendingTicker } from "@/components/TrendingTicker";
 import { AdPlaceholder } from "@/components/AdPlaceholder";
@@ -84,17 +83,6 @@ export default async function BusinessPage() {
           <p className="font-body-serif text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {section.tagline}
           </p>
-        </div>
-      </section>
-
-      {/* MOBILE: AI Chat */}
-      <section className="container mx-auto px-4 pb-8 lg:hidden">
-        <div className="space-y-6 pt-8">
-          <div id="search-mobile">
-            <h2 className="font-display text-2xl font-bold mb-3">Ask AI</h2>
-            <p className="text-sm text-muted-foreground mb-3">Knows all trending business topics</p>
-            <SearchBox />
-          </div>
         </div>
       </section>
 
@@ -224,14 +212,6 @@ export default async function BusinessPage() {
           {/* RIGHT COLUMN: Chat + Sidebar (Desktop only) */}
           <div className="hidden lg:block lg:col-span-5">
             <div className="lg:sticky lg:top-28 space-y-8">
-
-              {/* Chat Section */}
-              <div id="search">
-                <div className="border-b-2 border-foreground pb-2 mb-4">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Ask AI</h2>
-                </div>
-                <SearchBox />
-              </div>
 
               <AdPlaceholder id="biz-201" format="rectangle" />
 
