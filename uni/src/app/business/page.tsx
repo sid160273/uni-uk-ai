@@ -8,12 +8,14 @@ import { getSection } from "@/lib/sections";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
 const section = getSection('business')!;
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: `${section.name} News Today | Trending Markets & Economy Stories | uni-uk.ai`,
   description: `${section.tagline}. AI-powered business and markets news updated every 10 minutes — stocks, economy, corporate news, and political impacts on money.`,
   keywords: ["business news", "market news", "economy news", "stock market", "trending business", "interest rates", "corporate news", "finance news"],

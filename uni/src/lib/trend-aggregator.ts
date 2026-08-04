@@ -1,7 +1,7 @@
 /**
  * Trend Aggregator
  *
- * Combines Google Trends + Reddit into a single ranked feed.
+ * Combines Google Trends + Reddit + UK News Feeds into a single ranked feed.
  * Topics that appear on multiple sources get a higher score (cross-validation).
  * Each topic is tagged with a velocity label so the cron can prioritise
  * fast-rising stories for quick-take articles.
@@ -9,6 +9,7 @@
 
 import { NewsItem, fetchMultiRegionNews } from './news-sources';
 import { fetchRedditTrends } from './reddit-trends';
+import { fetchUKNewsFeeds } from './uk-news-feeds';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -92,18 +93,21 @@ function parseTrafficNumber(volume?: string): number {
  * a sorted list with the most important topics first.
  */
 export async function fetchAggregatedTrends(): Promise<ScoredTrend[]> {
-  const [googleResult, redditResult] = await Promise.allSettled([
+  const [googleResult, redditResult, ukNewsResult] = await Promise.allSettled([
     fetchMultiRegionNews(),
     fetchRedditTrends(),
+    fetchUKNewsFeeds(),
   ]);
 
   const google =
     googleResult.status === 'fulfilled' ? googleResult.value : [];
   const reddit =
     redditResult.status === 'fulfilled' ? redditResult.value : [];
+  const ukNews =
+    ukNewsResult.status === 'fulfilled' ? ukNewsResult.value : [];
 
   console.log(
-    `[Aggregator] Sources — Google: ${google.length}, Reddit: ${reddit.length}`
+    `[Aggregator] Sources — Google: ${google.length}, Reddit: ${reddit.length}, UK News: ${ukNews.length}`
   );
 
   // Tag each item with its source for grouping
@@ -111,6 +115,7 @@ export async function fetchAggregatedTrends(): Promise<ScoredTrend[]> {
   const allItems: TaggedItem[] = [
     ...google.map((i) => ({ ...i, _source: 'Google Trends' })),
     ...reddit.map((i) => ({ ...i, _source: 'Reddit' })),
+    ...ukNews.map((i) => ({ ...i, _source: 'UK News' })),
   ];
 
   // Group similar topics together
@@ -136,9 +141,10 @@ export async function fetchAggregatedTrends(): Promise<ScoredTrend[]> {
 
   // Score and flatten
   const scored: ScoredTrend[] = groups.map((group) => {
-    // Prefer the Google Trends item as the representative (better title)
+    // Prefer Google Trends item as representative, then UK News (better context), then Reddit
     const primary =
       group.items.find((i) => i._source === 'Google Trends') ||
+      group.items.find((i) => i._source === 'UK News') ||
       group.items[0];
     const sourceCount = group.sources.size;
     const maxTraffic = Math.max(

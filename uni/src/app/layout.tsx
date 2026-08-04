@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display, Source_Serif_4 } from "next/font/g
 import Script from "next/script";
 import { OrganizationSchema, WebSiteSchema } from "@/components/StructuredData";
 import { AdScripts } from "@/components/AdScripts";
+import { CLEARING_CYCLE } from "@/lib/clearing";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,11 +31,20 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   metadataBase: new URL("https://uni-uk.ai"),
   title: {
-    default: "Universal News Intelligence | AI-Powered News | uni-uk.ai",
+    default: `UCAS Clearing ${CLEARING_CYCLE.year} & UK University Guide | uni-uk.ai`,
     template: "%s | uni-uk.ai",
   },
-  description: "Universal News Intelligence — AI-powered news across sport, tech, crypto, entertainment, business and trending topics. Updated every 10 minutes.",
-  keywords: ["trending news", "universal news", "AI news", "sport news", "tech news", "crypto news", "entertainment news", "business news", "trending topics", "breaking news"],
+  description: `Clearing ${CLEARING_CYCLE.year} guidance and a complete guide to 140 UK universities — entry requirements, rankings, student satisfaction and cost of living, with an AI adviser to help you find a place.`,
+  keywords: [
+    `clearing ${CLEARING_CYCLE.year}`,
+    "ucas clearing",
+    "uk universities",
+    "university clearing",
+    "a level results day",
+    "university entry requirements",
+    "university rankings uk",
+    "find a university place",
+  ],
   authors: [{ name: "uni-uk.ai" }],
   creator: "uni-uk.ai",
   publisher: "uni-uk.ai",
@@ -65,8 +75,8 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   openGraph: {
-    title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
-    description: "AI-powered trending news platform. Discover what everyone is searching for with clear, insightful stories updated every 10 minutes.",
+    title: `UCAS Clearing ${CLEARING_CYCLE.year} & UK University Guide | uni-uk.ai`,
+    description: `Find a university place in Clearing ${CLEARING_CYCLE.year}. Search 140 UK universities, compare entry requirements and rankings, and get instant guidance.`,
     type: "website",
     locale: "en_GB",
     url: "https://uni-uk.ai",
@@ -76,14 +86,14 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "uni-uk.ai - Trending News & Stories Updated Every 30 Minutes",
+        alt: `uni-uk.ai — UCAS Clearing ${CLEARING_CYCLE.year} and UK university guide`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trending News Today | What's Trending Right Now | uni-uk.ai",
-    description: "AI-powered trending news. Discover what everyone is searching for, updated every 10 minutes.",
+    title: `UCAS Clearing ${CLEARING_CYCLE.year} & UK University Guide`,
+    description: `Search 140 UK universities, compare entry requirements, and find a place in Clearing.`,
     images: ["/logo.png"],
     creator: "@uniukai",
   },

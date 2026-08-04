@@ -6,6 +6,8 @@ import { RankingBadge } from "@/components/RankingBadge";
 import { HeroImage } from "@/components/HeroImage";
 import { Ad } from "@/components/Ad";
 import { MainNavigation } from "@/components/MainNavigation";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ClearingCallout } from "@/components/ClearingCallout";
 import { EducationalOrganizationSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { FAQ } from "@/components/FAQ";
 import { universityFAQs } from "@/data/faq-data";
@@ -115,6 +117,10 @@ export default async function UniversityPage({ params }: PageProps) {
                         {university.location}
                     </div>
                 </div>
+            </div>
+
+            <div className="container mx-auto px-4 pt-6">
+                <ClearingCallout universityName={university.name} />
             </div>
 
             <div className="container mx-auto px-4 py-6">
@@ -475,6 +481,8 @@ export default async function UniversityPage({ params }: PageProps) {
                 {/* Related Universities */}
                 <RelatedUniversities currentUniversity={university} maxResults={4} />
             </div>
+
+            <SiteFooter />
         </main>
     );
 }

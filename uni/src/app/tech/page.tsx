@@ -8,12 +8,14 @@ import { getSection } from "@/lib/sections";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
 const section = getSection('tech')!;
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: `${section.name} News Today | Trending Technology & Science Stories | uni-uk.ai`,
   description: `${section.tagline}. AI-powered tech and science news updated every 10 minutes — AI, startups, Big Tech, gadgets, and science breakthroughs.`,
   keywords: ["tech news", "AI news", "technology news", "science news", "startup news", "Apple news", "trending tech", "science breakthroughs"],

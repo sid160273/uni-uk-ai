@@ -53,20 +53,30 @@ export function getAllUniversities(): University[] {
 }
 
 // Get universities by region
-export function getUniversitiesByRegion(regionSlug: string): University[] {
-    const regionMap: Record<string, (location: string) => boolean> = {
-        'scotland': (loc) => loc.includes('Scotland'),
-        'wales': (loc) => loc.includes('Wales'),
-        'northern-ireland': (loc) => loc.includes('Northern Ireland'),
-        'london': (loc) => loc.includes('London'),
-        'north-england': (loc) => loc.match(/Manchester|Liverpool|Leeds|Sheffield|Bradford|York|Newcastle|Durham|Sunderland|Preston|Lancaster|Carlisle|Hull|Middlesbrough/i) !== null && loc.includes('England'),
-        'midlands': (loc) => loc.match(/Birmingham|Coventry|Leicester|Nottingham|Derby|Wolverhampton|Stoke|Lincoln/i) !== null && loc.includes('England'),
-        'south-west-england': (loc) => loc.match(/Bristol|Bath|Exeter|Plymouth|Gloucester|Cheltenham|Southampton|Portsmouth|Bournemouth/i) !== null && loc.includes('England'),
-        'south-east-england': (loc) => loc.match(/Brighton|Canterbury|Rochester|Guildford|Winchester|Reading|Buckingham|Milton Keynes/i) !== null && loc.includes('England'),
-        'east-england': (loc) => loc.match(/Cambridge|Oxford|Norwich|Colchester|Luton|Bedford|Hatfield/i) !== null && loc.includes('England'),
-    };
+// Region membership is derived from the university's location string. Kept at
+// module scope so the directory can label every university with its region in
+// one pass, rather than running nine separate filters.
+const REGION_MATCHERS: Record<string, (location: string) => boolean> = {
+    'scotland': (loc) => loc.includes('Scotland'),
+    'wales': (loc) => loc.includes('Wales'),
+    'northern-ireland': (loc) => loc.includes('Northern Ireland'),
+    'london': (loc) => loc.includes('London'),
+    'north-england': (loc) => loc.match(/Manchester|Liverpool|Leeds|Sheffield|Bradford|York|Newcastle|Durham|Sunderland|Preston|Lancaster|Carlisle|Hull|Middlesbrough/i) !== null && loc.includes('England'),
+    'midlands': (loc) => loc.match(/Birmingham|Coventry|Leicester|Nottingham|Derby|Wolverhampton|Stoke|Lincoln/i) !== null && loc.includes('England'),
+    'south-west-england': (loc) => loc.match(/Bristol|Bath|Exeter|Plymouth|Gloucester|Cheltenham|Southampton|Portsmouth|Bournemouth/i) !== null && loc.includes('England'),
+    'south-east-england': (loc) => loc.match(/Brighton|Canterbury|Rochester|Guildford|Winchester|Reading|Buckingham|Milton Keynes/i) !== null && loc.includes('England'),
+    'east-england': (loc) => loc.match(/Cambridge|Oxford|Norwich|Colchester|Luton|Bedford|Hatfield/i) !== null && loc.includes('England'),
+};
 
-    const filterFn = regionMap[regionSlug];
+export const REGION_SLUGS = Object.keys(REGION_MATCHERS);
+
+/** First region a location matches, or null if none of the matchers claim it. */
+export function getRegionSlugForLocation(location: string): string | null {
+    return REGION_SLUGS.find((slug) => REGION_MATCHERS[slug](location)) ?? null;
+}
+
+export function getUniversitiesByRegion(regionSlug: string): University[] {
+    const filterFn = REGION_MATCHERS[regionSlug];
     if (!filterFn) return [];
 
     return universities.filter(uni => filterFn(uni.location)).sort((a, b) => a.name.localeCompare(b.name));

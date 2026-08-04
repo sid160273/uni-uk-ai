@@ -26,10 +26,10 @@ function FAQAccordionItem({ item, isOpen, onToggle }: FAQAccordionItemProps) {
     <div className="border-b border-border last:border-b-0">
       <button
         onClick={onToggle}
-        className="w-full py-4 flex items-center justify-between text-left hover:text-primary transition-colors"
+        className="w-full py-4 flex items-center justify-between text-left hover:text-destructive transition-colors"
         aria-expanded={isOpen}
       >
-        <span className="font-medium text-base pr-4">{item.question}</span>
+        <span className="font-display font-bold text-lg pr-4">{item.question}</span>
         <ChevronDown
           className={cn(
             "w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-200",
@@ -43,7 +43,9 @@ function FAQAccordionItem({ item, isOpen, onToggle }: FAQAccordionItemProps) {
           isOpen ? "max-h-96 pb-4" : "max-h-0"
         )}
       >
-        <p className="text-muted-foreground leading-relaxed">{item.answer}</p>
+        <p className="font-body-serif text-muted-foreground leading-relaxed">
+          {item.answer}
+        </p>
       </div>
     </div>
   );
@@ -65,8 +67,10 @@ export function FAQ({ faqs, title = "Frequently Asked Questions", className }: F
   return (
     <section className={cn("py-8", className)}>
       <FAQSchema faqs={faqs} />
-      <h2 className="text-2xl font-bold mb-6">{title}</h2>
-      <div className="bg-card border rounded-xl p-6">
+      <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-4">
+        {title}
+      </h2>
+      <div className="border border-border p-6">
         {faqs.map((faq, index) => (
           <FAQAccordionItem
             key={index}

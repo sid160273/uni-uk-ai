@@ -6,10 +6,12 @@ import { fetchTopCoins, fetchTrendingCoins, formatPrice } from "@/lib/crypto-sou
 import { getCryptoPosts } from "@/lib/crypto-data";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: "Crypto Dashboard | Live Prices, Trends & AI Analysis | uni-uk.ai",
   description:
     "Live cryptocurrency prices, trending coins, market analysis and AI-powered insights. Track Bitcoin, Ethereum, Solana and 20+ coins with real-time data.",

@@ -4,6 +4,7 @@ import { MainNavigation } from "@/components/MainNavigation";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const topicName = slugToTopic(keyword);
 
   return {
+    robots: NOINDEX_FOLLOW,
     title: `${topicName} News & Updates — What's Trending | uni-uk.ai`,
     description: `Explore the latest ${topicName.toLowerCase()} stories, news, and analysis. Discover what's trending in ${topicName.toLowerCase()} right now with AI-powered insights.`,
     keywords: [

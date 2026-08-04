@@ -13,12 +13,12 @@ export function OrganizationSchema() {
       height: 512,
     },
     description:
-      "AI-powered platform for UK university discovery, rankings, and trending education news. Helping students find the perfect university with comprehensive data and insights.",
+      "Independent guide to UK universities and UCAS Clearing. Rankings, entry requirements, student satisfaction and cost of living for 140 UK universities.",
     sameAs: [],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
-      url: "https://uni-uk.ai/#about",
+      url: "https://uni-uk.ai/contact",
     },
   };
 
@@ -39,18 +39,12 @@ export function WebSiteSchema() {
     name: "uni-uk.ai",
     url: "https://uni-uk.ai",
     description:
-      "AI-powered UK university discovery platform with rankings, trending education news, and comprehensive university data.",
+      "UK university and UCAS Clearing guide — 140 universities with entry requirements, rankings, student satisfaction and cost of living.",
     publisher: {
       "@id": "https://uni-uk.ai/#organization",
     },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: "https://uni-uk.ai/?q={search_term_string}",
-      },
-      "query-input": "required name=search_term_string",
-    },
+    // No SearchAction: university search is client-side on /universities and
+    // has no query-parameter entry point for Google to call.
   };
 
   return (

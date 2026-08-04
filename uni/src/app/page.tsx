@@ -1,387 +1,327 @@
-import { MainNavigation } from "@/components/MainNavigation";
-import { TrendingTicker } from "@/components/TrendingTicker";
-import { AdPlaceholder } from "@/components/AdPlaceholder";
-import { TrendChart } from "@/components/TrendChart";
-import { NewsletterSignup } from "@/components/NewsletterSignup";
-import { BreadcrumbSchema } from "@/components/StructuredData";
-import { getAllBlogPostsCombined } from "@/lib/blog-data";
-import { SECTIONS } from "@/lib/sections";
-import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ArrowRight, Phone } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+import { MainNavigation } from "@/components/MainNavigation";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ClearingCountdown } from "@/components/ClearingCountdown";
+import { ClearingAdviser } from "@/components/ClearingAdviser";
+import { UniversityCard } from "@/components/UniversityCard";
+import { AdPlaceholder } from "@/components/AdPlaceholder";
+import { BreadcrumbSchema } from "@/components/StructuredData";
+import {
+  CLEARING_CYCLE,
+  CLEARING_SCENARIOS,
+  getClearingStatus,
+  getTimeline,
+} from "@/lib/clearing";
+import { getTopAcademicUniversities, getAllUniversities } from "@/lib/data";
+
+// The whole page keys off "what time is it in the Clearing cycle", so it must
+// not be cached across the boundary of a milestone.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Universal News Intelligence | AI-Powered News | uni-uk.ai",
-  description: "Universal News Intelligence — AI-powered news across sport, tech, crypto, entertainment, business and trending topics. Updated every 10 minutes.",
-  keywords: ["trending news", "universal news", "AI news", "sport news", "tech news", "crypto news", "entertainment news", "business news", "trending topics", "breaking news"],
+  title: `UCAS Clearing ${CLEARING_CYCLE.year} | Find a University Place | uni-uk.ai`,
+  description: `Clearing ${CLEARING_CYCLE.year} guidance for UK students. Search 140 UK universities, compare entry requirements and rankings, and get instant answers from our Clearing adviser.`,
+  keywords: [
+    `clearing ${CLEARING_CYCLE.year}`,
+    "ucas clearing",
+    "university clearing",
+    "clearing courses",
+    "a level results day",
+    "missed my grades",
+    "uk universities",
+    "university places",
+  ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Universal News Intelligence | uni-uk.ai",
-    description: "AI-powered news across sport, tech, crypto, entertainment, business and more. Updated every 10 minutes.",
+    title: `UCAS Clearing ${CLEARING_CYCLE.year} | Find a University Place`,
+    description: `Search 140 UK universities, compare entry requirements, and get instant Clearing guidance.`,
     type: "website",
     url: "https://uni-uk.ai",
     siteName: "uni-uk.ai",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "uni-uk.ai - Universal News Intelligence" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Universal News Intelligence | uni-uk.ai",
-    description: "AI-powered news across sport, tech, crypto, entertainment, business and more. Updated every 10 minutes.",
-    images: ["/logo.png"],
-    creator: "@uniukai",
   },
 };
 
-// Section hub links for the quick-nav bar
-const SECTION_LINKS = SECTIONS
-  .filter(s => s.slug !== 'universities' && s.slug !== 'trending')
-  .map(s => ({
-    name: s.shortName,
-    href: s.hasDedicatedDataSource ? `/${s.slug}` : `/${s.slug}`,
-    icon: s.icon,
-    accentHex: s.accentHex,
-  }));
+const REGION_LINKS = [
+  { name: "London", slug: "london" },
+  { name: "Scotland", slug: "scotland" },
+  { name: "North England", slug: "north-england" },
+  { name: "Midlands", slug: "midlands" },
+  { name: "South West", slug: "south-west-england" },
+  { name: "Wales", slug: "wales" },
+];
 
-export default async function Home() {
-  const headersList = await headers();
-  const detectedCountry = headersList.get('x-vercel-ip-country') || 'GB';
+const RANKING_LINKS = [
+  {
+    name: "Top academic",
+    href: "/rankings/academic",
+    detail: "Ranked by Guardian league table position",
+  },
+  {
+    name: "Student satisfaction",
+    href: "/rankings/satisfaction",
+    detail: "Ranked by National Student Survey scores",
+  },
+  {
+    name: "Top for sport",
+    href: "/rankings/sports",
+    detail: "Best facilities, teams and scholarships",
+  },
+];
 
-  // Single API call — everything derives from this
-  let trendingStories: any[] = [];
-  try {
-    const allPosts = await getAllBlogPostsCombined();
-    trendingStories = allPosts.slice(0, 10);
-  } catch (error) {
-    console.error('Error fetching trending stories:', error);
-  }
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Europe/London",
+  });
+}
 
-  const topStories = trendingStories.slice(0, 3);
-  const moreStories = trendingStories.slice(3, 6);
-  const restStories = trendingStories.slice(6);
+export default function Home() {
+  const now = new Date();
+  const status = getClearingStatus(now);
+  const timeline = getTimeline(now);
+  const featured = getTopAcademicUniversities(6);
+  const total = getAllUniversities().length;
 
   return (
     <main className="min-h-screen bg-background">
       <BreadcrumbSchema items={[{ name: "Home", url: "https://uni-uk.ai" }]} />
       <MainNavigation />
 
-      {/* Breaking News Ticker */}
-      {trendingStories.length > 0 && (
-        <TrendingTicker stories={trendingStories.map(s => ({
-          title: s.title,
-          category: s.category,
-          slug: s.slug,
-        }))} />
+      {status.focus && status.daysToFocus !== null && (
+        <ClearingCountdown
+          targetIso={status.focus.iso}
+          label={`${status.focus.label} — ${formatDate(status.focus.iso)}`}
+          initialNow={now.getTime()}
+        />
       )}
 
       {/* Hero */}
-      <section className="py-8 md:py-14 border-b border-border">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 border border-border text-xs font-semibold uppercase tracking-editorial text-muted-foreground mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
-            </span>
-            Live — Updated every 10 minutes
+      <section className="border-b border-border py-10 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl">
+            <p className="text-[11px] font-bold uppercase tracking-editorial text-destructive mb-3">
+              {status.eyebrow}
+            </p>
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-4">
+              {status.headline}
+            </h1>
+            <p className="font-body-serif text-lg md:text-xl text-muted-foreground max-w-2xl mb-7">
+              {status.standfirst}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/universities"
+                className="inline-flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[11px] font-bold uppercase tracking-editorial hover:opacity-90 transition-opacity"
+              >
+                Search {total} universities
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/clearing/how-it-works"
+                className="inline-flex items-center gap-2 border border-foreground px-6 py-3 text-[11px] font-bold uppercase tracking-editorial hover:bg-muted transition-colors"
+              >
+                How Clearing works
+              </Link>
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-3">
-            uni-uk<span className="text-destructive">.ai</span>
-          </h1>
-          <p className="font-display text-lg md:text-xl font-bold tracking-tight text-foreground/70 mb-4">
-            Universal News Intelligence
-          </p>
-          <p className="font-body-serif text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            AI-powered stories on what everyone is searching for right now. Browse the latest trends.
-          </p>
         </div>
       </section>
 
-      {/* Section Hub Quick Nav */}
-      <section className="border-b border-border bg-muted/30">
+      {/* What to do now */}
+      <section className="border-b border-border py-12">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-1 md:gap-2 py-3 overflow-x-auto">
-            {SECTION_LINKS.map((s) => (
+          <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-6">
+            What to do now
+          </h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {CLEARING_SCENARIOS.map((scenario, i) => (
               <Link
-                key={s.name}
-                href={s.href}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground border border-transparent hover:border-border rounded transition-colors whitespace-nowrap"
+                key={scenario.id}
+                href={scenario.href}
+                className="group border border-border p-6 hover:border-foreground transition-colors flex flex-col"
               >
-                <span>{s.icon}</span>
-                {s.name}
+                <span className="font-mono text-xs text-muted-foreground mb-3">
+                  0{i + 1}
+                </span>
+                <h3 className="font-display text-2xl font-bold leading-tight mb-3">
+                  {scenario.situation}
+                </h3>
+                <p className="font-body-serif text-sm text-muted-foreground leading-relaxed mb-4 grow">
+                  {scenario.summary}
+                </p>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-editorial group-hover:text-destructive transition-colors">
+                  What to do
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Adviser + key dates */}
+      <section className="py-12 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-6">
+                Ask the Clearing adviser
+              </h2>
+              <p className="font-body-serif text-muted-foreground mb-5">
+                Tell it your grades and the subject you want. It searches all{" "}
+                {total} universities in our database, compares your grades
+                against entry requirements, and tells you who is worth calling.
+              </p>
+              <ClearingAdviser />
+            </div>
+
+            <aside className="lg:col-span-5 space-y-8">
+              <div>
+                <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-4">
+                  Key dates {CLEARING_CYCLE.year}
+                </h2>
+                <ol className="space-y-0">
+                  {timeline.map((date) => (
+                    <li
+                      key={date.id}
+                      className="flex gap-4 py-3 border-b border-border last:border-0"
+                    >
+                      <span
+                        className={`font-mono text-xs whitespace-nowrap pt-0.5 ${
+                          date.passed
+                            ? "text-muted-foreground line-through"
+                            : "text-destructive font-bold"
+                        }`}
+                      >
+                        {formatDate(date.iso)}
+                      </span>
+                      <span
+                        className={`text-sm ${
+                          date.passed
+                            ? "text-muted-foreground"
+                            : "font-semibold"
+                        }`}
+                      >
+                        {date.label}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                <Link
+                  href="/clearing/key-dates"
+                  className="inline-flex items-center gap-1.5 mt-4 text-[11px] font-bold uppercase tracking-editorial hover:text-destructive transition-colors"
+                >
+                  Full calendar
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="border border-border p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="w-4 h-4" />
+                  <h3 className="text-[11px] font-bold uppercase tracking-editorial">
+                    Talk to UCAS
+                  </h3>
+                </div>
+                <p className="font-body-serif text-sm text-muted-foreground mb-3">
+                  If you are stuck on the Hub itself — your Clearing number, your
+                  status, adding a choice — UCAS can help directly.
+                </p>
+                <a
+                  href="tel:03714680468"
+                  className="font-display text-2xl font-bold hover:text-destructive transition-colors"
+                >
+                  0371 468 0468
+                </a>
+              </div>
+
+              <AdPlaceholder id="home-sidebar" format="rectangle" />
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured universities */}
+      <section className="py-12 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between border-b-2 border-foreground pb-1.5 mb-6">
+            <h2 className="text-[11px] font-bold uppercase tracking-editorial">
+              Top-ranked universities
+            </h2>
             <Link
               href="/universities"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground border border-transparent hover:border-border rounded transition-colors whitespace-nowrap"
+              className="text-[11px] font-bold uppercase tracking-editorial hover:text-destructive transition-colors"
             >
-              <span>🎓</span>
-              Unis
+              All {total} &rarr;
             </Link>
           </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {featured.map((uni) => (
+              <UniversityCard key={uni.id} university={uni} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Interactive Trend Chart */}
-      {trendingStories.length > 0 && (
-        <section className="container mx-auto px-4 py-8">
-          <TrendChart
-            stories={trendingStories.map(s => ({
-              title: s.title,
-              slug: s.slug,
-              category: s.category,
-              publishedAt: s.publishedAt,
-            }))}
-            defaultGeo={detectedCountry}
-          />
-        </section>
-      )}
-
-      {/* === MAIN CONTENT === */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-10">
-
-          {/* LEFT COLUMN: Stories Feed */}
-          <div className="lg:col-span-7 space-y-8">
-
-            {/* Top Stories */}
-            {topStories.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-6 border-b-2 border-foreground pb-2">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Top Stories</h2>
-                  <Link href="/blog" className="text-[11px] font-semibold uppercase tracking-editorial text-muted-foreground hover:text-foreground transition-colors">
-                    View all
-                  </Link>
-                </div>
-
-                {/* #1 Featured Story */}
-                <Link href={`/blog/${topStories[0].slug}`} className="block mb-8 group">
-                  <div className="relative aspect-video md:aspect-[2/1] overflow-hidden mb-4">
-                    <img
-                      src={topStories[0].imageUrl}
-                      alt={topStories[0].title}
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-editorial text-destructive">
-                      {topStories[0].category}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground uppercase tracking-editorial">
-                      {topStories[0].readingTime} min read
-                    </span>
-                  </div>
-                  <h3 className="font-display text-2xl md:text-4xl font-black leading-[1.1] mb-3 group-hover:underline decoration-2 underline-offset-4">
-                    {topStories[0].title}
-                  </h3>
-                  <p className="font-body-serif text-muted-foreground leading-relaxed line-clamp-2">{topStories[0].excerpt}</p>
-                </Link>
-
-                {/* #2 and #3 Stories */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-border pt-6">
-                  {topStories.slice(1).map((story) => (
-                    <Link key={story.slug} href={`/blog/${story.slug}`} className="group">
-                      <div className="aspect-video overflow-hidden mb-3">
-                        <img
-                          src={story.imageUrl}
-                          alt={story.title}
-                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                        />
-                      </div>
-                      <span className="text-[11px] font-bold uppercase tracking-editorial text-destructive">
-                        {story.category}
-                      </span>
-                      <h3 className="font-display text-lg md:text-xl font-extrabold mt-1 mb-2 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
-                        {story.title}
-                      </h3>
-                      <p className="font-body-serif text-sm text-muted-foreground line-clamp-2">{story.excerpt}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <AdPlaceholder id="101" format="horizontal" />
-
-            {/* More Stories */}
-            {moreStories.length > 0 && (
-              <div>
-                <div className="border-b-2 border-foreground pb-2 mb-6">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">More Stories</h2>
-                </div>
-                <div className="space-y-6 divide-y divide-border">
-                  {moreStories.map((story) => (
-                    <Link key={story.slug} href={`/blog/${story.slug}`} className="group flex gap-5 pt-6 first:pt-0">
-                      <div className="w-28 h-20 md:w-36 md:h-24 overflow-hidden shrink-0">
-                        <img src={story.imageUrl} alt={story.title} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">
-                          {story.category}
-                        </span>
-                        <h3 className="font-display text-base md:text-lg font-extrabold mt-0.5 leading-snug group-hover:underline decoration-1 underline-offset-2 line-clamp-2">
-                          {story.title}
-                        </h3>
-                        <p className="font-body-serif text-xs text-muted-foreground mt-1 line-clamp-1 hidden md:block">{story.excerpt}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <AdPlaceholder id="102" format="horizontal" />
-
-            {/* Also Trending */}
-            {restStories.length > 0 && (
-              <div>
-                <div className="border-b-2 border-foreground pb-2 mb-6">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Also Trending</h2>
-                </div>
-                <div className="divide-y divide-border">
-                  {restStories.map((story, index) => (
-                    <Link key={story.slug} href={`/blog/${story.slug}`} className="group flex items-center gap-4 py-3">
-                      <span className="font-display text-3xl font-bold text-muted-foreground/30 w-10 text-center shrink-0">
-                        {index + 7}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">
-                          {story.category}
-                        </span>
-                        <h3 className="font-semibold text-sm leading-snug group-hover:underline line-clamp-1">
-                          {story.title}
-                        </h3>
-                      </div>
-                      <span className="text-[11px] text-muted-foreground shrink-0">{story.readingTime} min</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT COLUMN: Sidebar (Desktop only) */}
-          <div className="hidden lg:block lg:col-span-5">
-            <div className="lg:sticky lg:top-28 space-y-8">
-
-              <AdPlaceholder id="201" format="rectangle" />
-
-              {/* Section Hubs */}
-              <div>
-                <div className="border-b-2 border-foreground pb-2 mb-4">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Explore Sections</h2>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {SECTION_LINKS.map((s) => (
-                    <Link
-                      key={s.name}
-                      href={s.href}
-                      className="flex items-center gap-2 p-3 border border-border hover:bg-muted/50 transition-colors group"
-                    >
-                      <span className="text-lg">{s.icon}</span>
-                      <span className="text-xs font-bold uppercase tracking-editorial group-hover:text-foreground text-muted-foreground">
-                        {s.name}
-                      </span>
-                    </Link>
-                  ))}
+      {/* Explore */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 grid gap-10 md:grid-cols-2">
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-4">
+              Browse by ranking
+            </h2>
+            <ul>
+              {RANKING_LINKS.map((ranking) => (
+                <li key={ranking.href} className="border-b border-border">
                   <Link
-                    href="/universities"
-                    className="flex items-center gap-2 p-3 border border-border hover:bg-muted/50 transition-colors group"
+                    href={ranking.href}
+                    className="group flex items-start justify-between gap-4 py-4 hover:text-destructive transition-colors"
                   >
-                    <span className="text-lg">🎓</span>
-                    <span className="text-xs font-bold uppercase tracking-editorial group-hover:text-foreground text-muted-foreground">
-                      Unis
-                    </span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Trending Stories sidebar */}
-              <div>
-                <div className="border-b-2 border-foreground pb-2 mb-4">
-                  <h2 className="text-[11px] font-bold uppercase tracking-editorial">Trending Stories</h2>
-                </div>
-                <div className="divide-y divide-border">
-                  {trendingStories.slice(0, 5).map((story) => (
-                    <Link key={story.slug} href={`/blog/${story.slug}`} className="group block py-3">
-                      <span className="text-[10px] font-bold uppercase tracking-editorial text-muted-foreground">{story.category}</span>
-                      <h4 className="font-display font-bold text-sm leading-snug mt-0.5 group-hover:underline line-clamp-2">
-                        {story.title}
-                      </h4>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-1 block">
-                        uni-uk.ai Newsroom
+                    <span>
+                      <span className="font-display text-xl font-bold block">
+                        {ranking.name}
                       </span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Newsletter Signup */}
-              <NewsletterSignup />
-            </div>
+                      <span className="text-sm text-muted-foreground">
+                        {ranking.detail}
+                      </span>
+                    </span>
+                    <ArrowRight className="w-4 h-4 mt-1.5 shrink-0" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </div>
 
-      <AdPlaceholder id="301" format="horizontal" className="container mx-auto px-4" />
-
-      {/* About Section */}
-      <section id="about" className="py-16 border-t border-border">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-3">
-                Why uni-uk.ai?
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Universal News Intelligence &mdash; every story, every angle, every 10 minutes
-              </p>
-            </div>
-
-            <div className="grid gap-px md:grid-cols-4 bg-border">
-              {[
-                { title: "Every Section", desc: "Sport, tech, crypto, entertainment, business — all in one place, all AI-powered" },
-                { title: "Real-Time", desc: "Updated every 10 minutes so you never miss what's happening right now" },
-                { title: "Multi-Source", desc: "Stories cross-validated across Google Trends, Reddit and 10 UK news outlets" },
-                { title: "Always Free", desc: "Universal access to intelligent news — no paywalls, no sign-up required" },
-              ].map((item) => (
-                <div key={item.title} className="bg-background p-6 text-center">
-                  <h3 className="font-display text-lg font-bold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-editorial border-b-2 border-foreground pb-1.5 mb-4">
+              Browse by region
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {REGION_LINKS.map((region) => (
+                <Link
+                  key={region.slug}
+                  href={`/regions/${region.slug}`}
+                  className="border border-border px-4 py-2.5 text-sm font-semibold hover:border-foreground transition-colors"
+                >
+                  {region.name}
+                </Link>
               ))}
             </div>
+            <p className="font-body-serif text-sm text-muted-foreground mt-6">
+              Where you study changes your cost of living as much as your course
+              does. Each region page compares rent, transport and the character
+              of the cities in it.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-10">
-        <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="font-display text-xl font-bold mb-4">
-            uni-uk<span className="text-destructive">.ai</span>
-          </div>
-          <p className="text-xs text-muted-foreground uppercase tracking-editorial">
-            Universal News Intelligence
-          </p>
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
-            <Link href="/editorial-policy" className="hover:text-foreground transition-colors">Editorial Policy</Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">Stories</Link>
-            <Link href="/sport" className="hover:text-foreground transition-colors">Sport</Link>
-            <Link href="/tech" className="hover:text-foreground transition-colors">Tech</Link>
-            <Link href="/entertainment" className="hover:text-foreground transition-colors">Entertainment</Link>
-            <Link href="/business" className="hover:text-foreground transition-colors">Business</Link>
-            <Link href="/crypto" className="hover:text-foreground transition-colors">Crypto</Link>
-            <Link href="/universities" className="hover:text-foreground transition-colors">Universities</Link>
-          </div>
-          <p className="text-muted-foreground text-xs">
-            &copy; {new Date().getFullYear()} uni-uk.ai &middot; Powered by AI &middot; Updated every 10 minutes
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

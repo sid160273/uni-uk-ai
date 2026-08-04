@@ -14,6 +14,7 @@ import { postToBluesky } from '@/lib/bluesky';
 import { postToThreads } from '@/lib/threads';
 import { formatStoryTweet, formatBreakingTweet, formatBlueskyPost, formatThreadsPost } from '@/lib/tweet-formatter';
 import { fetchAggregatedTrends, ScoredTrend } from '@/lib/trend-aggregator';
+import { fetchEducationNews, isEducationStory } from '@/lib/education-sources';
 
 const ALERT_EMAIL = 'sidspace.info@gmail.com';
 
@@ -49,20 +50,56 @@ export async function GET(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Step 1: Fetch trending topics from all sources (Google Trends + Reddit)
-    console.log('Fetching trending topics from aggregated sources...');
-    const trendingTopics = await fetchAggregatedTrends();
+    // Step 1: Fetch topics.
+    //
+    // The site is a UK university and Clearing publication, so education news
+    // is the primary source. General trends are still consulted, but only the
+    // education-relevant ones survive the filter — that way a genuinely big
+    // admissions story trending nationally still gets picked up, while sport
+    // and crypto do not. Set EDUCATION_ONLY=false to restore the old
+    // general-news behaviour.
+    const educationOnly = process.env.EDUCATION_ONLY !== 'false';
+
+    console.log(
+      `Fetching topics (mode: ${educationOnly ? 'education/Clearing' : 'general news'})...`
+    );
+
+    const [educationNews, generalTrends] = await Promise.all([
+      educationOnly ? fetchEducationNews() : Promise.resolve([]),
+      fetchAggregatedTrends(),
+    ]);
+
+    // Education stories carry no aggregator score, so give them one that puts
+    // them above general trends without discarding the aggregator's ranking
+    // within each group.
+    const educationTopics: ScoredTrend[] = educationNews.map((item, i) => ({
+      ...item,
+      sources: ['UK Education'],
+      sourceCount: 1,
+      score: 1000 - i,
+      velocity: 'trending' as const,
+    }));
+
+    const filteredGeneral = educationOnly
+      ? generalTrends.filter(t => isEducationStory(t.title, t.description))
+      : generalTrends;
+
+    const trendingTopics: ScoredTrend[] = [...educationTopics, ...filteredGeneral];
 
     if (trendingTopics.length === 0) {
       return NextResponse.json({
         success: false,
-        message: 'No trending topics found',
+        message: educationOnly
+          ? 'No education or Clearing stories found this cycle'
+          : 'No trending topics found',
         duration: Date.now() - startTime,
       });
     }
 
-    const crossValidated = trendingTopics.filter(t => t.sourceCount > 1).length;
-    console.log(`Found ${trendingTopics.length} trending topics (${crossValidated} cross-validated)`);
+    console.log(
+      `Found ${trendingTopics.length} topics: ${educationTopics.length} from education feeds, ` +
+      `${filteredGeneral.length} of ${generalTrends.length} general trends passed the education filter`
+    );
 
     // Step 2: Filter out topics we already have stories for
     // Check by matching the trending topic keyword against existing story titles/slugs

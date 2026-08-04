@@ -1,6 +1,7 @@
 import { getUniversitiesByRegion, getRegionMetadata } from "@/lib/data";
 import { UniversityCard } from "@/components/UniversityCard";
 import { MainNavigation } from "@/components/MainNavigation";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Ad } from "@/components/Ad";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { MapPin } from "lucide-react";
@@ -101,25 +102,19 @@ export default async function RegionPage({ params }: PageProps) {
       <MainNavigation />
 
       {/* Header */}
-      <section className="py-12 bg-gradient-to-br from-blue-50 via-background to-violet-50 dark:from-blue-950/20 dark:via-background dark:to-violet-950/20">
+      <section className="border-b border-border py-10 md:py-14">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-              <MapPin className="w-4 h-4" />
-              {metadata.name}
-            </div>
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+          <div className="max-w-3xl">
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-editorial text-destructive mb-3">
+              <MapPin className="w-3.5 h-3.5" />
+              {universities.length} universities
+            </p>
+            <h1 className="font-display text-4xl md:text-6xl font-black tracking-tight leading-[0.96] mb-4">
               {metadata.name}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="font-body-serif text-lg text-muted-foreground">
               {metadata.description}
             </p>
-            <div className="mt-6 flex items-center justify-center gap-4 text-sm">
-              <div className="bg-background border rounded-lg px-4 py-2">
-                <span className="font-bold text-primary">{universities.length}</span>
-                <span className="text-muted-foreground ml-1">Universities</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -153,37 +148,36 @@ export default async function RegionPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Back to Browse */}
-      <section className="py-8 border-t">
-        <div className="container mx-auto px-4 text-center">
-          <Link
-            href="/universities"
-            className="inline-flex items-center gap-2 text-primary hover:underline"
-          >
-            ← Browse All Universities
-          </Link>
+      {/* Next steps */}
+      <section className="border-t border-border py-12">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <h2 className="font-display text-3xl font-bold mb-3">
+            Calling universities in {metadata.name}?
+          </h2>
+          <p className="font-body-serif text-muted-foreground mb-6">
+            Regional demand is uneven in Clearing. Courses that fill instantly in
+            one part of the UK stay open for days in another — which is why
+            widening your search geographically is usually the fastest way to
+            find a place.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/clearing"
+              className="inline-flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[11px] font-bold uppercase tracking-editorial hover:opacity-90 transition-opacity"
+            >
+              Clearing guide
+            </Link>
+            <Link
+              href="/universities"
+              className="inline-flex items-center gap-2 border border-foreground px-5 py-2.5 text-[11px] font-bold uppercase tracking-editorial hover:bg-muted transition-colors"
+            >
+              All universities
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12 bg-muted/50">
-        <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/#about" className="hover:text-foreground transition-colors">
-              About
-            </Link>
-            <Link href="/universities" className="hover:text-foreground transition-colors">
-              Universities
-            </Link>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

@@ -8,12 +8,14 @@ import { getSection } from "@/lib/sections";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
 const section = getSection('entertainment')!;
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: `${section.name} News Today | Trending Celebrity & Culture Stories | uni-uk.ai`,
   description: `${section.tagline}. AI-powered entertainment news updated every 10 minutes — celebrities, TV, film, music, and viral moments.`,
   keywords: ["entertainment news", "celebrity news", "trending entertainment", "TV news", "film news", "music news", "pop culture", "viral moments"],

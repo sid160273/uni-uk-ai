@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 // Force dynamic rendering to always show fresh content
 export const dynamic = 'force-dynamic';
@@ -33,6 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ogImageUrl = `https://uni-uk.ai/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`;
 
   return {
+    robots: NOINDEX_FOLLOW,
     title: `${post.title} | Trending ${post.category} News`,
     description: truncatedExcerpt,
     keywords: [...post.tags, "trending news", post.category.toLowerCase(), "what's trending"],

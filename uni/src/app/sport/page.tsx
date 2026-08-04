@@ -8,12 +8,14 @@ import { getSection } from "@/lib/sections";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
 const section = getSection('sport')!;
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: `${section.name} News Today | Trending Sports Stories | uni-uk.ai`,
   description: `${section.tagline}. AI-powered sports news updated every 10 minutes — Premier League, F1, tennis, boxing, cricket and more.`,
   keywords: ["sports news", "trending sports", "Premier League", "F1 news", "Champions League", "transfer news", "sports today", "football news"],

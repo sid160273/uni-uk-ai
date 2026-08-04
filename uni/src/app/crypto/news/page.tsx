@@ -4,10 +4,12 @@ import { AdPlaceholder } from "@/components/AdPlaceholder";
 import { getCryptoPosts } from "@/lib/crypto-data";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: "Crypto News & Market Analysis | uni-uk.ai",
   description: "AI-powered cryptocurrency news and market analysis. Bitcoin, Ethereum, Solana and more — updated every hour with expert insights.",
   keywords: ["crypto news", "bitcoin news", "cryptocurrency analysis", "market analysis", "crypto updates"],

@@ -1,164 +1,87 @@
 import { MetadataRoute } from 'next'
-import { getAllUniversities } from '@/lib/data'
-import { getAllBlogPostsCombined, getAllCategoriesCombined } from '@/lib/blog-data'
-import { getCryptoPosts } from '@/lib/crypto-data'
-import { getAllTopics } from '@/lib/topic-utils'
+import { getAllUniversities, REGION_SLUGS } from '@/lib/data'
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+/**
+ * Sitemap for uni-uk.ai as a UK university and Clearing site.
+ *
+ * Deliberately excluded: /blog/*, /blog/category/*, /topic/*, /crypto/* and the
+ * sport/tech/business/entertainment hubs. Those are the legacy general-news
+ * archive — tens of thousands of URLs that made Google read this as a stale
+ * news portal. They stay live and are marked noindex,follow (see src/lib/seo.ts)
+ * rather than being deleted, so no inbound link 404s.
+ *
+ * To bring a section back into the index, remove NOINDEX_FOLLOW from its
+ * metadata and add its URLs back here.
+ */
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://uni-uk.ai'
+  const now = new Date()
 
-  // Get all universities
-  const universities = getAllUniversities()
-
-  // Generate university page URLs
-  const universityUrls = universities.map((uni) => ({
+  const universityUrls = getAllUniversities().map((uni) => ({
     url: `${baseUrl}/universities/${uni.slug}`,
-    lastModified: new Date(),
+    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  // Regional pages
-  const regions = [
-    'scotland',
-    'wales',
-    'northern-ireland',
-    'london',
-    'north-england',
-    'midlands',
-    'south-west-england',
-    'south-east-england',
-    'east-england',
-  ]
-
-  const regionUrls = regions.map((region) => ({
+  const regionUrls = REGION_SLUGS.map((region) => ({
     url: `${baseUrl}/regions/${region}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }))
-
-  // Get all blog posts (static + dynamic from Google Sheets)
-  const blogPosts = await getAllBlogPostsCombined()
-
-  const blogUrls = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
+    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
 
-  // Get blog categories for category pages
-  const categories = await getAllCategoriesCombined()
+  // Clearing is the priority cluster for this cycle.
+  const clearingUrls = [
+    '/clearing',
+    '/clearing/how-it-works',
+    '/clearing/missed-grades',
+    '/clearing/better-than-expected',
+    '/clearing/key-dates',
+  ].map((path) => ({
+    url: `${baseUrl}${path}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: path === '/clearing' ? 0.95 : 0.9,
+  }))
 
-  const categoryUrls = categories.map((category) => ({
-    url: `${baseUrl}/blog/category/${category.toLowerCase().replace(/\s+/g, '-')}`,
-    lastModified: new Date(),
+  const rankingUrls = [
+    '/rankings/academic',
+    '/rankings/satisfaction',
+    '/rankings/sports',
+  ].map((path) => ({
+    url: `${baseUrl}${path}`,
+    lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.6,
+    priority: 0.8,
   }))
 
-  // Get all topics for topic hub pages
-  const topics = await getAllTopics()
-
-  const topicUrls = topics.map((topic) => ({
-    url: `${baseUrl}/topic/${topic}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.5,
-  }))
-
-  // Section hub pages
-  const sectionHubUrls = [
-    { slug: 'sport', priority: 0.95 },
-    { slug: 'tech', priority: 0.95 },
-    { slug: 'entertainment', priority: 0.95 },
-    { slug: 'business', priority: 0.95 },
-  ].map(({ slug, priority }) => ({
-    url: `${baseUrl}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'hourly' as const,
-    priority,
-  }))
+  const trustUrls = ['/about', '/editorial-policy', '/contact', '/privacy'].map(
+    (path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
+    })
+  )
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      lastModified: now,
+      changeFrequency: 'daily' as const,
       priority: 1,
     },
-    ...sectionHubUrls,
+    ...clearingUrls,
     {
       url: `${baseUrl}/universities`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      lastModified: now,
+      changeFrequency: 'daily' as const,
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/rankings/academic`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/rankings/sports`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/rankings/satisfaction`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/editorial-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
+    ...rankingUrls,
     ...regionUrls,
     ...universityUrls,
-    ...blogUrls,
-    ...categoryUrls,
-    ...topicUrls,
-    {
-      url: `${baseUrl}/crypto`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/crypto/news`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
-      priority: 0.8,
-    },
+    ...trustUrls,
   ]
 }

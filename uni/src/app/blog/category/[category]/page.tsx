@@ -6,6 +6,7 @@ import { deduplicatePosts } from "@/lib/dedup-posts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const categoryName = slugToName(category);
 
   return {
+    robots: NOINDEX_FOLLOW,
     title: `${categoryName} Trending Stories Today | What's Trending in ${categoryName}`,
     description: `Latest trending ${categoryName.toLowerCase()} stories and breaking news. Discover what everyone is searching for right now with AI-powered insights, updated every 10 minutes.`,
     keywords: [`${categoryName.toLowerCase()} news`, "trending stories today", "what's trending", `trending ${categoryName.toLowerCase()}`, "breaking news", "news today"],

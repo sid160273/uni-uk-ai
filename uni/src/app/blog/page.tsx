@@ -6,8 +6,10 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { deduplicatePosts } from "@/lib/dedup-posts";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { NOINDEX_FOLLOW } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  robots: NOINDEX_FOLLOW,
   title: "Trending Stories Today | What's Trending Now | Breaking News",
   description:
     "Read the latest trending stories and breaking news. AI-powered coverage of what everyone is searching for — sports, politics, entertainment, tech. Updated every 10 minutes.",
