@@ -303,6 +303,16 @@ export function ClearingAdviser() {
         </button>
       </form>
 
+      {/* Disclosure at the point of collection, not just in the policy */}
+      <p className="px-3 pb-3 text-[11px] leading-snug text-muted-foreground">
+        Replies are AI-generated and can be wrong — always confirm with the
+        university. Conversations are stored for 12 months to improve the
+        adviser. Please don&apos;t type personal details.{" "}
+        <Link href="/privacy" className="underline hover:text-foreground">
+          Privacy
+        </Link>
+      </p>
+
       {/* Recommendations */}
       {recommendations.length > 0 && (
         <div className="border-t border-border p-4">

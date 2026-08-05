@@ -1,6 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Metadata } from "next";
+import { MainNavigation } from "@/components/MainNavigation";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
     title: "Privacy Policy | GDPR Compliance & Data Protection",
@@ -25,32 +26,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
     return (
         <div className="min-h-screen bg-background">
-            {/* Navigation */}
-            <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center">
-                        <Image
-                            src="/logo.png"
-                            alt="uni-uk.ai Logo"
-                            width={200}
-                            height={40}
-                            className="h-8 md:h-10 w-auto"
-                            priority
-                        />
-                    </Link>
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-                        <Link href="/#how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
-                        <Link href="/universities" className="hover:text-foreground transition-colors">Universities</Link>
-                        <Link href="/#about" className="hover:text-foreground transition-colors">About</Link>
-                    </div>
-                    <Link
-                        href="/"
-                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors inline-block"
-                    >
-                        Back to Home
-                    </Link>
-                </div>
-            </nav>
+            <MainNavigation />
 
             {/* Content */}
             <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -86,6 +62,34 @@ export default function PrivacyPage() {
 
                         <div className="bg-card border rounded-lg p-6 space-y-4">
                             <div>
+                                <h3 className="font-semibold text-lg mb-2">Clearing Adviser Conversations</h3>
+                                <p className="text-muted-foreground">
+                                    Our Clearing adviser is an AI chat feature. When you send it a message, we process and
+                                    <strong className="text-foreground"> store</strong> the following:
+                                </p>
+                                <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground">
+                                    <li>The full text of the messages you send</li>
+                                    <li>The full text of the adviser&apos;s replies</li>
+                                    <li>Details the adviser infers from your messages in order to give better advice — the subject you want to study, the grades you mention, whether you are a UK or international applicant, your home country, and your preferred location</li>
+                                    <li>A timestamp and a message number</li>
+                                </ul>
+                                <p className="text-muted-foreground mt-3">
+                                    These transcripts are sent to OpenAI to generate a reply, and are recorded in a private
+                                    Google Sheet that we use to understand what students are asking and improve the adviser.
+                                    They are not linked to your name, email address or account, because we do not ask for any
+                                    of those.
+                                </p>
+                                <div className="mt-3 border-l-2 border-destructive pl-4">
+                                    <p className="text-muted-foreground">
+                                        <strong className="text-foreground">Please do not type personal details into the adviser.</strong> It
+                                        does not need your full name, address, date of birth, UCAS Personal ID, Clearing number or
+                                        contact details to help you, and you should not share them. If you do include such details,
+                                        they will be stored in the transcript — contact us and we will delete it.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div>
                                 <h3 className="font-semibold text-lg mb-2">Analytics Data</h3>
                                 <p className="text-muted-foreground">
                                     We use Google Analytics to understand how visitors use our site. This includes anonymized data such as:
@@ -118,8 +122,8 @@ export default function PrivacyPage() {
                             Under GDPR, we process data based on the following legal grounds:
                         </p>
                         <ul className="list-disc list-inside mt-2 space-y-2 text-muted-foreground">
+                            <li><strong className="text-foreground">Consent:</strong> By choosing to send a message to the Clearing adviser, you consent to your messages being processed and stored as described in section 3. You do not have to use the adviser — every university page, ranking and Clearing guide on this site works without it</li>
                             <li><strong className="text-foreground">Legitimate Interests:</strong> We process analytics data to improve our service and understand user needs</li>
-                            <li><strong className="text-foreground">Consent:</strong> By using our website, you consent to the processing described in this policy</li>
                             <li><strong className="text-foreground">Legal Obligation:</strong> We may process data to comply with legal requirements</li>
                         </ul>
                     </section>
@@ -129,13 +133,17 @@ export default function PrivacyPage() {
                         <h2 className="text-2xl font-semibold mb-4">5. How We Use Your Data</h2>
                         <p className="text-muted-foreground leading-relaxed mb-2">We use collected data solely for:</p>
                         <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                            <li>Generating replies from the Clearing adviser and matching your grades and subject against our university database</li>
+                            <li>Reviewing adviser transcripts to find where its answers were wrong, unhelpful or incomplete, and improving them</li>
                             <li>Improving website functionality and user experience</li>
                             <li>Understanding usage patterns through anonymized analytics</li>
                             <li>Ensuring website security and preventing abuse</li>
                         </ul>
                         <p className="text-muted-foreground leading-relaxed mt-4">
                             <strong className="text-foreground">We do not:</strong> Sell your data, share it with third parties for marketing purposes,
-                            or use it for any purpose other than those listed above.
+                            pass your details to universities or agents, or use it for any purpose other than those listed above.
+                            We do not use your conversations to train our own AI models, and OpenAI does not use API data to train
+                            theirs.
                         </p>
                     </section>
 
@@ -171,9 +179,23 @@ export default function PrivacyPage() {
                             <div className="bg-card border rounded-lg p-4">
                                 <h3 className="font-semibold mb-2">OpenAI</h3>
                                 <p className="text-muted-foreground text-sm">
-                                    Powers our AI-generated news articles. Content is generated by OpenAI's API.
-                                    View their{' '}
-                                    <a href="https://openai.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                    Powers our Clearing adviser and generates our articles.{' '}
+                                    <strong className="text-foreground">The messages you send to the adviser are transmitted to OpenAI&apos;s API</strong>{' '}
+                                    in order to produce a reply. OpenAI does not use data submitted through its API to train its
+                                    models, and states that API data is retained for up to 30 days for abuse monitoring before
+                                    deletion. View their{' '}
+                                    <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                        privacy policy
+                                    </a>.
+                                </p>
+                            </div>
+
+                            <div className="bg-card border rounded-lg p-4">
+                                <h3 className="font-semibold mb-2">Google Sheets</h3>
+                                <p className="text-muted-foreground text-sm">
+                                    We store Clearing adviser transcripts and our article content in a private Google Sheet,
+                                    accessible only to us via a service account. View Google&apos;s{' '}
+                                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                                         privacy policy
                                     </a>.
                                 </p>
@@ -212,6 +234,7 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">8. Data Retention</h2>
                         <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                            <li><strong className="text-foreground">Clearing Adviser Transcripts:</strong> Retained for 12 months from the date of the conversation, then deleted. You can ask us to delete yours sooner — see section 9</li>
                             <li><strong className="text-foreground">Analytics Data:</strong> Retained for 26 months (Google Analytics default)</li>
                             <li><strong className="text-foreground">Server Logs:</strong> Automatically deleted after 30 days</li>
                         </ul>
@@ -255,9 +278,19 @@ export default function PrivacyPage() {
                             </div>
                         </div>
 
+                        <div className="bg-card border rounded-lg p-6 mt-4">
+                            <h3 className="font-semibold text-lg mb-2">Deleting your Clearing adviser conversation</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Because we do not ask for your name or email, we cannot look up your conversation from your
+                                identity alone. To have a transcript deleted, contact us via our{' '}
+                                <Link href="/contact" className="text-primary hover:underline">contact page</Link> with the
+                                approximate date and time you used the adviser and roughly what you asked about. That is
+                                normally enough for us to find and delete it. We will confirm once it is done.
+                            </p>
+                        </div>
                         <p className="text-muted-foreground leading-relaxed mt-4">
-                            Given that we collect minimal personal data, there is typically very little personal data to access or delete.
-                            However, if you wish to exercise any of these rights, please contact us.
+                            Outside of adviser transcripts we hold very little that identifies you — our analytics are
+                            anonymized and we operate no user accounts. To exercise any of these rights, please contact us.
                         </p>
                     </section>
 
@@ -291,11 +324,21 @@ export default function PrivacyPage() {
 
                     {/* Children's Privacy */}
                     <section>
-                        <h2 className="text-2xl font-semibold mb-4">12. Children's Privacy</h2>
+                        <h2 className="text-2xl font-semibold mb-4">12. Under-18s</h2>
+                        <p className="text-muted-foreground leading-relaxed mb-3">
+                            Most people using this site are 16 to 18 years old, and we design it on that basis. We do not
+                            operate accounts, we never ask for a name, email address, phone number or date of birth, and we
+                            do not build profiles of individual users or use their data for targeted advertising.
+                        </p>
+                        <p className="text-muted-foreground leading-relaxed mb-3">
+                            The Clearing adviser is the one place where a young person could type something identifying, which
+                            is why we ask them not to, and why we store transcripts without any identity attached and delete
+                            them after 12 months.
+                        </p>
                         <p className="text-muted-foreground leading-relaxed">
-                            Our service is intended for prospective university students and may be used by individuals under 18.
-                            We do not knowingly collect personal information from children. The minimal data we process (anonymized analytics)
-                            does not identify individuals. Parents or guardians with concerns should contact us.
+                            Parents and guardians: if you believe your child has shared personal details with the adviser and
+                            you want the conversation deleted, contact us with the approximate date and topic and we will
+                            remove it. You do not need to prove anything to us to have a transcript deleted.
                         </p>
                     </section>
 
@@ -339,32 +382,18 @@ export default function PrivacyPage() {
                     <section className="bg-primary/5 border-l-4 border-primary rounded-lg p-6">
                         <h2 className="text-2xl font-semibold mb-4">Summary</h2>
                         <p className="text-muted-foreground leading-relaxed">
-                            <strong className="text-foreground">In simple terms:</strong> We collect minimal data,
-                            use anonymized analytics to improve the site, and never sell your data. We're committed to your privacy and comply with GDPR regulations.
+                            <strong className="text-foreground">In simple terms:</strong> Browsing this site is anonymous —
+                            no account, no name, no email. If you use the Clearing adviser, we do keep what you typed and what
+                            it replied, for 12 months, so we can make it better; it is sent to OpenAI to generate the answer,
+                            it is not linked to your identity, and you can ask us to delete it at any time. We never sell your
+                            data or pass your details to universities or agents. Please do not type personal details into the
+                            adviser — it does not need them.
                         </p>
                     </section>
                 </div>
             </div>
 
-            {/* Footer */}
-            <footer className="border-t py-12 bg-muted/50 mt-12">
-                <div className="container mx-auto px-4 text-center space-y-4">
-                    <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-                        <Link href="/privacy" className="hover:text-foreground transition-colors font-medium">
-                            Privacy Policy
-                        </Link>
-                        <Link href="/#about" className="hover:text-foreground transition-colors">
-                            About
-                        </Link>
-                        <Link href="/universities" className="hover:text-foreground transition-colors">
-                            Universities
-                        </Link>
-                    </div>
-                    <p className="text-muted-foreground text-sm">
-                        &copy; {new Date().getFullYear()} uni-uk.ai. All rights reserved.
-                    </p>
-                </div>
-            </footer>
+            <SiteFooter />
         </div>
     );
 }
